@@ -1,0 +1,34 @@
+/* apps/admin/src/styles/variables.css */
+:root {
+  /* === Brand Colors === */
+  --primary: #a2ad91; /* Muted Rose - buttons, links */
+  --success: #4cb944; /* Fresh Green - success, active */
+  --background: #fcfaf9;
+  --sidebar-bg: #5603ad;
+  --header-bg: #023618; /* Deep Blue - header */
+  --text-dark: #120309; /* Rich Plum - main text */
+  --white: #ffffff;
+  --accent: #857e61;
+
+  /* === Layout === */
+  --header-height: 64px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  --border-color: #e1e4e8;
+  --bg-layout: var(--background);
+  --transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  /* === Typography === */
+  --font-base: 14px;
+  --font-medium: 16px;
+  --font-large: 18px;
+
+  /* === Shadows === */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* === Borders & Radius === */
+  --border-radius: 8px;
+  --border-radius-sm: 6px;
+}
