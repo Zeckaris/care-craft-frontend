@@ -1,23 +1,18 @@
-import { Avatar, Dropdown, Input, Menu, Space, Tooltip } from "antd";
+import { Avatar, Dropdown, Input, Layout, Menu, Space, Tooltip } from "antd";
 import { UserOutlined, SettingOutlined, BellOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 const { Search } = Input;
+const { Header: AntHeader } = Layout;
 
-interface HeaderProps {
-  collapsed?: boolean;
-}
-
-const Header = ({ collapsed }: HeaderProps) => {
+const Header = () => {
   const navigate = useNavigate();
 
   const userMenu = (
     <Menu
       onClick={({ key }) => {
         if (key === "profile") navigate("/admin/profile");
-        if (key === "logout") {
-          console.log("Logout");
-        }
+        if (key === "logout") console.log("Logout");
       }}
     >
       <Menu.Item key="profile">Profile</Menu.Item>
@@ -28,27 +23,27 @@ const Header = ({ collapsed }: HeaderProps) => {
   );
 
   return (
-    <header className="admin-header">
-      {/* === LEFT: SEARCH BAR === */}
+    <AntHeader className="admin-header">
+      {/* LEFT: Search */}
       <div className="header-search">
         <Search
           placeholder="Search students, teachers, subjects..."
           allowClear
-          enterButton
           size="middle"
-          className="search-input"
+          enterButton
+          onSearch={(value) => console.log("Search:", value)}
         />
       </div>
 
-      {/* === RIGHT: ICONS + AVATAR === */}
-      <Space size="middle" className="header-actions">
+      {/* RIGHT: Icons + Avatar Dropdown */}
+      <Space className="header-actions" size="middle">
         <Tooltip title="Notifications">
-          <BellOutlined className="header-icon" />
+          <BellOutlined className="anticon" />
         </Tooltip>
 
         <Tooltip title="Settings">
           <SettingOutlined
-            className="header-icon"
+            className="anticon"
             onClick={() => navigate("/admin/settings")}
           />
         </Tooltip>
@@ -58,14 +53,10 @@ const Header = ({ collapsed }: HeaderProps) => {
           placement="bottomRight"
           trigger={["click"]}
         >
-          <Avatar
-            size="large"
-            icon={<UserOutlined />}
-            className="header-avatar"
-          />
+          <Avatar className="ant-avatar" icon={<UserOutlined />} />
         </Dropdown>
       </Space>
-    </header>
+    </AntHeader>
   );
 };
 

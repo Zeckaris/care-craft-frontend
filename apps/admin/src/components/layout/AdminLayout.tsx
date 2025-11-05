@@ -39,7 +39,7 @@ export const AdminLayout = () => {
           transition: "margin-left 0.2s",
         }}
       >
-        <Header collapsed={collapsed} />
+        <Header />
 
         <Content className="admin-content">
           <div className="admin-content-inner">
