@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -11,13 +11,19 @@ import {
 } from "antd";
 import { useAdminSignup } from "@/hooks/useAdminSignup";
 import { useVerifyEmail } from "@/hooks/useVerifyEmai";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 export default function AdminSignupPage() {
   const [form] = Form.useForm();
   const [codeSent, setCodeSent] = useState(false);
-  const { loading: signupLoading, role, signup } = useAdminSignup();
+  const {
+    loading: signupLoading,
+    role,
+    signup,
+    isSignupSuccess,
+  } = useAdminSignup();
   const [error, setError] = useState<string | null>(null);
   const {
     sendCode,
@@ -25,6 +31,16 @@ export default function AdminSignupPage() {
     canResend,
     countdown,
   } = useVerifyEmail();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSignupSuccess) {
+      const timer = setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSignupSuccess, navigate]);
 
   const onFinish = async (values: any) => {
     setError(null);

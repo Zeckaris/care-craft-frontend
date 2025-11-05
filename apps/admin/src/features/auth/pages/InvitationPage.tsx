@@ -7,7 +7,6 @@ import {
   Card,
   message,
   Typography,
-  Space,
   Alert,
 } from "antd";
 import { useApi } from "@/hooks/useApi";
@@ -23,7 +22,10 @@ export default function InviteAdminPage() {
 
   const onFinish = async (values: any) => {
     setError(null);
-    const res = await post("/adminstrator/send-invite", values);
+    const res = await post({
+      url: "/adminstrator/send-invite",
+      body: values,
+    });
 
     if (!res) {
       setError("Invitation failed. Please try again.");

@@ -24,14 +24,14 @@ export const useVerifyEmail = () => {
     }
 
     try {
-      const res = await post('/auth/sendVerification', { email });
+      const res = await post( { url : '/auth/sendVerification', body:{email}  });
       if (res.success) {
         message.success(res.message || 'Verification code sent!');
         setCanResend(false);
         setCountdown(60); 
       }
     } catch (error) {
-      // Error already shown in useApi
+      message.error("Failed to send verification")
     }
   };
 

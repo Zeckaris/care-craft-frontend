@@ -3,21 +3,25 @@ import { message } from 'antd';
 import { useApi } from '@/hooks/useApi';
 
 export const useAdminSignup = () => {
-  const { loading, post } = useApi();
+  const { post, postMutation } = useApi();
+  const { isPending } = postMutation;
   const [role, setRole] = useState<'admin' | 'coordinator' | null>(null);
+  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
 
   const signup = async (data: any) => {
-    const res = await post('/auth/signup', data);
+    setIsSignupSuccess(false);
+    const res = await post({url : '/auth/signup', body: data});
 
     if (res.success) {
       // Role comes back in response.data.role (optional)
       if (res.data?.role) {
         setRole(res.data.role);
       }
+      setIsSignupSuccess(true);
       message.success(res.message || 'Account created!');
     }
     // Error already shown in useApi
   };
 
-  return { loading, role, signup };
+  return { loading: isPending, role, signup, isSignupSuccess };
 };
