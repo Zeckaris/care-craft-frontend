@@ -1,16 +1,7 @@
-import AdminSignupPage from "@/features/auth/AdminSignupPage";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+import { router } from "@/router";
+import "@/styles/index.css";
 
-function App() {
-  return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/signup" element={<AdminSignupPage />} />
-        </Routes>
-      </BrowserRouter>
-    </>
-  );
+export default function App() {
+  return <RouterProvider router={router} />;
 }
-
-export default App;
