@@ -8,13 +8,8 @@ export const useLogin = () => {
 
   const login = async (email: string, password: string) => {
     setError(null);
-    const res = await post('/auth/signin', { email, password });
-
-    if (!res) {
-      setError('Login failed. Please try again.');
-      return null;
-    }
-
+    try{
+    const res = await post( { url: '/auth/signin', body: { email, password }});
     if (res.success) {
       message.success(res.message || 'Login successful!');
       return res.data.user; // { id, email, role }
@@ -23,6 +18,10 @@ export const useLogin = () => {
       setError(`${res.message || 'Invalid email or password'}${statusInfo}`);
       return null;
     }
+    }catch(err){
+      setError('Login failed. Please try again.');
+      return null;
+    }  
   };
 
   return { login, loading, error, setError };

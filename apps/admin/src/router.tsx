@@ -3,6 +3,7 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import { DashboardPage } from "@/features/admin/pages/DashboardPage";
 import AdminSignupPage from "@/features/auth/AdminSignupPage";
 import InviteAdminPage from "@/features/auth/pages/InvitationPage";
+import SignInPage from "./features/auth/pages/SignInPage";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ export const router = createBrowserRouter([
         handle: { crumb: () => "Dashboard" },
       },
       // We'll add more admin routes later
+      {
+        path: "signin",
+        element: <SignInPage />,
+      },
     ],
   },
   {

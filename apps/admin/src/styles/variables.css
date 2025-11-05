@@ -154,11 +154,11 @@
 .palette-7 {
   --palette-primary: #0ea5e9;
   --palette-success: #22c55e;
-  --palette-accent: #f97316; /* Coral Orange */
-  --palette-bg: #f0f9ff; /* Very light blue */
-  --palette-text: #1e293b; /* Deep slate */
-  --palette-sidebar: #0369a1; /* Deep sky */
-  --palette-header: #0284c7; /* Rich blue */
+  --palette-accent: #f97316;
+  --palette-bg: #f0f9ff;
+  --palette-text: #1e293b;
+  --palette-sidebar: #0369a1;
+  --palette-header: #0284c7;
 
   --sidebar-text: #ffffff;
   --sidebar-hover: rgba(255, 255, 255, 0.2);

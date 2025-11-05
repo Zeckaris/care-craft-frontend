@@ -1,24 +1,40 @@
-import { useState } from 'react';
 import { message } from 'antd';
 import apiClient from '@/services/api-client'; 
+import { useMutation, useQuery, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 
 export const useApi = () => {
-  const [loading, setLoading] = useState(false);
+  const queryClient= useQueryClient();
 
-  const request = async (method: 'get' | 'post' | 'put' | 'delete', url: string, data?: any) => {
-    setLoading(true);
-    try {
-      const response = await apiClient[method](url, data);
-      return response.data; 
-    } catch (error: any) {
-      const msg = error.response?.data?.message || 'Request failed';
-      message.error(msg);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const get= (url: string, options={})=>{
+    return useQuery({
+      queryKey: [url],
+      queryFn: ()=>apiClient.get(url).then(r =>r.data),
+      ...options,
+    })
+  }
+  const createMutation = <TData= any, TVariables = any>( method: 'post' | 'put' | 'delete', options?: UseMutationOptions<TData, any, TVariables>)=>{
+    return useMutation({
+      mutationFn: (vars : any)=> apiClient[method](vars.url, vars.body).then(r => r.data),
+      onSuccess: (res: any, variables : any)=>{
+        message.success(res.message || 'Success!')
+        const base = variables.url.split('/')[1];
+        queryClient.invalidateQueries({ queryKey: [base] });
+      },
+      onError: (error:any)=>{
+        const msg= error.response?.data?.message || 'Request Failed'
+        message.error(msg);
+      },
+       ...options,
+    })
+  }
 
-  return { loading, get: (url: string) => request('get', url), post: (url: string, data: any) => request('post', url, data) };
+  const post= createMutation('post');
+  const put= createMutation('put')
+  const del= createMutation('delete')
+
+
+  return { loading: false, get , post: post.mutateAsync, put : put.mutateAsync,
+    delete: del.mutateAsync, postMutation: post, putMutation: put, deleteMutation: del,
+   };
 };
