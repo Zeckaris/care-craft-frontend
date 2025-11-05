@@ -1,34 +1,108 @@
-/* apps/admin/src/styles/variables.css */
+/* === SEMANTIC COLOR VARIABLES === */
 :root {
-  /* === Brand Colors === */
-  --primary: #a2ad91; /* Muted Rose - buttons, links */
-  --success: #4cb944; /* Fresh Green - success, active */
-  --background: #fcfaf9;
-  --sidebar-bg: #5603ad;
-  --header-bg: #023618; /* Deep Blue - header */
-  --text-dark: #120309; /* Rich Plum - main text */
+  --primary: var(--palette-primary);
+  --success: var(--palette-success);
+  --accent: var(--palette-accent);
+  --background: var(--palette-bg);
+  --text-dark: var(--palette-text);
+  --sidebar-bg: var(--palette-sidebar);
+  --header-bg: var(--palette-header);
   --white: #ffffff;
-  --accent: #857e61;
+  --bg-layout: var(--background);
+}
 
-  /* === Layout === */
+/* === LAYOUT === */
+:root {
   --header-height: 64px;
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 80px;
   --border-color: #e1e4e8;
-  --bg-layout: var(--background);
   --transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
 
-  /* === Typography === */
+/* === TYPOGRAPHY === */
+:root {
   --font-base: 14px;
   --font-medium: 16px;
   --font-large: 18px;
+}
 
-  /* === Shadows === */
+/* === SHADOWS === */
+:root {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
 
-  /* === Borders & Radius === */
+/* === BORDERS & RADIUS === */
+:root {
   --border-radius: 8px;
   --border-radius-sm: 6px;
+}
+
+/* === PALETTE 1: Muted Classic (Your Original) === */
+.palette-1 {
+  --palette-primary: #a2ad91;
+  --palette-success: #4cb944;
+  --palette-accent: #857e61;
+  --palette-bg: #fcfaf9;
+  --palette-text: #120309;
+  --palette-sidebar: #5603ad;
+  --palette-header: #023618;
+}
+
+/* === PALETTE 2: Fresh Indigo (Recommended) === */
+.palette-2 {
+  --palette-primary: #6366f1;
+  --palette-success: #10b981;
+  --palette-accent: #f59e0b;
+  --palette-bg: #f8fafc;
+  --palette-text: #1e293b;
+  --palette-sidebar: #1e293b;
+  --palette-header: #0f172a;
+}
+
+/* === PALETTE 3: Warm Coral (Friendly & Energetic) === */
+.palette-3 {
+  --palette-primary: #f43f5e;
+  --palette-success: #10b981;
+  --palette-accent: #fb923c;
+  --palette-bg: #fff1f2;
+  --palette-text: #1f2937;
+  --palette-sidebar: #be123c;
+  --palette-header: #881337;
+}
+
+/* === PALETTE 4: Ocean Teal (Calm & Professional) === */
+.palette-4 {
+  --palette-primary: #0891b2;
+  --palette-success: #059669;
+  --palette-accent: #f59e0b;
+  --palette-bg: #ecfeff;
+  --palette-text: #164e63;
+  --palette-sidebar: #164e63;
+  --palette-header: #0c4a6e;
+}
+
+/* === PALETTE 5: Sunset Purple (Bold & Modern) === */
+.palette-5 {
+  --palette-primary: #8b5cf6;
+  --palette-success: #10b981;
+  --palette-accent: #f97316;
+  --palette-bg: #faf5ff;
+  --palette-text: #4c1d95;
+  --palette-sidebar: #6d28d9;
+  --palette-header: #5b21b6;
+}
+
+/* === PALETTE 6: Dark Mode (Sleek & Elegant) === */
+.palette-dark {
+  --palette-primary: #818cf8;
+  --palette-success: #34d399;
+  --palette-accent: #fbbf24;
+  --palette-bg: #0f172a;
+  --palette-text: #e2e8f0;
+  --palette-sidebar: #1e293b;
+  --palette-header: #0f172a;
+  --border-color: #334155;
 }

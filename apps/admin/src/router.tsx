@@ -1,0 +1,28 @@
+import { createBrowserRouter } from "react-router-dom";
+import { AdminLayout } from "@/components/layout/AdminLayout";
+import { DashboardPage } from "@/features/admin/pages/DashboardPage";
+import AdminSignupPage from "@/features/auth/AdminSignupPage";
+import InviteAdminPage from "@/features/auth/pages/InvitationPage";
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "dashboard",
+        element: <DashboardPage />,
+        handle: { crumb: () => "Dashboard" },
+      },
+      // We'll add more admin routes later
+    ],
+  },
+  {
+    path: "/signup",
+    element: <AdminSignupPage />,
+  },
+  {
+    path: "/invite",
+    element: <InviteAdminPage />,
+  },
+]);

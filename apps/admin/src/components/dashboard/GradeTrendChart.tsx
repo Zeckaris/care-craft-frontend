@@ -1,6 +1,7 @@
+// src/components/dashboard/GradeTrendChart.tsx
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,23 +26,61 @@ const data = [
   { grade: "Grade 12", "2023": 88, "2024": 85, "2025": 90 },
 ];
 
+const years = ["2023", "2024", "2025"];
+const colors = ["#8884d8", "#82ca9d", "#ffc658"];
+
 export const GradeTrendChart = () => {
   return (
-    <Card title="Grade Distribution (2023–2025)" className="chart-full">
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart
+    <Card
+      title="Student Enrollment Trend (2023–2025)"
+      className="chart-full"
+      style={{ height: "100%" }}
+    >
+      <ResponsiveContainer width="100%" height={380}>
+        <LineChart
           data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="grade" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="2023" fill="#8884d8" />
-          <Bar dataKey="2024" fill="#82ca9d" />
-          <Bar dataKey="2025" fill="#ffc658" />
-        </BarChart>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis
+            dataKey="grade"
+            tick={{ fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: "#e0e0e0" }}
+          />
+          <YAxis
+            tick={{ fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: "#e0e0e0" }}
+            domain={[70, 110]}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "rgba(255, 255, 255, 0.95)",
+              border: "1px solid #e0e0e0",
+              borderRadius: 6,
+            }}
+          />
+          <Legend
+            verticalAlign="top"
+            height={36}
+            iconType="circle"
+            wrapperStyle={{ paddingBottom: 10 }}
+          />
+
+          {years.map((year, index) => (
+            <Line
+              key={year}
+              type="monotone"
+              dataKey={year}
+              stroke={colors[index]}
+              strokeWidth={2.5}
+              dot={{ r: 5, fill: colors[index], strokeWidth: 2 }}
+              activeDot={{ r: 7 }}
+              name={year}
+            />
+          ))}
+        </LineChart>
       </ResponsiveContainer>
     </Card>
   );

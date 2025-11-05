@@ -25,7 +25,9 @@ body {
   flex-direction: column;
   height: 100%;
   position: relative; /* necessary for absolute trigger */
-  overflow: hidden !important;
+}
+.ant-layout-sider {
+  will-change: width;
 }
 
 /* === Logo === */
@@ -74,9 +76,9 @@ body {
   font-size: 18px !important;
 }
 
-/* === BUILT-IN TRIGGER — VISIBLE & FIXED AT BOTTOM === */
+/* === BUILT-IN TRIGGER — FIXED AT BOTTOM === */
 .ant-layout-sider-trigger {
-  position: absolute !important; /* fixed at bottom */
+  position: absolute !important;
   bottom: 0 !important;
   left: 0;
   width: 100%;
@@ -120,65 +122,25 @@ body {
 
 /* ================= HEADER ================= */
 .admin-header {
-  background: var(--header-bg) !important;
+  background: var(--header-bg);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
   height: var(--header-height);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 999;
 }
 
-/* === Search Bar — FULL FIX === */
+/* === Search Bar === */
 .header-search {
-  flex: 1;
-  max-width: 400px;
-}
-
-.header-search .ant-input-group {
-  display: flex;
-  height: 100%; /* make it fill header height */
-}
-
-.header-search .ant-input {
-  height: 100% !important;
-  padding: 0 12px !important;
-  font-size: 14px !important;
-  border-radius: 6px 0 0 6px !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: var(--text-dark) !important; /* input text readable */
-}
-
-.header-search .ant-input::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-.header-search .ant-input-suffix {
-  display: flex;
-  align-items: center; /* vertically center suffix icons */
-}
-
-.header-search .ant-btn {
-  height: 100% !important; /* match input height */
-  width: 40px !important;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0 !important;
-  border-radius: 0 6px 6px 0 !important;
-  background: rgba(255, 255, 255, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-left: none !important;
-  color: var(--white) !important;
-}
-
-.header-search .ant-btn:hover {
-  background: rgba(255, 255, 255, 0.35) !important;
+  gap: 20px;
+  max-width: 300px;
+  flex: 1;
 }
 
 /* === Header Actions === */
@@ -189,14 +151,14 @@ body {
 }
 
 .header-actions .anticon {
-  color: var(--white) !important;
-  font-size: 20px !important;
+  color: var(--white);
+  font-size: 20px;
   cursor: pointer;
   transition: color 0.3s;
 }
 
 .header-actions .anticon:hover {
-  color: var(--accent) !important;
+  color: var(--accent);
 }
 
 .header-actions .ant-avatar {
@@ -214,8 +176,8 @@ body {
 }
 
 .admin-content {
-  background: var(--white) !important;
-  color: var(--text-dark) !important;
+  background: var(--white);
+  color: var(--text-dark);
   margin: 16px;
   padding: 24px;
   border-radius: 8px;
@@ -230,12 +192,12 @@ body {
 
 /* === Breadcrumb === */
 .admin-content .ant-breadcrumb a {
-  color: var(--primary) !important;
+  color: var(--primary);
   font-weight: 500;
 }
 
 .admin-content .ant-breadcrumb a:hover {
-  color: var(--accent) !important;
+  color: var(--accent);
 }
 
 /* === Content Scrollbar === */
