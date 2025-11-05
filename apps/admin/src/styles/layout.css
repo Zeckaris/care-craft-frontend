@@ -42,7 +42,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--sidebar-border);
 }
 
 /* === Menu === */
@@ -53,7 +53,7 @@ body {
 
 .sidebar-menu .ant-menu-item,
 .sidebar-menu .ant-menu-submenu-title {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: var(--sidebar-text) !important;
   font-size: 15px !important;
   font-weight: 500 !important;
   margin: 4px 8px !important;
@@ -63,12 +63,12 @@ body {
 .sidebar-menu .ant-menu-item:hover,
 .sidebar-menu .ant-menu-submenu-title:hover {
   color: var(--white) !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: var(--sidebar-hover) !important;
 }
 
 .sidebar-menu .ant-menu-item-selected {
   color: var(--white) !important;
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: var(--sidebar-selected) !important;
   font-weight: 600 !important;
 }
 
@@ -84,7 +84,7 @@ body {
   width: 100%;
   background: var(--primary) !important;
   color: var(--white) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-top: 1px solid var(--sidebar-border) !important;
   height: 48px !important;
   line-height: 48px !important;
   font-size: 18px !important;
@@ -95,7 +95,7 @@ body {
 }
 
 .ant-layout-sider-trigger:hover {
-  background: #7f8970 !important;
+  background: var(--primary-dark) !important;
 }
 
 /* === Scrollbar === */
@@ -111,13 +111,13 @@ body {
 
 .sidebar-menu::-webkit-scrollbar-thumb,
 .admin-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--sidebar-scroll);
   border-radius: 3px;
 }
 
 .sidebar-menu::-webkit-scrollbar-thumb:hover,
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* ================= HEADER ================= */
@@ -163,7 +163,7 @@ body {
 
 .header-actions .ant-avatar {
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--header-icon-bg);
   width: 36px;
   height: 36px;
   line-height: 36px;

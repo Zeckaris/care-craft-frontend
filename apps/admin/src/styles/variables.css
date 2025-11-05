@@ -49,6 +49,13 @@
   --palette-text: #120309;
   --palette-sidebar: #5603ad;
   --palette-header: #023618;
+  --sidebar-text: rgba(255, 255, 255, 0.85);
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #7f8970;
+  --header-icon-bg: rgba(255, 255, 255, 0.2);
 }
 
 /* === PALETTE 2: Fresh Indigo (Recommended) === */
@@ -60,6 +67,13 @@
   --palette-text: #1e293b;
   --palette-sidebar: #1e293b;
   --palette-header: #0f172a;
+  --sidebar-text: rgba(255, 255, 255, 0.9);
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-selected: rgba(255, 255, 255, 0.3);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-scroll: rgba(255, 255, 255, 0.3);
+  --primary-dark: #4f46e5;
+  --header-icon-bg: rgba(255, 255, 255, 0.25);
 }
 
 /* === PALETTE 3: Warm Coral (Friendly & Energetic) === */
@@ -71,6 +85,13 @@
   --palette-text: #1f2937;
   --palette-sidebar: #be123c;
   --palette-header: #881337;
+  --sidebar-text: rgba(255, 255, 255, 0.9);
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-selected: rgba(255, 255, 255, 0.3);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-scroll: rgba(255, 255, 255, 0.3);
+  --primary-dark: #e11d48;
+  --header-icon-bg: rgba(255, 255, 255, 0.25);
 }
 
 /* === PALETTE 4: Ocean Teal (Calm & Professional) === */
@@ -82,6 +103,13 @@
   --palette-text: #164e63;
   --palette-sidebar: #164e63;
   --palette-header: #0c4a6e;
+  --sidebar-text: rgba(255, 255, 255, 0.9);
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-selected: rgba(255, 255, 255, 0.3);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-scroll: rgba(255, 255, 255, 0.3);
+  --primary-dark: #0e7490;
+  --header-icon-bg: rgba(255, 255, 255, 0.25);
 }
 
 /* === PALETTE 5: Sunset Purple (Bold & Modern) === */
@@ -93,11 +121,18 @@
   --palette-text: #4c1d95;
   --palette-sidebar: #6d28d9;
   --palette-header: #5b21b6;
+  --sidebar-text: rgba(255, 255, 255, 0.9);
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-selected: rgba(255, 255, 255, 0.3);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-scroll: rgba(255, 255, 255, 0.3);
+  --primary-dark: #7c3aed;
+  --header-icon-bg: rgba(255, 255, 255, 0.25);
 }
 
 /* === PALETTE 6: Dark Mode (Sleek & Elegant) === */
-.palette-dark {
-  --palette-primary: #818cf8;
+.palette-6 {
+  --palette-primary: #60a5fa;
   --palette-success: #34d399;
   --palette-accent: #fbbf24;
   --palette-bg: #0f172a;
@@ -105,4 +140,31 @@
   --palette-sidebar: #1e293b;
   --palette-header: #0f172a;
   --border-color: #334155;
+
+  --sidebar-text: #f1f5f9;
+  --sidebar-hover: #334155;
+  --sidebar-selected: #475569;
+  --sidebar-border: #334155;
+  --sidebar-scroll: #475569;
+  --primary-dark: #3b82f6;
+  --header-icon-bg: rgba(255, 255, 255, 0.1);
+}
+
+/* === PALETTE 6: Vivid Sky (Bright & Modern) === */
+.palette-7 {
+  --palette-primary: #0ea5e9;
+  --palette-success: #22c55e;
+  --palette-accent: #f97316; /* Coral Orange */
+  --palette-bg: #f0f9ff; /* Very light blue */
+  --palette-text: #1e293b; /* Deep slate */
+  --palette-sidebar: #0369a1; /* Deep sky */
+  --palette-header: #0284c7; /* Rich blue */
+
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-selected: rgba(255, 255, 255, 0.3);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-scroll: rgba(255, 255, 255, 0.4);
+  --primary-dark: #0284c7;
+  --header-icon-bg: rgba(255, 255, 255, 0.25);
 }
