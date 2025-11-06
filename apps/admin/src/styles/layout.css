@@ -170,6 +170,31 @@ body {
   font-size: 16px;
 }
 
+.header-avatar-dropdown .ant-dropdown-trigger {
+  display: flex;
+  align-items: center;
+}
+
+.header-username {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.ant-avatar {
+  background: var(--header-icon-bg) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-avatar .anticon {
+  color: var(--white);
+  font-size: 18px;
+}
+
 /* ================= CONTENT ================= */
 .main-layout {
   transition: margin-left 0.2s;

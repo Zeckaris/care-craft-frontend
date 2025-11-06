@@ -1,12 +1,33 @@
-import { Avatar, Dropdown, Input, Layout, Menu, Space, Tooltip } from "antd";
-import { UserOutlined, SettingOutlined, BellOutlined } from "@ant-design/icons";
+import {
+  Avatar,
+  Dropdown,
+  Input,
+  Layout,
+  Menu,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
+import {
+  UserOutlined,
+  SettingOutlined,
+  BellOutlined,
+  CrownOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { getUser } from "@/utils/auth";
 
 const { Search } = Input;
 const { Header: AntHeader } = Layout;
+const { Text } = Typography;
 
 const Header = () => {
   const navigate = useNavigate();
+
+  const user = getUser();
+  const avatarIcon =
+    user?.role === "admin" ? <CrownOutlined /> : <TeamOutlined />;
 
   const userMenu = (
     <Menu
@@ -53,7 +74,19 @@ const Header = () => {
           placement="bottomRight"
           trigger={["click"]}
         >
-          <Avatar className="ant-avatar" icon={<UserOutlined />} />
+          <Space align="center" size={8} style={{ cursor: "pointer" }}>
+            <Avatar size={36} icon={avatarIcon} className="ant-avatar" />
+            <Text
+              strong
+              className="header-username"
+              style={{
+                fontSize: "var(--font-medium)",
+                color: "var(--white)",
+              }}
+            >
+              {user?.firstName || "Guest"}
+            </Text>
+          </Space>
         </Dropdown>
       </Space>
     </AntHeader>

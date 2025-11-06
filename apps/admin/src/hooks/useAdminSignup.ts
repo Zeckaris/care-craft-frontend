@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { message } from 'antd';
 import { useApi } from '@/hooks/useApi';
+import { capitalizeFirstLetter } from '@/utils/string';
 
 export const useAdminSignup = () => {
   const { post, postMutation } = useApi();
@@ -13,11 +14,10 @@ export const useAdminSignup = () => {
     const res = await post({url : '/auth/signup', body: data});
 
     if (res.success) {
-      // Role comes back in response.data.role (optional)
-      if (res.data?.role) {
-        setRole(res.data.role);
-      }
-      setIsSignupSuccess(true);
+      const { firstName, role } = res.data.user;
+      const formattedName = capitalizeFirstLetter(firstName);
+      localStorage.setItem('user', JSON.stringify({ firstName: formattedName, role }));
+      setRole(role);
       message.success(res.message || 'Account created!');
     }
     // Error already shown in useApi

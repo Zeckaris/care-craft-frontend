@@ -33,18 +33,15 @@ export const DashboardPage = () => {
             icon={<TeamOutlined />}
           />
 
-          {/* === Gender Donut (Full Width) === */}
           <div className="chart-card full-width">
             <GenderDonut />
           </div>
 
-          {/* === Activity Feed (KEEP AS-IS) === */}
           <div className="qlink-feed-container">
             <div className="feed-card">
               <ActivityFeed />
             </div>
 
-            {/* === Quick Links (Full Width) === */}
             <div className="quick-links">
               <QuickLinkButton
                 to="/admin/students"
@@ -64,7 +61,6 @@ export const DashboardPage = () => {
             </div>
           </div>
 
-          {/* === Grade Trend Chart (Full Width) === */}
           <div className="chart-full full-width">
             <GradeTrendChart />
           </div>
