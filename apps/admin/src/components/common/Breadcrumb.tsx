@@ -1,17 +1,21 @@
 // src/components/common/Breadcrumb.tsx
 import { Breadcrumb as AntBreadcrumb, Typography } from "antd";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
+import { getUser } from "@/utils/auth";
 
 const { Text } = Typography;
 
 export const Breadcrumb = () => {
   const crumbs = useBreadcrumb();
+  const user = getUser();
 
   // === DASHBOARD MODE: Only one crumb and it's "Dashboard" ===
   if (crumbs.length === 1 && crumbs[0] === "Dashboard") {
     return (
       <div className="dashboard-breadcrumb">
-        <h2 className="welcome-title">Welcome, Amanuel</h2>
+        <h2 className="welcome-title">
+          Welcome {user.firstName ? user.firstName : "Admin"}
+        </h2>
         <div className="dashboard-page-title">
           <Text strong style={{ color: "var(--primary)", fontSize: "16px" }}>
             Dashboard
