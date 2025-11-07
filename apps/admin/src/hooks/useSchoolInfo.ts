@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 
-interface ISchoolInfo {
+export interface ISchoolInfo {
   _id?: string;
   name: string;
   address: string;
@@ -13,7 +13,7 @@ interface ISchoolInfo {
 export const useSchoolInfo = () => {
   const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
-  const urlPath = '/general/school-info';
+  const urlPath = '/general/school';
 
   // Fetch
   const { data: rawData, isLoading } = get(urlPath);
