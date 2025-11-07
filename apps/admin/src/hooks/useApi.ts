@@ -35,6 +35,6 @@ export const useApi = () => {
 
 
   return { loading: false, get , post: post.mutateAsync, put : put.mutateAsync,
-    delete: del.mutateAsync, postMutation: post, putMutation: put, deleteMutation: del,
+    del: del.mutateAsync, postMutation: post, putMutation: put, deleteMutation: del,
    };
 };

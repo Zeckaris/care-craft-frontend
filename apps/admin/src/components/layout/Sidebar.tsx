@@ -5,8 +5,9 @@ import {
   TeamOutlined,
   BookOutlined,
   TrophyOutlined,
-  FallOutlined,
   UserSwitchOutlined,
+  BankOutlined,
+  HeartFilled,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 
@@ -20,7 +21,8 @@ const menuItems = [
   { key: "/admin/teachers", icon: <TeamOutlined />, label: "Teachers" },
   { key: "/admin/subjects", icon: <BookOutlined />, label: "Subjects" },
   { key: "/admin/grades", icon: <TrophyOutlined />, label: "Grades" },
-  { key: "/admin/parents", icon: <FallOutlined />, label: "Parents" },
+  { key: "/admin/parents", icon: <HeartFilled />, label: "Parents" },
+  { key: "/admin/school-info", icon: <BankOutlined />, label: "School Info" },
   {
     key: "/admin/coordinators",
     icon: <UserSwitchOutlined />,
