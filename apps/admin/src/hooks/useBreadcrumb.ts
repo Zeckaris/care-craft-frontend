@@ -20,5 +20,5 @@ export const useBreadcrumb = (): string[] => {
       return typeof crumb === 'function' ? crumb(match.data) : crumb;
     });
 
-  return crumbs.length > 0 ? crumbs : ['Dashboard'];
+  return crumbs
 };

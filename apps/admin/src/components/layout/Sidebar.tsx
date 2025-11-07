@@ -16,13 +16,13 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { key: "/admin", icon: <DashboardOutlined />, label: "Dashboard" },
-  { key: "/admin/students", icon: <UserOutlined />, label: "Students" },
-  { key: "/admin/teachers", icon: <TeamOutlined />, label: "Teachers" },
-  { key: "/admin/subjects", icon: <BookOutlined />, label: "Subjects" },
-  { key: "/admin/grades", icon: <TrophyOutlined />, label: "Grades" },
-  { key: "/admin/parents", icon: <HeartFilled />, label: "Parents" },
-  { key: "/admin/school-info", icon: <BankOutlined />, label: "School Info" },
+  { key: "/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
+  { key: "/students", icon: <UserOutlined />, label: "Students" },
+  { key: "/teachers", icon: <TeamOutlined />, label: "Teachers" },
+  { key: "/subjects", icon: <BookOutlined />, label: "Subjects" },
+  { key: "/grades", icon: <TrophyOutlined />, label: "Grades" },
+  { key: "/parents", icon: <HeartFilled />, label: "Parents" },
+  { key: "/school-info", icon: <BankOutlined />, label: "School Info" },
   {
     key: "/admin/coordinators",
     icon: <UserSwitchOutlined />,

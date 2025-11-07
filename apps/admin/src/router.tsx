@@ -4,6 +4,7 @@ import { DashboardPage } from "@/features/admin/pages/DashboardPage";
 import AdminSignupPage from "@/features/auth/pages/AdminSignupPage";
 import InviteAdminPage from "@/features/auth/pages/InvitationPage";
 import SignInPage from "./features/auth/pages/SignInPage";
+import { SchoolInfoPage } from "./features/admin/pages/SchoolInfoPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,11 @@ export const router = createBrowserRouter([
       {
         path: "signup",
         element: <AdminSignupPage />,
+      },
+      {
+        path: "/school-info",
+        element: <SchoolInfoPage />,
+        handle: { crumb: () => "School Info" },
       },
     ],
   },

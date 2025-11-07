@@ -1,7 +1,7 @@
-// src/components/common/Breadcrumb.tsx
 import { Breadcrumb as AntBreadcrumb, Typography } from "antd";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 import { getUser } from "@/utils/auth";
+import { useLocation } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -10,7 +10,7 @@ export const Breadcrumb = () => {
   const user = getUser();
 
   // === DASHBOARD MODE: Only one crumb and it's "Dashboard" ===
-  if (crumbs.length === 1 && crumbs[0] === "Dashboard") {
+  if (location.pathname === "/dashboard") {
     return (
       <div className="dashboard-breadcrumb">
         <h2 className="welcome-title">
@@ -36,7 +36,14 @@ export const Breadcrumb = () => {
         return (
           <AntBreadcrumb.Item key={index}>
             {isLast ? (
-              <Text strong style={{ color: "var(--primary)" }}>
+              <Text
+                strong
+                style={{
+                  color: "var(--primary)",
+                  fontSize: "16px",
+                  fontWeight: 600,
+                }}
+              >
                 {crumb}
               </Text>
             ) : (
