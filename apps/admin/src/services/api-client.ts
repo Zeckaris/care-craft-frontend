@@ -1,9 +1,21 @@
 import axios from "axios";
 
-const apiClient= axios.create({
+export const apiClient= axios.create({
     baseURL: "http://localhost:5000/api/",
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true,
 })
 
-export default apiClient;
+
+apiClient.interceptors.request.use((config) => {
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  } else {
+    config.headers["Content-Type"] = "application/json";
+  }
+  return config;
+});
+
+export const ASSETS_BASE = 'http://localhost:5000';
+
+ 

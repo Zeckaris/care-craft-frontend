@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import apiClient from '@/services/api-client'; 
+import {apiClient} from '@/services/api-client'; 
 import { useMutation, useQuery, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 
