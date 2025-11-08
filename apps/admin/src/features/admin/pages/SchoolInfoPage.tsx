@@ -7,17 +7,8 @@ import { useSchoolInfo } from "@/hooks/useSchoolInfo";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export const SchoolInfoPage = () => {
-  const {
-    schoolInfo,
-    isLoading,
-    error,
-    create,
-    update,
-    remove,
-    isSaving,
-    isDeleting,
-    resetPreview,
-  } = useSchoolInfo();
+  const { schoolInfo, isLoading, error, remove, isDeleting, resetLogo } =
+    useSchoolInfo();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
@@ -30,7 +21,7 @@ export const SchoolInfoPage = () => {
 
   const closeDrawer = () => {
     setDrawerOpen(false);
-    resetPreview();
+    resetLogo();
   };
 
   const handleSaveSuccess = () => {

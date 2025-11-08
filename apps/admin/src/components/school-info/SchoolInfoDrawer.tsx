@@ -1,6 +1,6 @@
 import { Drawer, Form, Input, Button, Space, Upload, message } from "antd";
 import { UploadOutlined, LoadingOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type ISchoolInfo, useSchoolInfo } from "@/hooks/useSchoolInfo";
 
 const { TextArea } = Input;
@@ -23,39 +23,46 @@ export const SchoolInfoDrawer = ({
   const {
     previewLogo,
     handleLogoChange,
-    resetPreview,
+    resetLogo,
     create,
     update,
     isSaving,
+    logoFile,
   } = useSchoolInfo();
   const [form] = Form.useForm();
 
   const [fileList, setFileList] = useState<any[]>([]);
 
+  useEffect(() => {
+    if (open) {
+      form.resetFields();
+      if (mode === "create") {
+        resetLogo();
+        setFileList([]);
+      }
+    }
+  }, [open, mode, form, resetLogo]);
+
   const handleSubmit = async (values: any) => {
     try {
-      const payload = {
+      const data = {
         ...values,
-        logo: previewLogo || initialData?.logo || null,
+        logo: logoFile,
       };
-
       if (mode === "create") {
-        await create(payload);
+        await create(data);
       } else {
-        await update(payload);
+        await update(data);
       }
       onSuccess();
-      form.resetFields();
-      resetPreview();
-      setFileList([]);
     } catch (err) {
-      // Error handled by useApi
+      // ...
     }
   };
 
   const handleClose = () => {
     form.resetFields();
-    resetPreview();
+    resetLogo();
     setFileList([]);
     onClose();
   };
@@ -63,7 +70,7 @@ export const SchoolInfoDrawer = ({
   const uploadProps = {
     onRemove: () => {
       setFileList([]);
-      resetPreview();
+      resetLogo();
     },
     beforeUpload: (file: File) => {
       const isImage = file.type.startsWith("image/");
@@ -118,7 +125,7 @@ export const SchoolInfoDrawer = ({
         autoComplete="off"
       >
         {/* Logo Upload */}
-        <Form.Item label="School Logo" name="logo">
+        <Form.Item label="School Logo">
           <Upload {...uploadProps} listType="picture-card">
             {fileList.length === 0 && (
               <div>
