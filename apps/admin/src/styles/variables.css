@@ -9,6 +9,12 @@
   --header-bg: var(--palette-header);
   --white: #ffffff;
   --bg-layout: var(--background);
+
+  /* === ACTION ICONS === */
+  --action-view: var(--palette-primary);
+  --action-edit: var(--palette-success);
+  --action-delete: #ef4444;
+  --action-hover: #3b82f6;
 }
 
 /* === LAYOUT === */
@@ -56,6 +62,11 @@
   --sidebar-scroll: rgba(255, 255, 255, 0.2);
   --primary-dark: #7f8970;
   --header-icon-bg: rgba(255, 255, 255, 0.2);
+
+  --action-view: #a2ad91;
+  --action-edit: #4cb944;
+  --action-delete: #d73a49;
+  --action-hover: #6b7280;
 }
 
 /* === PALETTE 2: Fresh Indigo (Recommended) === */
@@ -74,6 +85,11 @@
   --sidebar-scroll: rgba(255, 255, 255, 0.3);
   --primary-dark: #4f46e5;
   --header-icon-bg: rgba(255, 255, 255, 0.25);
+
+  --action-view: #6366f1;
+  --action-edit: #10b981;
+  --action-delete: #ef4444;
+  --action-hover: #3b82f6;
 }
 
 /* === PALETTE 3: Warm Coral (Friendly & Energetic) === */
@@ -92,6 +108,11 @@
   --sidebar-scroll: rgba(255, 255, 255, 0.3);
   --primary-dark: #e11d48;
   --header-icon-bg: rgba(255, 255, 255, 0.25);
+
+  --action-view: #f43f5e;
+  --action-edit: #10b981;
+  --action-delete: #b91c1c;
+  --action-hover: #fb7185;
 }
 
 /* === PALETTE 4: Ocean Teal (Calm & Professional) === */
@@ -110,6 +131,11 @@
   --sidebar-scroll: rgba(255, 255, 255, 0.3);
   --primary-dark: #0e7490;
   --header-icon-bg: rgba(255, 255, 255, 0.25);
+
+  --action-view: #0891b2;
+  --action-edit: #059669;
+  --action-delete: #dc2626;
+  --action-hover: #06b6d4;
 }
 
 /* === PALETTE 5: Sunset Purple (Bold & Modern) === */
@@ -128,6 +154,11 @@
   --sidebar-scroll: rgba(255, 255, 255, 0.3);
   --primary-dark: #7c3aed;
   --header-icon-bg: rgba(255, 255, 255, 0.25);
+
+  --action-view: #8b5cf6;
+  --action-edit: #10b981;
+  --action-delete: #c026d3;
+  --action-hover: #a78bfa;
 }
 
 /* === PALETTE 6: Dark Mode (Sleek & Elegant) === */
@@ -148,6 +179,11 @@
   --sidebar-scroll: #475569;
   --primary-dark: #3b82f6;
   --header-icon-bg: rgba(255, 255, 255, 0.1);
+
+  --action-view: #60a5fa;
+  --action-edit: #34d399;
+  --action-delete: #f87171;
+  --action-hover: #93c5fd;
 }
 
 /* === PALETTE 6: Vivid Sky (Bright & Modern) === */
@@ -167,4 +203,9 @@
   --sidebar-scroll: rgba(255, 255, 255, 0.4);
   --primary-dark: #0284c7;
   --header-icon-bg: rgba(255, 255, 255, 0.25);
+
+  --action-view: #0ea5e9;
+  --action-edit: #22c55e;
+  --action-delete: #ef4444;
+  --action-hover: #38bdf8;
 }
