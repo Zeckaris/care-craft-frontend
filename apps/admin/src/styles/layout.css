@@ -1,5 +1,3 @@
-/* apps/admin/src/styles/layout.css */
-
 /* ================= ROOT ================= */
 body {
   margin: 0;
@@ -118,6 +116,58 @@ body {
 .sidebar-menu::-webkit-scrollbar-thumb:hover,
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
+}
+
+/* === SUBMENU — TEXT LINK STYLE (NO BUTTON) === */
+.sidebar-menu .ant-menu-sub {
+  background: transparent !important;
+  margin: 0 12px !important;
+  padding: 4px 0 !important;
+  border-left: 2px solid transparent !important;
+}
+
+.sidebar-menu .ant-menu-sub .ant-menu-item {
+  background: transparent !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 8px 0 8px 56px !important; /* Deep indent */
+  height: auto !important;
+  line-height: 1.5 !important;
+  font-size: 14.5px !important;
+  font-weight: 500 !important;
+  color: var(--sidebar-text) !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* === UNDERLINE ON HOVER === */
+.sidebar-menu .ant-menu-sub .ant-menu-item:hover {
+  background: transparent !important;
+  color: var(--white) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+}
+
+/* === SELECTED: BOLD + UNDERLINE + PRIMARY BORDER === */
+.sidebar-menu .ant-menu-sub .ant-menu-item-selected {
+  background: transparent !important;
+  color: var(--white) !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+}
+
+.sidebar-menu .ant-menu-sub .ant-menu-item-selected::after {
+  content: "";
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: none !important;
 }
 
 /* ================= HEADER ================= */
