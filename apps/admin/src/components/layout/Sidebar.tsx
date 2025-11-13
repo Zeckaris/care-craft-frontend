@@ -8,8 +8,10 @@ import {
   UserSwitchOutlined,
   BankOutlined,
   HeartFilled,
+  SafetyOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -28,28 +30,73 @@ const menuItems = [
     icon: <UserSwitchOutlined />,
     label: "Coordinators",
   },
+  {
+    key: "/assessments",
+    icon: <SafetyOutlined />,
+    label: "Assessments",
+    children: [
+      {
+        key: "/assessments/types",
+        label: <Link to="/assessments/types">Types</Link>,
+      },
+    ],
+  },
 ];
 
 const Sidebar = ({ collapsed }: SidebarProps) => {
   const location = useLocation();
   const selectedKey = location.pathname;
 
-  const items = menuItems.map((item) => ({
-    key: item.key,
-    icon: item.icon,
-    label: <Link to={item.key}>{item.label}</Link>,
-  }));
+  // === CONTROLLED openKeys ===
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+  // Auto-open if on child route
+  useEffect(() => {
+    if (location.pathname.startsWith("/assessments")) {
+      setOpenKeys(["/assessments"]);
+    } else {
+      setOpenKeys([]);
+    }
+  }, [location.pathname]);
+
+  const onOpenChange = (keys: string[]) => {
+    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
+    if (latestOpenKey && latestOpenKey === "/assessments") {
+      setOpenKeys([latestOpenKey]);
+    } else {
+      setOpenKeys([]);
+    }
+  };
+
+  const items = menuItems.map((item) => {
+    if (item.children) {
+      return {
+        key: item.key,
+        icon: item.icon,
+        label: item.label,
+        children: item.children.map((child) => ({
+          key: child.key,
+          label: child.label, // Already has <Link>
+        })),
+      };
+    }
+    return {
+      key: item.key,
+      icon: item.icon,
+      label: <Link to={item.key}>{item.label}</Link>,
+    };
+  });
 
   return (
     <>
-      {/* === LOGO === */}
       <div className="sidebar-logo">{collapsed ? "CC" : "Care Craft"}</div>
 
-      {/* === MENU — SCROLLABLE === */}
       <Menu
         mode="inline"
         theme="dark"
         selectedKeys={[selectedKey]}
+        openKeys={openKeys}
+        onOpenChange={onOpenChange}
         items={items}
         className="sidebar-menu"
         style={{

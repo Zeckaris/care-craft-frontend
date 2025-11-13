@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { DashboardPage } from "@/features/admin/pages/DashboardPage";
 import AdminSignupPage from "@/features/auth/pages/AdminSignupPage";
@@ -7,12 +7,15 @@ import SignInPage from "./features/auth/pages/SignInPage";
 import { SchoolInfoPage } from "./features/admin/pages/SchoolInfoPage";
 import GradesPage from "./features/admin/pages/GradesPage";
 import StudentsPage from "./features/admin/pages/StudentsPage";
+import SubjectsPage from "./features/admin/pages/SubjectsPage";
+import AssessmentTypesPage from "./features/admin/pages/assessments/AssessmentTypesPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <AdminLayout />,
     children: [
+      { index: true, element: <Navigate to="/dashboard" replace /> },
       {
         path: "dashboard",
         element: <DashboardPage />,
@@ -41,6 +44,32 @@ export const router = createBrowserRouter([
         path: "/students",
         element: <StudentsPage />,
         handle: { crumb: () => "Students" },
+      },
+      {
+        path: "/subjects",
+        element: <SubjectsPage />,
+        handle: { crumb: () => "Subjects" },
+      },
+
+      {
+        path: "assessments",
+        handle: { crumb: () => "Assessments" },
+        children: [
+          {
+            index: true,
+            element: <Navigate to="types" replace />,
+          },
+          {
+            path: "types",
+            element: <AssessmentTypesPage />,
+            handle: { crumb: () => "Types" },
+          },
+          // {
+          //   path: "setup",
+          //   element: <AssessmentSetupPage />,
+          //   handle: { crumb: () => "Setup" },
+          // },
+        ],
       },
     ],
   },
