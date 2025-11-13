@@ -5,6 +5,8 @@ import AdminSignupPage from "@/features/auth/pages/AdminSignupPage";
 import InviteAdminPage from "@/features/auth/pages/InvitationPage";
 import SignInPage from "./features/auth/pages/SignInPage";
 import { SchoolInfoPage } from "./features/admin/pages/SchoolInfoPage";
+import GradesPage from "./features/admin/pages/GradesPage";
+import StudentsPage from "./features/admin/pages/StudentsPage";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +31,16 @@ export const router = createBrowserRouter([
         path: "/school-info",
         element: <SchoolInfoPage />,
         handle: { crumb: () => "School Info" },
+      },
+      {
+        path: "/grades",
+        element: <GradesPage />,
+        handle: { crumb: () => "Grades" },
+      },
+      {
+        path: "/students",
+        element: <StudentsPage />,
+        handle: { crumb: () => "Students" },
       },
     ],
   },
