@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { Table, Input, Button, Skeleton, Popconfirm } from "antd";
+import { Table, Button, Skeleton, Popconfirm } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { ActionColumn } from "./ActionColumn";
 
 interface DataType {
-  id: string | number;
+  _id: string | number;
   [key: string]: any;
 }
 
@@ -21,52 +21,58 @@ interface DataTableProps<T extends DataType> {
   data: T[];
   columns: Column<T>[];
   loading?: boolean;
-  rowKey?: keyof T | ((record: T) => string);
+  rowKey?: keyof T | ((record: T) => React.Key);
   searchPlaceholder?: string;
   emptyText?: string;
   onView?: (record: T) => void;
   onEdit?: (record: T) => void;
-  onDelete?: (id: T["id"]) => void;
-  onBulkDelete?: (ids: T["id"][]) => void;
+  onDelete?: (key: React.Key) => void; // ← Fixed: React.Key
+  onBulkDelete?: (keys: React.Key[]) => void; // ← Fixed: React.Key[]
+  pagination?: false | import("antd").TablePaginationConfig;
 }
 
 export function DataTable<T extends DataType>({
   data,
   columns,
   loading = false,
-  rowKey = "id" as keyof T,
+  rowKey = "_id" as keyof T,
   searchPlaceholder = "Search...",
   emptyText = "No data found",
   onView,
   onEdit,
   onDelete,
   onBulkDelete,
+  pagination,
 }: DataTableProps<T>) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [searchText, setSearchText] = useState("");
 
-  const filteredData = useMemo(() => {
-    if (!searchText) return data;
-    const term = searchText.toLowerCase();
-    return data.filter((record) =>
-      Object.values(record).some((v) =>
-        v?.toString().toLowerCase().includes(term)
-      )
-    );
-  }, [data, searchText]);
+  const filteredData = pagination
+    ? data
+    : useMemo(() => {
+        if (!searchText) return data;
+        const term = searchText.toLowerCase();
+        return data.filter((record) =>
+          Object.values(record).some((v) =>
+            v?.toString().toLowerCase().includes(term)
+          )
+        );
+      }, [data, searchText]);
 
-  useEffect(() => {
-    setSelectedRowKeys([]);
-  }, [data]);
+  const getRowKey = (record: T): React.Key => {
+    if (typeof rowKey === "function") {
+      return rowKey(record);
+    }
+    const key = record[rowKey];
+    if (key != null) return key;
+    console.warn("DataTable: Missing _id, using fallback", record);
+    return Math.random();
+  };
 
-  const getRowKey = (record: T): string =>
-    typeof rowKey === "function" ? rowKey(record) : String(record[rowKey]);
-
-  // Fixed: Prevent "select all" bug
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
-    type: "checkbox" as const, // Critical fix
+    type: "checkbox" as const,
   };
 
   const hasSelected = selectedRowKeys.length > 0;
@@ -83,7 +89,6 @@ export function DataTable<T extends DataType>({
 
   const antdColumns: ColumnsType<T> = [
     ...userColumns,
-    // Use ActionColumn — no inline icons
     {
       title: "Actions",
       key: "actions",
@@ -94,7 +99,7 @@ export function DataTable<T extends DataType>({
           record={record}
           onView={onView}
           onEdit={onEdit}
-          onDelete={onDelete}
+          onDelete={onDelete} // ← Pass React.Key
         />
       ),
     },
@@ -111,14 +116,6 @@ export function DataTable<T extends DataType>({
           alignItems: "center",
         }}
       >
-        <Input
-          placeholder={searchPlaceholder}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          prefix={<SearchOutlined />}
-          style={{ width: 240 }}
-          allowClear
-        />
         <div style={{ flex: 1 }} />
         {hasSelected && onBulkDelete && (
           <Popconfirm
@@ -126,7 +123,7 @@ export function DataTable<T extends DataType>({
               selectedRowKeys.length > 1 ? "s" : ""
             }?`}
             onConfirm={() => {
-              onBulkDelete(selectedRowKeys as T["id"][]);
+              onBulkDelete(selectedRowKeys);
               setSelectedRowKeys([]);
             }}
             okText="Delete"
@@ -146,11 +143,15 @@ export function DataTable<T extends DataType>({
           dataSource={filteredData}
           rowKey={getRowKey}
           rowSelection={rowSelection}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
+          pagination={
+            pagination === false
+              ? false
+              : pagination ?? {
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                }
+          }
           scroll={{ x: "max-content" }}
           locale={{ emptyText }}
         />

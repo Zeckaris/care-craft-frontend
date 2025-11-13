@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, message, Form, Modal, Input, Space, Typography } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
@@ -10,8 +10,13 @@ import type { IGrade as DrawerIGrade } from "@/components/grades/GradeDrawer";
 const { Text } = Typography;
 
 export default function GradesPage() {
+  const [searchText, setSearchText] = useState("");
+  const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
   const {
     grades,
+    total,
+    currentPage,
+    pageSize,
     isLoading,
     create,
     update,
@@ -20,13 +25,19 @@ export default function GradesPage() {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useGrades();
+  } = useGrades({
+    search: searchText,
+    pagination,
+  });
+
+  useEffect(() => {
+    setPagination((p) => ({ ...p, page: 1 }));
+  }, [searchText]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"view" | "edit">("view");
   const [selectedGrade, setSelectedGrade] = useState<DrawerIGrade | null>(null);
   const [form] = Form.useForm();
-  const [searchText, setSearchText] = useState(""); // ← Search state
 
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
@@ -119,14 +130,6 @@ export default function GradesPage() {
     }
   };
 
-  // FILTER DATA CLIENT-SIDE
-  const filteredGrades = grades.filter(
-    (grade) =>
-      grade.level.toLowerCase().includes(searchText.toLowerCase()) ||
-      (grade.description?.toLowerCase().includes(searchText.toLowerCase()) ??
-        false)
-  );
-
   const columns = [
     {
       key: "level",
@@ -176,7 +179,7 @@ export default function GradesPage() {
 
       {/* Table */}
       <DataTable
-        data={filteredGrades}
+        data={grades}
         columns={columns}
         loading={isLoading}
         rowKey="_id"
@@ -185,6 +188,16 @@ export default function GradesPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onBulkDelete={handleBulkDelete}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          onChange: (page, size) => {
+            setPagination({ page, pageSize: size || 10 });
+          },
+        }}
       />
 
       {/* Delete Confirm Modal */}
