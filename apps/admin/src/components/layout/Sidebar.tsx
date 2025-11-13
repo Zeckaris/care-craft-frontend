@@ -39,6 +39,10 @@ const menuItems = [
         key: "/assessments/types",
         label: <Link to="/assessments/types">Types</Link>,
       },
+      {
+        key: "/assessments/setup",
+        label: <Link to="/assessments/setup">Setup</Link>,
+      },
     ],
   },
 ];

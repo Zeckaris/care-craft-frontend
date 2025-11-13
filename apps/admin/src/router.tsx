@@ -9,6 +9,7 @@ import GradesPage from "./features/admin/pages/GradesPage";
 import StudentsPage from "./features/admin/pages/StudentsPage";
 import SubjectsPage from "./features/admin/pages/SubjectsPage";
 import AssessmentTypesPage from "./features/admin/pages/assessments/AssessmentTypesPage";
+import AssessmentSetupPage from "./features/admin/pages/assessments/AssessmentSetupPage";
 
 export const router = createBrowserRouter([
   {
@@ -64,11 +65,11 @@ export const router = createBrowserRouter([
             element: <AssessmentTypesPage />,
             handle: { crumb: () => "Types" },
           },
-          // {
-          //   path: "setup",
-          //   element: <AssessmentSetupPage />,
-          //   handle: { crumb: () => "Setup" },
-          // },
+          {
+            path: "setup",
+            element: <AssessmentSetupPage />,
+            handle: { crumb: () => "Setup" },
+          },
         ],
       },
     ],
