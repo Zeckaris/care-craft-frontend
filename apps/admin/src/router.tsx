@@ -10,6 +10,9 @@ import StudentsPage from "./features/admin/pages/StudentsPage";
 import SubjectsPage from "./features/admin/pages/SubjectsPage";
 import AssessmentTypesPage from "./features/admin/pages/assessments/AssessmentTypesPage";
 import AssessmentSetupPage from "./features/admin/pages/assessments/AssessmentSetupPage";
+import ParentsPage from "./features/admin/pages/users/ParentsPage";
+import TeachersPage from "./features/admin/pages/users/TeachersPage";
+import CoordinatorsPage from "./features/admin/pages/users/CoordinatorsPage";
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +53,21 @@ export const router = createBrowserRouter([
         path: "/subjects",
         element: <SubjectsPage />,
         handle: { crumb: () => "Subjects" },
+      },
+      {
+        path: "/parents",
+        element: <ParentsPage />,
+        handle: { crumb: () => "Parents" },
+      },
+      {
+        path: "/teachers",
+        element: <TeachersPage />,
+        handle: { crumb: () => "Teachers" },
+      },
+      {
+        path: "/coordinators",
+        element: <CoordinatorsPage />,
+        handle: { crumb: () => "Coordinators" },
       },
 
       {

@@ -26,7 +26,7 @@ const menuItems = [
   { key: "/parents", icon: <HeartFilled />, label: "Parents" },
   { key: "/school-info", icon: <BankOutlined />, label: "School Info" },
   {
-    key: "/admin/coordinators",
+    key: "/coordinators",
     icon: <UserSwitchOutlined />,
     label: "Coordinators",
   },
