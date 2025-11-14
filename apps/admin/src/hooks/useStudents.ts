@@ -1,4 +1,3 @@
-// src/hooks/useStudents.ts
 import { useQueryClient } from '@tanstack/react-query';
 import { useApi } from '@/hooks/useApi';
 
@@ -50,14 +49,13 @@ export const useStudents = ({
   const queryClient = useQueryClient();
   const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
 
-  // Build URL with query params
   const params = new URLSearchParams();
   if (gradeId) params.set('gradeId', gradeId);
   if (pagination) {
     params.set('page', String(pagination.page));
     params.set('limit', String(pagination.pageSize));
   }
-  if (search) params.set('search', search); // Backend can use this later
+  if (search) params.set('search', search);
 
   const fetchUrl = `/student?${params.toString()}`;
   const queryKey = ['/student', { gradeId, pagination, search }];
