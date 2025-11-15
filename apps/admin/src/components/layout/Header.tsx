@@ -17,6 +17,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "@/utils/auth";
+import { PalettePicker } from "@/components/common/PalettePicker";
 
 const { Search } = Input;
 const { Header: AntHeader } = Layout;
@@ -68,6 +69,7 @@ const Header = () => {
             onClick={() => navigate("/admin/settings")}
           />
         </Tooltip>
+        <PalettePicker />
 
         <Dropdown
           overlay={userMenu}

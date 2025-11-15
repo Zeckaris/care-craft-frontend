@@ -48,48 +48,50 @@
 
 /* === PALETTE 1: Muted Classic (Your Original) === */
 .palette-1 {
-  --palette-primary: #a2ad91;
-  --palette-success: #4cb944;
-  --palette-accent: #857e61;
-  --palette-bg: #fcfaf9;
-  --palette-text: #120309;
-  --palette-sidebar: #5603ad;
-  --palette-header: #023618;
-  --sidebar-text: rgba(255, 255, 255, 0.85);
+  --palette-primary: #4f8a6b;
+  --palette-success: #22c55e;
+  --palette-accent: #f59e0b;
+  --palette-bg: #f8faf9;
+  --palette-text: #1a3a2e;
+  --palette-sidebar: #2d6a4f;
+  --palette-header: #1f4d36;
+  --sidebar-text: rgba(255, 255, 255, 0.9);
   --sidebar-hover: rgba(255, 255, 255, 0.15);
   --sidebar-selected: rgba(255, 255, 255, 0.25);
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-scroll: rgba(255, 255, 255, 0.2);
-  --primary-dark: #7f8970;
+  --primary-dark: #3d6b52;
   --header-icon-bg: rgba(255, 255, 255, 0.2);
+  --icon-color: #ffffff;
 
-  --action-view: #a2ad91;
-  --action-edit: #4cb944;
-  --action-delete: #d73a49;
+  --action-view: #4f8a6b;
+  --action-edit: #22c55e;
+  --action-delete: #ef4444;
   --action-hover: #6b7280;
 }
 
-/* === PALETTE 2: Fresh Indigo (Recommended) === */
+/* === PALETTE 2: Mint Breeze (Fresh & Modern) === */
 .palette-2 {
-  --palette-primary: #6366f1;
-  --palette-success: #10b981;
-  --palette-accent: #f59e0b;
-  --palette-bg: #f8fafc;
-  --palette-text: #1e293b;
-  --palette-sidebar: #1e293b;
-  --palette-header: #0f172a;
-  --sidebar-text: rgba(255, 255, 255, 0.9);
+  --palette-primary: #10b981;
+  --palette-success: #22c55e;
+  --palette-accent: #f97316;
+  --palette-bg: #f0fdf4;
+  --palette-text: #134e3a;
+  --palette-sidebar: #059669;
+  --palette-header: #047857;
+  --sidebar-text: rgba(255, 255, 255, 0.95);
   --sidebar-hover: rgba(255, 255, 255, 0.2);
   --sidebar-selected: rgba(255, 255, 255, 0.3);
   --sidebar-border: rgba(255, 255, 255, 0.15);
   --sidebar-scroll: rgba(255, 255, 255, 0.3);
-  --primary-dark: #4f46e5;
+  --primary-dark: #059669;
   --header-icon-bg: rgba(255, 255, 255, 0.25);
+  --icon-color: #ffffff;
 
-  --action-view: #6366f1;
-  --action-edit: #10b981;
+  --action-view: #10b981;
+  --action-edit: #22c55e;
   --action-delete: #ef4444;
-  --action-hover: #3b82f6;
+  --action-hover: #34d399;
 }
 
 /* === PALETTE 3: Warm Coral (Friendly & Energetic) === */
