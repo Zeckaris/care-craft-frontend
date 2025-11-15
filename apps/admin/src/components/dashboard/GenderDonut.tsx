@@ -8,18 +8,28 @@ import {
 } from "recharts";
 import { Card } from "antd";
 
-const data = [
-  { name: "Male", value: 682, color: "#1890ff" },
-  { name: "Female", value: 566, color: "#ff4d4f" },
-];
+interface GenderDonutProps {
+  data: Array<{ name: "M" | "F"; value: number }>;
+  total: number;
+}
 
-export const GenderDonut = () => {
+const COLORS = {
+  Male: "#1890ff",
+  Female: "#ff4d4f",
+};
+
+export const GenderDonut = ({ data, total }: GenderDonutProps) => {
+  const displayData = data.map((item) => ({
+    ...item,
+    name: item.name === "M" ? "Male" : "Female",
+  }));
+
   return (
     <Card title="Gender Distribution" className="chart-full">
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={data}
+            data={displayData}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -27,23 +37,28 @@ export const GenderDonut = () => {
             paddingAngle={5}
             dataKey="value"
           >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+            {displayData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[entry.name as keyof typeof COLORS]}
+              />
             ))}
           </Pie>
           <Tooltip />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
+
       <div
         style={{
           textAlign: "center",
           marginTop: 16,
           fontSize: 24,
           fontWeight: "bold",
+          color: "var(--text-primary)",
         }}
       >
-        1,248 Total
+        {total.toLocaleString()} Total
       </div>
     </Card>
   );

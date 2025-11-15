@@ -11,8 +11,17 @@ import {
   TrophyOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 export const DashboardPage = () => {
+  const {
+    totalStudents,
+    totalTeachers,
+    genderBreakdown,
+    totalInGenderChart,
+    recentActivities,
+  } = useDashboardStats();
+
   return (
     <div className="dashboard-page">
       <header className="dashboard-header">
@@ -24,22 +33,22 @@ export const DashboardPage = () => {
           {/* === Metric Cards === */}
           <MetricCard
             title="Total Students"
-            value="1,248"
+            value={totalStudents}
             icon={<UserOutlined />}
           />
           <MetricCard
             title="Total Teachers"
-            value="68"
+            value={totalTeachers}
             icon={<TeamOutlined />}
           />
 
           <div className="chart-card full-width">
-            <GenderDonut />
+            <GenderDonut data={genderBreakdown} total={totalInGenderChart} />
           </div>
 
           <div className="qlink-feed-container">
             <div className="feed-card">
-              <ActivityFeed />
+              <ActivityFeed activities={recentActivities} />
             </div>
 
             <div className="quick-links">
