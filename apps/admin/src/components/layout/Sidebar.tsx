@@ -9,6 +9,7 @@ import {
   BankOutlined,
   HeartFilled,
   SafetyOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -20,6 +21,11 @@ interface SidebarProps {
 const menuItems = [
   { key: "/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   { key: "/students", icon: <UserOutlined />, label: "Students" },
+  {
+    key: "/enroll",
+    icon: <CalendarOutlined />,
+    label: "Enroll",
+  },
   { key: "/teachers", icon: <TeamOutlined />, label: "Teachers" },
   { key: "/subjects", icon: <BookOutlined />, label: "Subjects" },
   { key: "/grades", icon: <TrophyOutlined />, label: "Grades" },

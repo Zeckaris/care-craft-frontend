@@ -13,7 +13,7 @@ export const useApi = () => {
       ...options,
     })
   }
-  const createMutation = <TData= any, TVariables = any>( method: 'post' | 'put' | 'delete', options?: UseMutationOptions<TData, any, TVariables>)=>{
+  const createMutation = <TData= any, TVariables = any>( method: 'post' | 'put' | 'patch' | 'delete', options?: UseMutationOptions<TData, any, TVariables>)=>{
     return useMutation({
       mutationFn: (vars : any)=> apiClient[method](vars.url, vars.body).then(r => r.data),
       onSuccess: (res: any, variables : any)=>{
@@ -32,9 +32,11 @@ export const useApi = () => {
   const post= createMutation('post');
   const put= createMutation('put')
   const del= createMutation('delete')
+  const patch = createMutation('patch');
+  
 
 
-  return { loading: false, get , post: post.mutateAsync, put : put.mutateAsync,
-    del: del.mutateAsync, postMutation: post, putMutation: put, deleteMutation: del,
+  return { loading: false, get , post: post.mutateAsync, put : put.mutateAsync, patch: patch.mutateAsync,
+    del: del.mutateAsync, postMutation: post, putMutation: put, patchMutation: patch, deleteMutation: del,
    };
 };

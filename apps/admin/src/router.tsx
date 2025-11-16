@@ -13,6 +13,7 @@ import AssessmentSetupPage from "./features/admin/pages/assessments/AssessmentSe
 import ParentsPage from "./features/admin/pages/users/ParentsPage";
 import TeachersPage from "./features/admin/pages/users/TeachersPage";
 import CoordinatorsPage from "./features/admin/pages/users/CoordinatorsPage";
+import EnrollPage from "./features/admin/pages/EnrollPage";
 
 export const router = createBrowserRouter([
   {
@@ -68,6 +69,11 @@ export const router = createBrowserRouter([
         path: "/coordinators",
         element: <CoordinatorsPage />,
         handle: { crumb: () => "Coordinators" },
+      },
+      {
+        path: "/enroll",
+        element: <EnrollPage />,
+        handle: { crumb: () => "Enroll" },
       },
 
       {
