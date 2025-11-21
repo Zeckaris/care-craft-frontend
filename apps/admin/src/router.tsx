@@ -14,6 +14,7 @@ import ParentsPage from "./features/admin/pages/users/ParentsPage";
 import TeachersPage from "./features/admin/pages/users/TeachersPage";
 import CoordinatorsPage from "./features/admin/pages/users/CoordinatorsPage";
 import EnrollPage from "./features/admin/pages/EnrollPage";
+import AcademicCalendarPage from "./features/admin/pages/AcademicCalendarPage";
 
 export const router = createBrowserRouter([
   {
@@ -26,7 +27,6 @@ export const router = createBrowserRouter([
         element: <DashboardPage />,
         handle: { crumb: () => "Dashboard" },
       },
-      // We'll add more admin routes later
       {
         path: "signin",
         element: <SignInPage />,
@@ -75,7 +75,11 @@ export const router = createBrowserRouter([
         element: <EnrollPage />,
         handle: { crumb: () => "Enroll" },
       },
-
+      {
+        path: "/calendar",
+        element: <AcademicCalendarPage />,
+        handle: { crumb: () => "Enroll" },
+      },
       {
         path: "assessments",
         handle: { crumb: () => "Assessments" },

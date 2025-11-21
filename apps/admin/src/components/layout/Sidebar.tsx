@@ -10,6 +10,8 @@ import {
   HeartFilled,
   SafetyOutlined,
   CalendarOutlined,
+  ScheduleOutlined,
+  ReconciliationOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -50,6 +52,12 @@ const menuItems = [
         label: <Link to="/assessments/setup">Setup</Link>,
       },
     ],
+  },
+
+  {
+    key: "/calendar",
+    icon: <ScheduleOutlined />,
+    label: "Academic Calendar",
   },
 ];
 
