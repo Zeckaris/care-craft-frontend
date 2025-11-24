@@ -12,6 +12,7 @@ import {
   CalendarOutlined,
   ScheduleOutlined,
   ReconciliationOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -58,6 +59,11 @@ const menuItems = [
     key: "/calendar",
     icon: <ScheduleOutlined />,
     label: "Academic Calendar",
+  },
+  {
+    key: "/gsa",
+    icon: <AppstoreOutlined />,
+    label: "Grade Subject Assessment Setup",
   },
 ];
 

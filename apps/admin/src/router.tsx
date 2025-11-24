@@ -15,6 +15,7 @@ import TeachersPage from "./features/admin/pages/users/TeachersPage";
 import CoordinatorsPage from "./features/admin/pages/users/CoordinatorsPage";
 import EnrollPage from "./features/admin/pages/EnrollPage";
 import AcademicCalendarPage from "./features/admin/pages/AcademicCalendarPage";
+import GradeSubjectAssessmentsPage from "./features/admin/pages/GradeSubjectAssessmentsPage";
 
 export const router = createBrowserRouter([
   {
@@ -99,6 +100,11 @@ export const router = createBrowserRouter([
             handle: { crumb: () => "Setup" },
           },
         ],
+      },
+      {
+        path: "/gsa",
+        element: <GradeSubjectAssessmentsPage />,
+        handle: { crumb: () => "Assign Subject & Assessment Setup For Grades" },
       },
     ],
   },
