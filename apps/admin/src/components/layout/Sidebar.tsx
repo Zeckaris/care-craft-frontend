@@ -13,6 +13,8 @@ import {
   ScheduleOutlined,
   ReconciliationOutlined,
   AppstoreOutlined,
+  RadarChartOutlined,
+  StrikethroughOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -64,6 +66,16 @@ const menuItems = [
     key: "/gsa",
     icon: <AppstoreOutlined />,
     label: "Grade Subject Assessment Setup",
+  },
+  {
+    key: "/attribute-categories",
+    icon: <RadarChartOutlined />,
+    label: "Attribute Categories",
+  },
+  {
+    key: "/attribute-evaluations",
+    icon: <StrikethroughOutlined />,
+    label: "Attribute Evaluation",
   },
 ];
 

@@ -9,12 +9,19 @@ interface DataType {
   [key: string]: any;
 }
 
-interface Column<T extends DataType> {
+export interface Column<T extends DataType> {
   key: keyof T | string;
   title: string;
   render?: (record: T) => React.ReactNode;
   sorter?: boolean | ((a: T, b: T) => number);
   width?: number;
+}
+
+interface ExtraAction<T> {
+  key: string;
+  label: string;
+  onClick: (record: T) => void;
+  danger?: boolean;
 }
 
 interface DataTableProps<T extends DataType> {
@@ -26,9 +33,10 @@ interface DataTableProps<T extends DataType> {
   emptyText?: string;
   onView?: (record: T) => void;
   onEdit?: (record: T) => void;
-  onDelete?: (key: React.Key) => void; // ← Fixed: React.Key
-  onBulkDelete?: (keys: React.Key[]) => void; // ← Fixed: React.Key[]
+  onDelete?: (key: React.Key) => void;
+  onBulkDelete?: (keys: React.Key[]) => void;
   pagination?: false | import("antd").TablePaginationConfig;
+  extraRowActions?: (record: T) => ExtraAction<T>[];
 }
 
 export function DataTable<T extends DataType>({
@@ -43,6 +51,7 @@ export function DataTable<T extends DataType>({
   onDelete,
   onBulkDelete,
   pagination,
+  extraRowActions,
 }: DataTableProps<T>) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -99,7 +108,8 @@ export function DataTable<T extends DataType>({
           record={record}
           onView={onView}
           onEdit={onEdit}
-          onDelete={onDelete} // ← Pass React.Key
+          onDelete={onDelete}
+          extraActions={extraRowActions?.(record)}
         />
       ),
     },
