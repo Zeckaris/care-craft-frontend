@@ -18,6 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getUser } from "@/utils/auth";
 import { PalettePicker } from "@/components/common/PalettePicker";
+import { useLogout } from "@/hooks/useLogout";
 
 const { Search } = Input;
 const { Header: AntHeader } = Layout;
@@ -25,6 +26,7 @@ const { Text } = Typography;
 
 const Header = () => {
   const navigate = useNavigate();
+  const { logout } = useLogout();
 
   const user = getUser();
   const avatarIcon =
@@ -34,7 +36,7 @@ const Header = () => {
     <Menu
       onClick={({ key }) => {
         if (key === "profile") navigate("/admin/profile");
-        if (key === "logout") console.log("Logout");
+        if (key === "logout") logout();
       }}
     >
       <Menu.Item key="profile">Profile</Menu.Item>
