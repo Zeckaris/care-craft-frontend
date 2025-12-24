@@ -18,6 +18,7 @@ import {
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { MdPlaylistAddCheck } from "react-icons/md";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -76,6 +77,11 @@ const menuItems = [
     key: "/attribute-evaluations",
     icon: <StrikethroughOutlined />,
     label: "Attribute Evaluation",
+  },
+  {
+    key: "/action-plans",
+    icon: <MdPlaylistAddCheck style={{ fontSize: 18 }} />,
+    label: "Action Plans",
   },
 ];
 
