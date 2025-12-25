@@ -19,6 +19,11 @@ import GradeSubjectAssessmentsPage from "./features/admin/pages/GradeSubjectAsse
 import AttributeCategoriesPage from "./features/admin/pages/AttributeCategoriesPage";
 import AttributeEvaluationsPage from "./features/admin/pages/AttributeEvaluationsPage";
 import ActionPlansPage from "@/features/admin/pages/ActionPlansPage";
+import { Typography } from "antd";
+import BadgeCriteriaPage from "./features/admin/pages/badge/BadgeCriteriaPage";
+import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
+
+const { Title, Text } = Typography;
 
 export const router = createBrowserRouter([
   {
@@ -123,6 +128,37 @@ export const router = createBrowserRouter([
         path: "/action-plans",
         element: <ActionPlansPage />,
         handle: { crumb: () => "Action Plans" },
+      },
+      {
+        path: "/badges",
+        handle: { crumb: () => "Badges" },
+        children: [
+          {
+            index: true,
+            element: <Navigate to="definitions" replace />,
+          },
+          {
+            path: "definitions",
+            element: <BadgeDefinitionsPage />,
+            handle: { crumb: () => "Definitions" },
+          },
+          {
+            path: "criteria",
+            element: <BadgeCriteriaPage />,
+            handle: { crumb: () => "Criteria" },
+          },
+          // Placeholder for future Awards page (no actual page yet)
+          {
+            path: "awards",
+            element: (
+              <div style={{ padding: 24, textAlign: "center" }}>
+                <Title level={3}>Student Badge Awards</Title>
+                <Text type="secondary">Coming soon...</Text>
+              </div>
+            ),
+            handle: { crumb: () => "Awards" },
+          },
+        ],
       },
     ],
   },

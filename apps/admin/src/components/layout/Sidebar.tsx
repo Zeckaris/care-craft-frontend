@@ -19,6 +19,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MdPlaylistAddCheck } from "react-icons/md";
+import { RiMedal2Line } from "react-icons/ri";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -57,7 +58,6 @@ const menuItems = [
       },
     ],
   },
-
   {
     key: "/calendar",
     icon: <ScheduleOutlined />,
@@ -83,6 +83,25 @@ const menuItems = [
     icon: <MdPlaylistAddCheck style={{ fontSize: 18 }} />,
     label: "Action Plans",
   },
+  {
+    key: "/badges",
+    icon: <RiMedal2Line style={{ fontSize: 18 }} />,
+    label: "Badges",
+    children: [
+      {
+        key: "/badges/definitions",
+        label: <Link to="/badges/definitions">Definitions</Link>,
+      },
+      {
+        key: "/badges/criteria",
+        label: <Link to="/badges/criteria">Criteria</Link>,
+      },
+      {
+        key: "/badges/awards",
+        label: <Link to="/badges/awards">Awards</Link>,
+      },
+    ],
+  },
 ];
 
 const Sidebar = ({ collapsed }: SidebarProps) => {
@@ -92,18 +111,25 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
   // === CONTROLLED openKeys ===
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
-  // Auto-open if on child route
+  // Auto-open parent if currently on a child route
   useEffect(() => {
     if (location.pathname.startsWith("/assessments")) {
       setOpenKeys(["/assessments"]);
+    } else if (location.pathname.startsWith("/badges")) {
+      setOpenKeys(["/badges"]);
     } else {
       setOpenKeys([]);
     }
   }, [location.pathname]);
 
+  // Allow only one submenu open at a time
   const onOpenChange = (keys: string[]) => {
     const latestOpenKey = keys.find((key) => !openKeys.includes(key));
-    if (latestOpenKey && latestOpenKey === "/assessments") {
+
+    if (
+      latestOpenKey &&
+      (latestOpenKey === "/assessments" || latestOpenKey === "/badges")
+    ) {
       setOpenKeys([latestOpenKey]);
     } else {
       setOpenKeys([]);
