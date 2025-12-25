@@ -22,6 +22,7 @@ import ActionPlansPage from "@/features/admin/pages/ActionPlansPage";
 import { Typography } from "antd";
 import BadgeCriteriaPage from "./features/admin/pages/badge/BadgeCriteriaPage";
 import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
+import ObservationsPage from "./features/admin/pages/ObservationsPage";
 
 const { Title, Text } = Typography;
 
@@ -88,6 +89,11 @@ export const router = createBrowserRouter([
         path: "/calendar",
         element: <AcademicCalendarPage />,
         handle: { crumb: () => "Enroll" },
+      },
+      {
+        path: "/observations",
+        element: <ObservationsPage />,
+        handle: { crumb: () => "Observations" },
       },
       {
         path: "assessments",

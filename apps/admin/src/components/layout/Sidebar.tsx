@@ -20,6 +20,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MdPlaylistAddCheck } from "react-icons/md";
 import { RiMedal2Line } from "react-icons/ri";
+import { EyeOutlined } from "@ant-design/icons";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -101,6 +102,11 @@ const menuItems = [
         label: <Link to="/badges/awards">Awards</Link>,
       },
     ],
+  },
+  {
+    key: "/observations",
+    icon: <EyeOutlined />,
+    label: "Observations",
   },
 ];
 
