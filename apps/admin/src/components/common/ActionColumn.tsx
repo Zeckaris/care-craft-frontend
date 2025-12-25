@@ -110,9 +110,11 @@ export function ActionColumn<T extends Record<string, any>>({
     key: action.key,
     label: action.label,
     danger: action.danger,
-    onClick: () => action.onClick(record),
+    onClick: (e: any) => {
+      e.domEvent.stopPropagation();
+      action.onClick(record); // ← now it calls your function exactly once
+    },
   }));
-
   return (
     <Space size="small">
       {defaultActions}

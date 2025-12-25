@@ -15,26 +15,30 @@ export const useAttributeCategories = (
   {
     search = '',
     pagination = { page: 1, pageSize: 10 },
+    all= false
   }: {
     search?: string;
     pagination?: { page: number; pageSize: number };
+    all ?:boolean
   } = {}
 ) => {
   const queryClient = useQueryClient();
   const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
 
   const urlPath = '/attribute';
-
   // Build query params
   const params = new URLSearchParams();
-  if (search) params.set('name', search);
-  if (pagination) {
+
+  if (all) {
+    params.set('all', 'true');
+  } else {
     params.set('page', String(pagination.page));
     params.set('limit', String(pagination.pageSize));
   }
+  if (search) params.set('name', search);
 
   const fetchUrl = `${urlPath}?${params.toString()}`;
-  const queryKey = [urlPath, { search, pagination }];
+  const queryKey = [urlPath, { search, pagination, all }];
 
   const { data: raw, isLoading, isError, error, refetch } = get(fetchUrl, {
     queryKey,
@@ -43,7 +47,7 @@ export const useAttributeCategories = (
   });
 
   const categories: IAttributeCategory[] = raw?.success ? (raw.data as IAttributeCategory[]) : [];
-  const paginationMeta = raw?.pagination ?? { total: 0, page: 1, limit: 10 };
+  const paginationMeta = raw?.pagination ?? { total: categories.length, page: 1, limit: categories.length };
 
   // Mutations
   const create = async (data: {

@@ -43,7 +43,7 @@ export function AttributeEvaluationDrawer({
   const [showOverrideWarning, setShowOverrideWarning] = useState(false);
 
   const { categories, isLoading: categoriesLoading } = useAttributeCategories({
-    pagination: { page: 1, pageSize: 100 },
+    all: true,
   });
 
   useEffect(() => {

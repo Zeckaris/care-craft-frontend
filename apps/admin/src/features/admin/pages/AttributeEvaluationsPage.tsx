@@ -276,10 +276,10 @@ export default function AttributeEvaluationsPage() {
         }}
         extraRowActions={(record) => [
           {
-            key: "new-evaluation",
+            key: "new-eval",
             label: "New Evaluation (Admin Override)",
-            onClick: () => handleNewEvaluation(record),
             danger: true,
+            onClick: () => handleNewEvaluation(record), // ← this is now correct
           },
         ]}
       />
