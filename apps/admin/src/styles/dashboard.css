@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--background);
+  background: var(--page-bg); /* Changed from var(--background) */
   color: var(--text-dark);
 }
 
@@ -61,18 +61,19 @@
 }
 
 .metric-card {
-  background: var(--white);
+  background: var(--card-bg); /* Changed from var(--white) */
   border-radius: var(--border-radius);
   padding: 20px;
   box-shadow: var(--shadow-sm);
   text-align: center;
   transition: var(--transition);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color); /* Updated to palette border */
 }
 
 .metric-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
+  background: var(--card-bg-hover); /* Added hover tint */
 }
 
 .metric-value {
@@ -102,7 +103,7 @@
   display: flex;
   flex-direction: column;
   min-height: 280px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color); /* Updated border */
 }
 
 .chart-card h3 {
@@ -113,12 +114,12 @@
 }
 
 .feed-card {
-  background: var(--white);
+  background: var(--card-bg); /* Changed from var(--white) */
   border-radius: var(--border-radius);
   padding: 20px;
   box-shadow: var(--shadow-sm);
   min-height: 280px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color); /* Updated border */
 }
 
 .feed-card h3 {
@@ -127,6 +128,7 @@
   color: var(--text-dark);
   font-weight: 600;
 }
+
 .activity-feed {
   padding: 0;
 }
@@ -161,7 +163,7 @@
 }
 
 .quick-link {
-  background: var(--white);
+  background: var(--card-bg); /* Changed from var(--white) */
   border-radius: var(--border-radius);
   padding: 16px;
   box-shadow: var(--shadow-sm);
@@ -172,7 +174,7 @@
   font-weight: 500;
   color: var(--text-dark);
   transition: var(--transition);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color); /* Updated border */
   text-decoration: none;
   cursor: pointer;
 }
@@ -180,7 +182,7 @@
 .quick-link:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  background: var(--background);
+  background: var(--card-bg-hover); /* Updated hover */
 }
 
 .quick-link .anticon {
@@ -228,7 +230,7 @@
   color: var(--primary);
   margin: 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-color); /* Updated from hardcoded */
 }
 
 .full-width {

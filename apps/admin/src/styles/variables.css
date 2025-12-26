@@ -3,18 +3,29 @@
   --primary: var(--palette-primary);
   --success: var(--palette-success);
   --accent: var(--palette-accent);
+  --page-bg: var(
+    --palette-page-bg,
+    var(--palette-bg)
+  ); /* New: Main page background */
+  --content-bg: var(
+    --palette-content-bg,
+    var(--page-bg)
+  ); /* New: Main content area */
+  --card-bg: var(--palette-card-bg, #ffffff); /* Updated fallback */
+  --card-bg-hover: var(--palette-card-bg-hover, #f5f5f5); /* Updated fallback */
+  --border-color: var(--palette-border, #e1e4e8); /* New: Subtle borders */
+  --input-bg: var(--palette-input-bg, #ffffff); /* New: Inputs, search bars */
   --background: var(--palette-bg);
   --text-dark: var(--palette-text);
   --sidebar-bg: var(--palette-sidebar);
   --header-bg: var(--palette-header);
   --white: #ffffff;
-  --bg-layout: var(--background);
-  --card-bg: #fafafa;
-  --card-bg-hover: #f5f5f5;
+  --bg-layout: var(--page-bg);
   --card-success-background: #1fad5392;
   --warning: #faad14;
   --danger: #ef4444;
   --success-bg: rgba(var(--success), 0.08);
+  --font-family-base: "Roboto", sans-serif; /* New: For future font setting */
 
   /* === ACTION ICONS === */
   --action-view: var(--palette-primary);
@@ -28,7 +39,6 @@
   --header-height: 64px;
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 80px;
-  --border-color: #e1e4e8;
   --transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
@@ -52,7 +62,7 @@
   --border-radius-sm: 6px;
 }
 
-/* === PALETTE 1: Muted Classic (Your Original) === */
+/* === PALETTE 1: Forest Sage === */
 .palette-1 {
   --palette-primary: #4f8a6b;
   --palette-success: #22c55e;
@@ -78,9 +88,17 @@
   --warning: #f59e0b;
   --danger: #ef4444;
   --success-bg: rgba(34, 197, 94, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f8faf9;
+  --palette-content-bg: #f8faf9;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #f0f4f2;
+  --palette-border: #e1e8e4;
+  --palette-input-bg: #ffffff;
 }
 
-/* === PALETTE 2: Mint Breeze (Fresh & Modern) === */
+/* === PALETTE 2: Mint Breeze === */
 .palette-2 {
   --palette-primary: #10b981;
   --palette-success: #22c55e;
@@ -106,9 +124,17 @@
   --warning: #f97316;
   --danger: #ef4444;
   --success-bg: rgba(34, 197, 94, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f0fdf4;
+  --palette-content-bg: #f0fdf4;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #e7f5ec;
+  --palette-border: #d4f4e2;
+  --palette-input-bg: #ffffff;
 }
 
-/* === PALETTE 3: Warm Coral (Friendly & Energetic) === */
+/* === PALETTE 3: Warm Coral === */
 .palette-3 {
   --palette-primary: #f43f5e;
   --palette-success: #10b981;
@@ -133,9 +159,17 @@
   --warning: #fb923c;
   --danger: #b91c1c;
   --success-bg: rgba(16, 185, 129, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #fff1f2;
+  --palette-content-bg: #fff1f2;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #fee2e2;
+  --palette-border: #fce4e6;
+  --palette-input-bg: #ffffff;
 }
 
-/* === PALETTE 4: Ocean Teal (Calm & Professional) === */
+/* === PALETTE 4: Ocean Teal === */
 .palette-4 {
   --palette-primary: #0891b2;
   --palette-success: #059669;
@@ -159,10 +193,18 @@
 
   --warning: #f59e0b;
   --danger: #dc2626;
-  --success-bg: rgba(5, 150, 105, 0.08); /* --success = #059669 */
+  --success-bg: rgba(5, 150, 105, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #ecfeff;
+  --palette-content-bg: #ecfeff;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #e4f9fb;
+  --palette-border: #cff9fb;
+  --palette-input-bg: #ffffff;
 }
 
-/* === PALETTE 5: Sunset Purple (Bold & Modern) === */
+/* === PALETTE 5: Sunset Purple === */
 .palette-5 {
   --palette-primary: #8b5cf6;
   --palette-success: #10b981;
@@ -187,39 +229,18 @@
   --warning: #f97316;
   --danger: #c026d3;
   --success-bg: rgba(16, 185, 129, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #faf5ff;
+  --palette-content-bg: #faf5ff;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #f3e8ff;
+  --palette-border: #ede9fe;
+  --palette-input-bg: #ffffff;
 }
 
-/* === PALETTE 6: Dark Mode (Sleek & Elegant) === */
+/* === PALETTE 6: Vivid Sky === */
 .palette-6 {
-  --palette-primary: #60a5fa;
-  --palette-success: #34d399;
-  --palette-accent: #fbbf24;
-  --palette-bg: #0f172a;
-  --palette-text: #e2e8f0;
-  --palette-sidebar: #1e293b;
-  --palette-header: #0f172a;
-  --border-color: #334155;
-
-  --sidebar-text: #f1f5f9;
-  --sidebar-hover: #334155;
-  --sidebar-selected: #475569;
-  --sidebar-border: #334155;
-  --sidebar-scroll: #475569;
-  --primary-dark: #3b82f6;
-  --header-icon-bg: rgba(255, 255, 255, 0.1);
-
-  --action-view: #60a5fa;
-  --action-edit: #34d399;
-  --action-delete: #f87171;
-  --action-hover: #93c5fd;
-
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --success-bg: rgba(52, 211, 153, 0.08);
-}
-
-/* === PALETTE 6: Vivid Sky (Bright & Modern) === */
-.palette-7 {
   --palette-primary: #0ea5e9;
   --palette-success: #22c55e;
   --palette-accent: #f97316;
@@ -244,4 +265,272 @@
   --warning: #f97316;
   --danger: #ef4444;
   --success-bg: rgba(34, 197, 94, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f0f9ff;
+  --palette-content-bg: #f0f9ff;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #e0f2fe;
+  --palette-border: #e0f2fe;
+  --palette-input-bg: #ffffff;
+}
+
+/* === PALETTE 7: Classic Navy & Gold === */
+.palette-7 {
+  --palette-primary: #0c2340;
+  --palette-success: #059669;
+  --palette-accent: #f59e0b;
+  --palette-bg: #f0f7ff;
+  --palette-text: #1e293b;
+  --palette-sidebar: #001233;
+  --palette-header: #0c2340;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #0a1d56;
+  --header-icon-bg: rgba(255, 255, 255, 0.2);
+  --icon-color: #ffffff;
+
+  --action-view: #0c2340;
+  --action-edit: #059669;
+  --action-delete: #dc2626;
+  --action-hover: #1e40af;
+
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --success-bg: rgba(5, 150, 105, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f0f7ff;
+  --palette-content-bg: #f0f7ff;
+  --palette-card-bg: #ffffff; /* Keep white */
+  --palette-card-bg-hover: #e0f0ff; /* Slight blue tint on hover */
+  --palette-border: #d0e8ff;
+  --palette-input-bg: #ffffff;
+}
+
+/* === PALETTE 8: Maroon & Cream === */
+.palette-8 {
+  --palette-primary: #861f2d;
+  --palette-success: #16a34a;
+  --palette-accent: #ca8a04;
+  --palette-bg: #fef2f2;
+  --palette-text: #451a1a;
+  --palette-sidebar: #991b1b;
+  --palette-header: #861f2d;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #7f1d1d;
+  --header-icon-bg: rgba(255, 255, 255, 0.2);
+
+  --action-view: #861f2d;
+  --action-edit: #16a34a;
+  --action-delete: #b91c1c;
+  --action-hover: #dc2626;
+
+  --warning: #ca8a04;
+  --danger: #b91c1c;
+  --success-bg: rgba(22, 163, 74, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #fef2f2;
+  --palette-content-bg: #fef2f2;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #fed4d4;
+  --palette-border: #fdb4b4;
+  --palette-input-bg: #ffffff;
+}
+
+/* === PALETTE 9: Forest Green & Beige === */
+.palette-9 {
+  --palette-primary: #264e36;
+  --palette-success: #22c55e;
+  --palette-accent: #f59e0b;
+  --palette-bg: #f4f9f4;
+  --palette-text: #1e293b;
+  --palette-sidebar: #1e3a2a;
+  --palette-header: #264e36;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #1e3a2a;
+
+  --action-view: #264e36;
+  --action-edit: #22c55e;
+  --action-delete: #dc2626;
+  --action-hover: #4ade80;
+
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --success-bg: rgba(34, 197, 94, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f4f9f4;
+  --palette-content-bg: #f4f9f4;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #e0f2e0;
+  --palette-border: #c0e6c0;
+  --palette-input-bg: #ffffff;
+}
+
+/* === PALETTE 10: Royal Purple & Silver === */
+.palette-10 {
+  --palette-primary: #581c87;
+  --palette-success: #059669;
+  --palette-accent: #e11d48;
+  --palette-bg: #f4f1fb;
+  --palette-text: #4c1d95;
+  --palette-sidebar: #4c1d95;
+  --palette-header: #581c87;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #4c1d95;
+
+  --action-view: #581c87;
+  --action-edit: #059669;
+  --action-delete: #e11d48;
+  --action-hover: #7c3aed;
+
+  --warning: #fbbf24;
+  --danger: #e11d48;
+  --success-bg: rgba(5, 150, 105, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f4f1fb;
+  --palette-content-bg: #f4f1fb;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #e8e0ff;
+  --palette-border: #d8ccff;
+  --palette-input-bg: #ffffff;
+}
+
+/* === PALETTE 11: Crimson & Gray === */
+.palette-11 {
+  --palette-primary: #9b2c2c;
+  --palette-success: #16a34a;
+  --palette-accent: #ca8a04;
+  --palette-bg: #f8f5f5;
+  --palette-text: #1f2937;
+  --palette-sidebar: #7f1d1d;
+  --palette-header: #9b2c2c;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #7f1d1d;
+
+  --action-view: #9b2c2c;
+  --action-edit: #16a34a;
+  --action-delete: #b91c1c;
+  --action-hover: #dc2626;
+
+  --warning: #ca8a04;
+  --danger: #b91c1c;
+  --success-bg: rgba(22, 163, 74, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #f8f5f5;
+  --palette-content-bg: #f8f5f5;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #fde0e0;
+  --palette-border: #fbc0c0;
+  --palette-input-bg: #ffffff;
+}
+
+/* === PALETTE 12: Indigo & Light Blue === */
+.palette-12 {
+  --palette-primary: #3730a3;
+  --palette-success: #059669;
+  --palette-accent: #f59e0b;
+  --palette-bg: #eef2ff;
+  --palette-text: #312e81;
+  --palette-sidebar: #4338ca;
+  --palette-header: #3730a3;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.15);
+  --sidebar-selected: rgba(255, 255, 255, 0.25);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-scroll: rgba(255, 255, 255, 0.2);
+  --primary-dark: #312e81;
+
+  --action-view: #3730a3;
+  --action-edit: #059669;
+  --action-delete: #dc2626;
+  --action-hover: #6366f1;
+
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --success-bg: rgba(5, 150, 105, 0.08);
+
+  /* Theming overrides */
+  --palette-page-bg: #eef2ff;
+  --palette-content-bg: #eef2ff;
+  --palette-card-bg: #ffffff;
+  --palette-card-bg-hover: #dde5ff;
+  --palette-border: #c0cfff;
+  --palette-input-bg: #ffffff;
+}
+
+/* === ANT DESIGN GLOBAL OVERRIDES === */
+.ant-card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.ant-card:hover {
+  background: var(--card-bg-hover) !important;
+}
+
+.ant-table {
+  background: var(--card-bg) !important;
+}
+
+.ant-table-thead > tr > th {
+  background: var(--card-bg-hover) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.ant-table-tbody > tr > td {
+  background: var(--card-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: var(--card-bg-hover) !important;
+}
+
+.ant-input,
+.ant-select-selector,
+.ant-picker {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(var(--primary), 0.2) !important;
+}
+
+.ant-pagination-item,
+.ant-btn {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.ant-pagination-item-active,
+.ant-btn-primary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }

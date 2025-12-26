@@ -12,37 +12,42 @@ export const PalettePicker = () => {
       <div style={{ padding: "0 16px 8px" }}>
         <Text strong>Choose Theme</Text>
       </div>
-      {PALETTES.map((p) => (
-        <div
-          key={p.id}
-          onClick={() => setPalette(p.id)}
-          style={{
-            padding: "8px 16px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            borderRadius: 6,
-            backgroundColor:
-              palette === p.id ? "rgba(0, 0, 0, 0.04)" : "transparent",
-          }}
-        >
-          <Radio checked={palette === p.id} />
-          <Space>
-            <span style={{ fontSize: 14 }}>{p.name}</span>
-            <div
-              style={{
-                width: 20,
-                height: 20,
-                backgroundColor: p.color,
-                borderRadius: 4,
-                border: "2px solid #e5e7eb",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              }}
-            />
-          </Space>
-        </div>
-      ))}
+      <div style={{ maxHeight: 400, overflowY: "auto" }}>
+        {" "}
+        {/* NEW: Scrollable list */}
+        {PALETTES.map((p) => (
+          <div
+            key={p.id}
+            onClick={() => setPalette(p.id)}
+            style={{
+              padding: "8px 16px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              borderRadius: 6,
+              backgroundColor:
+                palette === p.id ? "rgba(0, 0, 0, 0.04)" : "transparent",
+            }}
+          >
+            <Radio checked={palette === p.id} />
+            <Space>
+              <span style={{ fontSize: 14 }}>{p.name}</span>
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: p.color,
+                  borderRadius: 4,
+                  border: "2px solid #e5e7eb",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                }}
+              />
+            </Space>
+          </div>
+        ))}
+      </div>{" "}
+      {/* NEW: End of scrollable div */}
       <div
         style={{
           padding: "12px 16px 0",
