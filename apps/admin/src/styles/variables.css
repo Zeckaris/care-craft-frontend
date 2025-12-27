@@ -49,6 +49,11 @@
   --font-large: 18px;
 }
 
+/* Apply font globally */
+body {
+  font-family: var(--font-family-base), "Roboto";
+}
+
 /* === SHADOWS === */
 :root {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
@@ -533,4 +538,27 @@
 .ant-btn-primary {
   background: var(--primary) !important;
   border-color: var(--primary) !important;
+}
+
+/* Global font override for most AntD components */
+.ant-card,
+.ant-btn,
+.ant-input,
+.ant-select-selector,
+.ant-picker,
+.ant-table,
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td,
+.ant-pagination-item,
+.ant-menu,
+.ant-menu-item,
+.ant-menu-submenu-title,
+.ant-typography,
+.ant-typography h1,
+.ant-typography h2,
+.ant-typography h3,
+.ant-typography h4,
+.ant-typography h5,
+.ant-typography h6 {
+  font-family: var(--font-family-base) !important;
 }

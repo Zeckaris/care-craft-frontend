@@ -6,9 +6,7 @@ body {
     --page-bg
   ); /* Changed from var(--background) to use palette-specific page bg */
   color: var(--text-dark);
-  font-family: var(
-    --font-family-base
-  ); /* Updated to use the new font variable (ready for admin setting) */
+  font-family: var(--font-family-base, "Roboto");
 }
 
 /* ================= LAYOUT ROOT ================= */
