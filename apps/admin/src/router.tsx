@@ -23,6 +23,7 @@ import { Typography } from "antd";
 import BadgeCriteriaPage from "./features/admin/pages/badge/BadgeCriteriaPage";
 import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
 import ObservationsPage from "./features/admin/pages/ObservationsPage";
+import { SettingsPage } from "./features/admin/pages/SettingsPage";
 
 const { Title, Text } = Typography;
 
@@ -32,6 +33,11 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        handle: { crumb: () => "Settings" },
+      },
       {
         path: "dashboard",
         element: <DashboardPage />,
