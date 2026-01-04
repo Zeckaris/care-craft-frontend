@@ -1,7 +1,8 @@
 import { Typography, Divider, Space } from "antd";
 import { BrandingSection } from "@/components/settings/BrandingSection";
+import { SecuritySection } from "@/components/settings/SecuritySection";
+
 // Placeholder imports will come later
-// import { SecuritySection } from "@/components/settings/SecuritySection";
 // import { AnnouncementsSection } from "@/components/settings/AnnouncementsSection";
 // import { DataExportSection } from "@/components/settings/DataExportSection";
 // import { DangerZoneSection } from "@/components/settings/DangerZoneSection";
@@ -33,8 +34,8 @@ export const SettingsPage = () => {
         {/* 1. Branding - Fully Implemented */}
         <BrandingSection />
 
-        {/* 2. Security & Sessions - Placeholder */}
-        {/* <SecuritySection /> */}
+        {/* 2. Security & Sessions - Now Active */}
+        <SecuritySection />
 
         {/* 3. Announcements - Placeholder */}
         {/* <AnnouncementsSection /> */}
@@ -53,11 +54,6 @@ export const SettingsPage = () => {
         </Title>
 
         {[
-          {
-            title: "Security & Sessions",
-            icon: "🔐",
-            desc: "MFA, session management, and logout controls",
-          },
           {
             title: "Announcements",
             icon: "📢",
