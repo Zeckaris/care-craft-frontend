@@ -1,7 +1,16 @@
-// src/features/auth/pages/SignInPage.tsx
-import { Form, Input, Button, Card, Typography, Alert } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Typography,
+  Alert,
+  message,
+  Spin,
+} from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useLogin } from "@/hooks/useLogin";
+import { useState } from "react";
 
 const { Title, Text } = Typography;
 
@@ -9,9 +18,28 @@ export default function SignInPage() {
   const [form] = useForm();
   const { login, loading, error, setError } = useLogin();
 
-  const onFinish = async (values: { email: string; password: string }) => {
-    const user = await login(values.email, values.password);
-    if (user) {
+  const [showMfaInput, setShowMfaInput] = useState(false);
+
+  const onFinish = async (values: {
+    email: string;
+    password: string;
+    mfaCode?: string;
+  }) => {
+    setError(null);
+    setShowMfaInput(false);
+
+    const { email, password, mfaCode } = values;
+
+    const result = await login(email, password, mfaCode);
+
+    if (result && result.mfaRequired) {
+      setShowMfaInput(true);
+      message.info("A verification code has been sent to your email.");
+      return;
+    }
+
+    if (result) {
+      message.success("Login successful!");
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1000);
@@ -58,15 +86,44 @@ export default function SignInPage() {
               { type: "email", message: "Invalid email" },
             ]}
           >
-            <Input placeholder="Email" size="large" />
+            <Input placeholder="Email" size="large" disabled={loading} />
           </Form.Item>
 
           <Form.Item
             name="password"
             rules={[{ required: true, message: "Password is required" }]}
           >
-            <Input.Password placeholder="Password" size="large" />
+            <Input.Password
+              placeholder="Password"
+              size="large"
+              disabled={loading}
+            />
           </Form.Item>
+
+          {showMfaInput && (
+            <Form.Item
+              name="mfaCode"
+              rules={[
+                { required: true, message: "Verification code is required" },
+              ]}
+            >
+              <Input
+                placeholder="••••••"
+                size="large"
+                maxLength={6}
+                style={{
+                  textAlign: "center",
+                  letterSpacing: "12px",
+                  fontSize: "24px",
+                  fontWeight: "600",
+                  padding: "12px 8px",
+                }}
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "••••••")}
+                disabled={loading}
+              />
+            </Form.Item>
+          )}
 
           <Button
             type="primary"
@@ -79,10 +136,24 @@ export default function SignInPage() {
               borderColor: "var(--primary)",
               borderRadius: 8,
               fontWeight: 600,
+              marginTop: showMfaInput ? 8 : 24,
             }}
           >
-            Sign In
+            {showMfaInput ? "Verify & Sign In" : "Sign In"}
           </Button>
+
+          {/* Clear loading feedback below button */}
+          {loading && (
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <Spin size="default" />
+              <Text
+                type="secondary"
+                style={{ marginLeft: 12, display: "block", marginTop: 8 }}
+              >
+                {showMfaInput ? "Verifying code..." : "Signing you in..."}
+              </Text>
+            </div>
+          )}
         </Form>
 
         <Text
