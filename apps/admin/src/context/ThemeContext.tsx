@@ -8,7 +8,6 @@ interface ThemeState {
   setFontFamily: (font: string) => void;
 }
 
-// Palette definitions
 export const PALETTES = [
   { id: "palette-1", name: "Forest Sage", color: "#4f8a6b" },
   { id: "palette-2", name: "Mint Breeze", color: "#10b981" },
@@ -24,7 +23,6 @@ export const PALETTES = [
   { id: "palette-12", name: "Indigo & Light Blue", color: "#3730a3" },
 ] as const;
 
-// Font links mapping (Google Fonts)
 const FONT_LINKS: Record<string, string> = {
   Roboto:
     "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap",
@@ -50,11 +48,18 @@ export const ThemeContext = createContext<ThemeState | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [palette, setPaletteState] = useState<string | null>(null); // null = not ready
-  const [fontFamily, setFontFamilyState] = useState<string>("Roboto"); // default
-  const { schoolInfo, isLoading: schoolLoading } = useSchoolInfo();
+  const [palette, setPaletteState] = useState<string | null>(null);
+  const [fontFamily, setFontFamilyState] = useState<string>("Roboto");
 
-  // Palette logic (unchanged)
+  // Check if user is logged in
+  const storedUser = localStorage.getItem("user");
+  const isAuthenticated = !!storedUser;
+
+  // Only call useSchoolInfo when authenticated
+  const schoolInfoResult = isAuthenticated ? useSchoolInfo() : null;
+  const schoolInfo = schoolInfoResult?.schoolInfo || null;
+  const schoolLoading = schoolInfoResult ? schoolInfoResult.isLoading : false;
+
   const setPalette = (id: string) => {
     const normalizedId = id.startsWith("palette-") ? id : `palette-${id}`;
     document.documentElement.className = normalizedId;
@@ -80,18 +85,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [schoolInfo, schoolLoading]);
 
-  // Font effect: load Google Fonts and update CSS variable
   useEffect(() => {
     if (!fontFamily) return;
 
-    // Inject Google Font
     if (!document.getElementById(`font-${fontFamily}`)) {
       const link = document.createElement("link");
       link.id = `font-${fontFamily}`;
       link.rel = "stylesheet";
       link.href = FONT_LINKS[fontFamily] || FONT_LINKS["Roboto"];
       link.onload = () => {
-        // Update CSS variable after font is loaded
         document.documentElement.style.setProperty(
           "--font-family-base",
           fontFamily
@@ -99,7 +101,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       };
       document.head.appendChild(link);
     } else {
-      // Font already exists — just update CSS variable
       document.documentElement.style.setProperty(
         "--font-family-base",
         fontFamily
@@ -113,13 +114,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     setFontFamilyState(font);
   };
 
-  if (palette === null || schoolLoading) {
+  if (palette === null || (isAuthenticated && schoolLoading)) {
     return null;
   }
 
   return (
     <ThemeContext.Provider
-      value={{ palette, setPalette, fontFamily, setFontFamily }}
+      value={{
+        palette: palette || "palette-1",
+        setPalette,
+        fontFamily,
+        setFontFamily,
+      }}
     >
       {children}
     </ThemeContext.Provider>

@@ -33,11 +33,7 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
-      {
-        path: "settings",
-        element: <SettingsPage />,
-        handle: { crumb: () => "Settings" },
-      },
+
       {
         path: "dashboard",
         element: <DashboardPage />,
@@ -80,6 +76,11 @@ export const router = createBrowserRouter([
         path: "/teachers",
         element: <TeachersPage />,
         handle: { crumb: () => "Teachers" },
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        handle: { crumb: () => "Settings" },
       },
       {
         path: "/coordinators",
