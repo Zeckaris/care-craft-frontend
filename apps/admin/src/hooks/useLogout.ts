@@ -15,7 +15,7 @@ export const useLogout = () => {
     } finally {
       clearUser();
       message.info('You have been logged out');
-      navigate('/login', { replace: true });
+      navigate('/signin', { replace: true });
     }
   };
 
