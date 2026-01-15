@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { message } from 'antd';
 import { useApi } from '@/hooks/useApi';
 import { capitalizeFirstLetter } from '@/utils/string';
+import { useUser } from '@/context/UserContext';
 
 export const useLogin = () => {
   const { post, postMutation } = useApi(); 
   const [error, setError] = useState<string | null>(null);
+  const { setUser } = useUser(); // <-- set user in context
 
   const login = async (email: string, password: string, mfaCode?: string) => {
     setError(null);
@@ -22,9 +24,12 @@ export const useLogin = () => {
       }
 
       if (res.success) {
-        const { firstName, role } = res.data.user;
+        const { firstName, role, email: userEmail, _id } = res.data.user;
         const formattedName = capitalizeFirstLetter(firstName);
-        localStorage.setItem('user', JSON.stringify({ firstName: formattedName, role }));
+
+        // Set user in context
+        setUser({ id: _id, firstName: formattedName, role, email: userEmail });
+
         message.success(res.message || 'Login successful!');
         return res.data.user;
       }
