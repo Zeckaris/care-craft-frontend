@@ -1,20 +1,21 @@
 import { Breadcrumb as AntBreadcrumb, Typography } from "antd";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
-import { getUser } from "@/utils/auth";
+import { useUser } from "@/context/UserContext";
 import { useLocation } from "react-router-dom";
 
 const { Text } = Typography;
 
 export const Breadcrumb = () => {
   const crumbs = useBreadcrumb();
-  const user = getUser();
+  const { user, isLoading } = useUser();
+  const location = useLocation();
 
-  // === DASHBOARD MODE: Only one crumb and it's "Dashboard" ===
+  // === DASHBOARD MODE ===
   if (location.pathname === "/dashboard") {
     return (
       <div className="dashboard-breadcrumb">
         <h2 className="welcome-title">
-          Welcome {user.firstName ? user.firstName : "Admin"}
+          Welcome {user?.firstName || "Admin"} {/* safe access */}
         </h2>
         <div className="dashboard-page-title">
           <Text strong style={{ color: "var(--primary)", fontSize: "16px" }}>
@@ -25,7 +26,7 @@ export const Breadcrumb = () => {
     );
   }
 
-  // === NORMAL MODE: Render trail from string[] ===
+  // === NORMAL MODE ===
   if (crumbs.length === 0) return null;
 
   return (

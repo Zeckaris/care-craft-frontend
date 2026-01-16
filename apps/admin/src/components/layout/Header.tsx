@@ -16,8 +16,8 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { getUser } from "@/utils/auth";
 import { useLogout } from "@/hooks/useLogout";
+import { useUser } from "@/context/UserContext";
 
 const { Search } = Input;
 const { Header: AntHeader } = Layout;
@@ -26,8 +26,8 @@ const { Text } = Typography;
 const Header = () => {
   const navigate = useNavigate();
   const { logout } = useLogout();
+  const { user } = useUser(); // <-- get user from context
 
-  const user = getUser();
   const avatarIcon =
     user?.role === "admin" ? <CrownOutlined /> : <TeamOutlined />;
 
@@ -86,7 +86,7 @@ const Header = () => {
                 color: "var(--white)",
               }}
             >
-              {user?.firstName || "Guest"}
+              {user?.firstName || "Guest"} {/* <-- safe fallback */}
             </Text>
           </Space>
         </Dropdown>
