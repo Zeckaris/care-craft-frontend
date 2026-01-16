@@ -20,7 +20,7 @@ export const useSecurity = () => {
   // Suspend a user (admin only)
   const suspendUser = async (userId: string, reason?: string) => {
     await patch({ 
-      url: `/users/${userId}/suspend`, 
+      url: `${basePath}/users/${userId}/suspend`, 
       body: reason ? { suspensionReason: reason } : {} 
     });
   };
@@ -28,7 +28,7 @@ export const useSecurity = () => {
   // Unsuspend a user (admin only)
   const unsuspendUser = async (userId: string) => {
     await patch({ 
-      url: `/users/${userId}/unsuspend`, 
+      url: `${basePath}/users/${userId}/unsuspend`, 
       body: {} 
     });
   };
