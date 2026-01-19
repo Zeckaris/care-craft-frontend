@@ -1,11 +1,7 @@
 import { Typography, Divider, Space } from "antd";
 import { BrandingSection } from "@/components/settings/BrandingSection";
 import { SecuritySection } from "@/components/settings/SecuritySection";
-
-// Placeholder imports will come later
-// import { AnnouncementsSection } from "@/components/settings/AnnouncementsSection";
-// import { DataExportSection } from "@/components/settings/DataExportSection";
-// import { DangerZoneSection } from "@/components/settings/DangerZoneSection";
+import { AnnouncementSection } from "@/components/settings/AnnouncementSection";
 
 const { Title, Paragraph } = Typography;
 
@@ -33,16 +29,12 @@ export const SettingsPage = () => {
       <div className="settings-sections">
         {/* 1. Branding - Fully Implemented */}
         <BrandingSection />
-
         {/* 2. Security & Sessions - Now Active */}
         <SecuritySection />
-
-        {/* 3. Announcements - Placeholder */}
-        {/* <AnnouncementsSection /> */}
-
+        {/* 3. Announcements */}
+        <AnnouncementSection /> {/* <-- Activated */}
         {/* 4. Data Export & Print - Placeholder */}
         {/* <DataExportSection /> */}
-
         {/* 5. Danger Zone - Placeholder */}
         {/* <DangerZoneSection /> */}
       </div>
@@ -54,11 +46,6 @@ export const SettingsPage = () => {
         </Title>
 
         {[
-          {
-            title: "Announcements",
-            icon: "📢",
-            desc: "Send broadcast messages to user groups with history",
-          },
           {
             title: "Data Export & Print",
             icon: "📊",
