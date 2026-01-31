@@ -1,11 +1,11 @@
 import { useApi } from '@/hooks/useApi';
 import type { Notification } from './notification.type';
 
-export const useAllNotifications = () => {
+export const useUnreadNotifications = () => {
   const { get } = useApi();
 
-  const query = get('/notifications/all', {
-    staleTime: 2 * 60 * 1000, // 2 minutes
+  const query = get('/notifications/unread', {
+    staleTime: 2 * 60 * 1000, 
   });
 
   return {
