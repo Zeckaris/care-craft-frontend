@@ -3,28 +3,51 @@ import {
   Col,
   Row,
   Switch,
-  Button,
   message,
   Spin,
   Typography,
   Space,
   Modal,
-  Input,
   Badge,
+  AutoComplete,
+  Button,
+  Input,
 } from "antd";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { LockOutlined } from "@ant-design/icons";
 import { useSecurity } from "@/hooks/useSecurity";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useUserSearch, type SearchUser } from "@/hooks/useUserSearch";
 import { useState } from "react";
 
 const { Title, Text } = Typography;
-const { confirm } = Modal;
 
 export const SecuritySection = () => {
-  const { toggleMfa, isSaving } = useSecurity();
+  const { toggleMfa, isSaving, suspendUser, unsuspendUser } = useSecurity();
   const { user, isLoading, refetch } = useCurrentUser();
 
   const [mfaLoading, setMfaLoading] = useState(false);
+
+  const [suspendSearch, setSuspendSearch] = useState("");
+  const [unsuspendSearch, setUnsuspendSearch] = useState("");
+
+  const [selectedForSuspend, setSelectedForSuspend] =
+    useState<SearchUser | null>(null);
+  const [selectedForUnsuspend, setSelectedForUnsuspend] =
+    useState<SearchUser | null>(null);
+
+  const [suspendModalOpen, setSuspendModalOpen] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
+  const [suspending, setSuspending] = useState(false);
+
+  const { users: activeUsers, loading: activeLoading } = useUserSearch(
+    suspendSearch,
+    { suspendedOnly: false }
+  );
+
+  const { users: suspendedUsers, loading: suspendedLoading } = useUserSearch(
+    unsuspendSearch,
+    { suspendedOnly: true }
+  );
 
   const handleMfaToggle = async (checked: boolean) => {
     setMfaLoading(true);
@@ -35,22 +58,67 @@ export const SecuritySection = () => {
           checked ? "enabled" : "disabled"
         } successfully`
       );
-      refetch(); // Refresh user data to reflect new MFA status
-      if (checked) {
-        message.info(
-          "You will be required to verify with a code on your next login."
-        );
-      }
-    } catch (err) {
+      refetch();
+    } catch {
       message.error("Failed to update MFA setting");
     } finally {
       setMfaLoading(false);
     }
   };
 
+  const openSuspendModal = (user: SearchUser) => {
+    setSelectedForSuspend(user);
+    setSuspendReason("");
+    setSuspendModalOpen(true);
+  };
+
+  const handleConfirmSuspend = async () => {
+    if (!selectedForSuspend) return;
+
+    try {
+      setSuspending(true);
+      await suspendUser(selectedForSuspend.id, suspendReason.trim());
+      message.success(`${selectedForSuspend.fullName} has been suspended.`);
+      setSuspendModalOpen(false);
+      setSelectedForSuspend(null);
+      setSuspendSearch("");
+    } catch {
+      message.error("Failed to suspend account.");
+    } finally {
+      setSuspending(false);
+    }
+  };
+
+  const handleUnsuspend = async () => {
+    if (!selectedForUnsuspend) return;
+
+    try {
+      await unsuspendUser(selectedForUnsuspend.id);
+      message.success(`${selectedForUnsuspend.fullName} has been restored.`);
+      setSelectedForUnsuspend(null);
+      setUnsuspendSearch("");
+    } catch {
+      message.error("Failed to restore account.");
+    }
+  };
+
+  const renderOption = (user: SearchUser) => ({
+    value: user.id,
+    label: (
+      <Space>
+        <Text strong>{user.fullName}</Text>
+        <Text type="secondary">({user.role})</Text>
+        <Badge
+          status={user.isSuspended ? "error" : "success"}
+          text={user.isSuspended ? "Suspended" : "Active"}
+        />
+      </Space>
+    ),
+  });
+
   if (isLoading) {
     return (
-      <Card style={{ marginBottom: 32 }}>
+      <Card>
         <Spin size="large" style={{ display: "block", margin: "40px auto" }} />
       </Card>
     );
@@ -59,78 +127,140 @@ export const SecuritySection = () => {
   const isMfaEnabled = user?.mfaEnabled || false;
 
   return (
-    <Card
-      title={
-        <Space>
-          <LockOutlined />
-          <span>Security & Sessions</span>
-        </Space>
-      }
-      style={{ marginBottom: 32 }}
-    >
-      <Row gutter={[0, 24]}>
-        {/* MFA Section */}
-        <Col span={24}>
-          <Title level={5}>Multi-Factor Authentication (MFA)</Title>
-          <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
-            Add an extra layer of security by requiring a verification code sent
-            to your email on every login.
-          </Text>
-
-          <Space align="center">
-            <Switch
-              checked={isMfaEnabled}
-              onChange={handleMfaToggle}
-              loading={mfaLoading || isSaving}
-              disabled={isSaving}
-            />
-            <Text strong>
-              {isMfaEnabled ? (
-                <Badge status="success" text="Enabled" />
-              ) : (
-                <Badge status="default" text="Disabled" />
-              )}
-            </Text>
+    <>
+      <Card
+        title={
+          <Space>
+            <LockOutlined />
+            <span>Security & Sessions</span>
           </Space>
+        }
+        style={{ marginBottom: 32 }}
+      >
+        <Row gutter={[0, 24]}>
+          {/* ================= MFA ================= */}
+          <Col span={24}>
+            <Title level={5}>Multi-Factor Authentication</Title>
+            <Space>
+              <Switch
+                checked={isMfaEnabled}
+                onChange={handleMfaToggle}
+                loading={mfaLoading || isSaving}
+              />
+              <Badge
+                status={isMfaEnabled ? "success" : "default"}
+                text={isMfaEnabled ? "Enabled" : "Disabled"}
+              />
+            </Space>
+          </Col>
 
-          {isMfaEnabled && (
-            <Text type="secondary" style={{ display: "block", marginTop: 8 }}>
-              A verification code will be sent to <strong>{user?.email}</strong>{" "}
-              on login.
-            </Text>
-          )}
-        </Col>
-
-        {/* Placeholder for future Account Suspension (when ready) */}
-        <Col span={24}>
-          <Title level={5} style={{ color: "#8c8c8c", marginTop: 32 }}>
-            Account Suspension Management
-          </Title>
-          <Text type="secondary">
-            Manage access for teachers, coordinators, and parents by suspending
-            accounts when needed.
-          </Text>
-          <div
-            style={{
-              padding: "32px",
-              marginTop: 16,
-              background: "#fafafa",
-              border: "1px dashed #d9d9d9",
-              borderRadius: 8,
-              textAlign: "center",
-              opacity: 0.7,
-            }}
-          >
-            <UserOutlined style={{ fontSize: 48, color: "#d9d9d9" }} />
-            <Title level={4} style={{ margin: "16px 0 8px", color: "#8c8c8c" }}>
-              Coming Soon
+          {/* ================= SUSPENSION ================= */}
+          <Col span={24}>
+            <Title level={5} style={{ marginTop: 32 }}>
+              Account Suspension Management
             </Title>
-            <Text type="secondary">
-              List and suspend/unsuspend user accounts
+
+            {/* -------- Suspend -------- */}
+            <Text strong style={{ display: "block" }}>
+              Suspend an account
             </Text>
-          </div>
-        </Col>
-      </Row>
-    </Card>
+            <AutoComplete
+              style={{ maxWidth: 560, width: "100%", marginTop: 8 }}
+              options={activeUsers.map(renderOption)}
+              value={suspendSearch}
+              onSearch={setSuspendSearch}
+              onSelect={(id) => {
+                const selected = activeUsers.find((u) => u.id === id);
+                if (selected) {
+                  setSuspendSearch(selected.fullName);
+                  openSuspendModal(selected);
+                }
+              }}
+              onClear={() => {
+                setSuspendSearch("");
+                setSelectedForSuspend(null);
+              }}
+              allowClear
+              placeholder="Search active users..."
+              notFoundContent={
+                activeLoading ? <Spin size="small" /> : "No active users"
+              }
+            />
+
+            {/* -------- Unsuspend -------- */}
+            <Text strong style={{ marginTop: 24, display: "block" }}>
+              Restore (unsuspend) an account
+            </Text>
+            <AutoComplete
+              style={{ maxWidth: 560, width: "100%", marginTop: 8 }}
+              options={suspendedUsers.map(renderOption)}
+              value={unsuspendSearch}
+              onSearch={setUnsuspendSearch}
+              onSelect={(id) => {
+                const selected = suspendedUsers.find((u) => u.id === id);
+                if (selected) {
+                  setSelectedForUnsuspend(selected);
+                  setUnsuspendSearch(selected.fullName);
+                }
+              }}
+              onClear={() => {
+                setUnsuspendSearch("");
+                setSelectedForUnsuspend(null);
+              }}
+              allowClear
+              placeholder="Search suspended users..."
+              notFoundContent={
+                suspendedLoading ? <Spin size="small" /> : "No suspended users"
+              }
+            />
+
+            {selectedForUnsuspend && (
+              <Space
+                style={{
+                  marginTop: 12,
+                  padding: 12,
+                  background: "#f6ffed",
+                  borderRadius: 6,
+                }}
+              >
+                <Text type="secondary">
+                  Selected: <strong>{selectedForUnsuspend.fullName}</strong> (
+                  {selectedForUnsuspend.role})
+                </Text>
+                <Space>
+                  <Button type="primary" onClick={handleUnsuspend}>
+                    Restore Access
+                  </Button>
+                  <Button onClick={() => setSelectedForUnsuspend(null)}>
+                    Cancel
+                  </Button>
+                </Space>
+              </Space>
+            )}
+          </Col>
+        </Row>
+      </Card>
+
+      {/* ================= SUSPEND MODAL ================= */}
+      <Modal
+        open={suspendModalOpen}
+        title={`Suspend ${selectedForSuspend?.fullName}`}
+        okText="Suspend Account"
+        okButtonProps={{ danger: true, loading: suspending }}
+        onCancel={() => setSuspendModalOpen(false)}
+        onOk={handleConfirmSuspend}
+      >
+        <Text type="secondary">
+          Optionally provide a reason for suspending this account.
+        </Text>
+        <Input.TextArea
+          rows={4}
+          value={suspendReason}
+          onChange={(e) => setSuspendReason(e.target.value)}
+          placeholder="Reason (optional)"
+          style={{ marginTop: 12 }}
+        />
+      </Modal>
+    </>
   );
 };

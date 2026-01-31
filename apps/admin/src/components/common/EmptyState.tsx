@@ -4,8 +4,8 @@ import { PlusOutlined } from "@ant-design/icons";
 interface EmptyStateProps {
   title: string;
   description: string;
-  buttonText: string;
-  onClick: () => void;
+  buttonText?: string;
+  onClick?: () => void;
 }
 
 export const EmptyState = ({
