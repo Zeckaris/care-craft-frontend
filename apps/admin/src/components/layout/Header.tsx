@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Dropdown,
   Input,
   Layout,
@@ -18,6 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/hooks/useLogout";
 import { useUser } from "@/context/UserContext";
+import { useNotificationCounts } from "@/hooks/notifications/useNotificationCounts";
 
 const { Search } = Input;
 const { Header: AntHeader } = Layout;
@@ -26,7 +28,10 @@ const { Text } = Typography;
 const Header = () => {
   const navigate = useNavigate();
   const { logout } = useLogout();
-  const { user } = useUser(); // <-- get user from context
+  const { user } = useUser();
+
+  // New: Get unread count for badge
+  const { unreadCount, isLoading } = useNotificationCounts();
 
   const avatarIcon =
     user?.role === "admin" ? <CrownOutlined /> : <TeamOutlined />;
@@ -61,7 +66,13 @@ const Header = () => {
       {/* RIGHT: Icons + Avatar Dropdown */}
       <Space className="header-actions" size="middle">
         <Tooltip title="Notifications">
-          <BellOutlined className="anticon" />
+          <Badge count={isLoading ? 0 : unreadCount} overflowCount={99}>
+            <BellOutlined
+              className="anticon"
+              onClick={() => navigate("/notifications")}
+              style={{ cursor: "pointer" }}
+            />
+          </Badge>
         </Tooltip>
 
         <Tooltip title="Settings">
@@ -86,7 +97,7 @@ const Header = () => {
                 color: "var(--white)",
               }}
             >
-              {user?.firstName || "Guest"} {/* <-- safe fallback */}
+              {user?.firstName || "Guest"}
             </Text>
           </Space>
         </Dropdown>

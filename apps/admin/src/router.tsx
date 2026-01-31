@@ -24,6 +24,7 @@ import BadgeCriteriaPage from "./features/admin/pages/badge/BadgeCriteriaPage";
 import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
 import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
+import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
 
 const { Title, Text } = Typography;
 
@@ -83,6 +84,11 @@ export const router = createBrowserRouter([
         handle: { crumb: () => "Settings" },
       },
       {
+        path: "/notifications",
+        element: <NotificationsPage />,
+        handle: { crumb: () => "Notifications" },
+      },
+      {
         path: "/coordinators",
         element: <CoordinatorsPage />,
         handle: { crumb: () => "Coordinators" },
@@ -95,7 +101,7 @@ export const router = createBrowserRouter([
       {
         path: "/calendar",
         element: <AcademicCalendarPage />,
-        handle: { crumb: () => "Enroll" },
+        handle: { crumb: () => "Calendar" },
       },
       {
         path: "/observations",
@@ -160,7 +166,7 @@ export const router = createBrowserRouter([
             element: <BadgeCriteriaPage />,
             handle: { crumb: () => "Criteria" },
           },
-          // Placeholder for future Awards page (no actual page yet)
+          // Placeholder for future Awards page
           {
             path: "awards",
             element: (
