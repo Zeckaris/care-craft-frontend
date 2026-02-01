@@ -3,6 +3,10 @@ node_modules/
 pnpm-lock.yaml
 .pnpm-store/
 
+
+#normal files
+fixes_planed.txt
+
 # Vite / Build
 dist/
 .env
