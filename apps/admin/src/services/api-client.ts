@@ -7,7 +7,7 @@ export const apiClient= axios.create({
 })
 
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config: any) => {
   if (config.data instanceof FormData) {
     delete config.headers["Content-Type"];
   } else {

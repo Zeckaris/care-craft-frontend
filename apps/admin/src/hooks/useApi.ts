@@ -9,13 +9,13 @@ export const useApi = () => {
   const get= (url: string, options={})=>{
     return useQuery({
       queryKey: [url],
-      queryFn: ()=>apiClient.get(url).then(r =>r.data),
+      queryFn: ()=>apiClient.get(url).then((r:any) =>r.data),
       ...options,
     })
   }
   const createMutation = <TData= any, TVariables = any>( method: 'post' | 'put' | 'patch' | 'delete', options?: UseMutationOptions<TData, any, TVariables>)=>{
     return useMutation({
-      mutationFn: (vars : any)=> apiClient[method](vars.url, vars.body).then(r => r.data),
+      mutationFn: (vars : any)=> apiClient[method](vars.url, vars.body).then((r:any) => r.data),
       onSuccess: (res: any, variables : any)=>{
         message.success(res.message || 'Success!')
         const base = variables.url.split('/')[1];
