@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export const apiClient= axios.create({
-    baseURL: "http://localhost:5000/api/",
-    headers: { 'Content-Type': 'application/json' },
-    withCredentials: true,
+export const apiClient = axios.create({
+  baseURL: "http://192.168.22.145:5000/api/",
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 })
 
 
@@ -16,6 +16,5 @@ apiClient.interceptors.request.use((config: any) => {
   return config;
 });
 
-export const ASSETS_BASE = 'http://localhost:5000';
 
- 
+export const ASSETS_BASE = 'http://192.168.22.145:5000';
