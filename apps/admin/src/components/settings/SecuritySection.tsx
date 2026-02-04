@@ -13,11 +13,12 @@ import {
   Button,
   Input,
 } from "antd";
-import { LockOutlined } from "@ant-design/icons";
+import { LockOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useSecurity } from "@/hooks/useSecurity";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useUserSearch, type SearchUser } from "@/hooks/useUserSearch";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -39,14 +40,16 @@ export const SecuritySection = () => {
   const [suspendReason, setSuspendReason] = useState("");
   const [suspending, setSuspending] = useState(false);
 
+  const navigate = useNavigate();
+
   const { users: activeUsers, loading: activeLoading } = useUserSearch(
     suspendSearch,
-    { suspendedOnly: false }
+    { suspendedOnly: false },
   );
 
   const { users: suspendedUsers, loading: suspendedLoading } = useUserSearch(
     unsuspendSearch,
-    { suspendedOnly: true }
+    { suspendedOnly: true },
   );
 
   const handleMfaToggle = async (checked: boolean) => {
@@ -56,7 +59,7 @@ export const SecuritySection = () => {
       message.success(
         `Multi-Factor Authentication ${
           checked ? "enabled" : "disabled"
-        } successfully`
+        } successfully`,
       );
       refetch();
     } catch {
@@ -261,6 +264,16 @@ export const SecuritySection = () => {
           style={{ marginTop: 12 }}
         />
       </Modal>
+
+      <div style={{ marginTop: 32, textAlign: "center" }}>
+        <Button
+          type="primary"
+          icon={<UserAddOutlined />}
+          onClick={() => navigate("/invite")}
+        >
+          Send Invite to New Admin
+        </Button>
+      </div>
     </>
   );
 };
