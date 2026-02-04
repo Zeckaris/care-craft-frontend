@@ -1,11 +1,13 @@
 import axios from "axios";
 
-export const apiClient = axios.create({
-  baseURL: "http://192.168.22.145:5000/api/",
-  headers: { 'Content-Type': 'application/json' },
-  withCredentials: true,
-})
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const ASSETS_BASE = import.meta.env.VITE_ASSETS_BASE;
 
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
 
 apiClient.interceptors.request.use((config: any) => {
   if (config.data instanceof FormData) {
@@ -15,6 +17,3 @@ apiClient.interceptors.request.use((config: any) => {
   }
   return config;
 });
-
-
-export const ASSETS_BASE = 'http://192.168.22.145:5000';
