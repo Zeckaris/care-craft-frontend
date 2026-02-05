@@ -10,7 +10,6 @@ import {
   Typography,
 } from "antd";
 import {
-  UserOutlined,
   SettingOutlined,
   BellOutlined,
   CrownOutlined,
@@ -30,13 +29,15 @@ const Header = () => {
   const { logout } = useLogout();
   const { user } = useUser();
 
-  // New: Get unread count for badge
-  const { unreadCount, isLoading } = useNotificationCounts();
-
   const avatarIcon =
     user?.role === "admin" ? <CrownOutlined /> : <TeamOutlined />;
 
-  const userMenu = (
+  // Always call the hook, but disable fetch if no user
+  const notificationData = useNotificationCounts({ enabled: !!user });
+  const unreadCount = notificationData.unreadCount ?? 0;
+  const isLoading = notificationData.isLoading ?? false;
+
+  const userMenu = user ? (
     <Menu
       onClick={({ key }) => {
         if (key === "profile") navigate("/admin/profile");
@@ -47,6 +48,14 @@ const Header = () => {
       <Menu.Item key="logout" danger>
         Logout
       </Menu.Item>
+    </Menu>
+  ) : (
+    <Menu
+      onClick={({ key }) => {
+        if (key === "login") navigate("/signin");
+      }}
+    >
+      <Menu.Item key="login">Login</Menu.Item>
     </Menu>
   );
 
@@ -65,15 +74,17 @@ const Header = () => {
 
       {/* RIGHT: Icons + Avatar Dropdown */}
       <Space className="header-actions" size="middle">
-        <Tooltip title="Notifications">
-          <Badge count={isLoading ? 0 : unreadCount} overflowCount={99}>
-            <BellOutlined
-              className="anticon"
-              onClick={() => navigate("/notifications")}
-              style={{ cursor: "pointer" }}
-            />
-          </Badge>
-        </Tooltip>
+        {user && (
+          <Tooltip title="Notifications">
+            <Badge count={isLoading ? 0 : unreadCount} overflowCount={99}>
+              <BellOutlined
+                className="anticon"
+                onClick={() => navigate("/notifications")}
+                style={{ cursor: "pointer" }}
+              />
+            </Badge>
+          </Tooltip>
+        )}
 
         <Tooltip title="Settings">
           <SettingOutlined
@@ -92,10 +103,7 @@ const Header = () => {
             <Text
               strong
               className="header-username"
-              style={{
-                fontSize: "var(--font-medium)",
-                color: "var(--white)",
-              }}
+              style={{ fontSize: "var(--font-medium)", color: "var(--white)" }}
             >
               {user?.firstName || "Guest"}
             </Text>
