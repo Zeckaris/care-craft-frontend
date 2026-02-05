@@ -11,16 +11,16 @@ export interface EnrollmentTrendItem {
 /* ---------- UI Activity ---------- */
 export interface Activity {
   id: string;
-  message: string;        
+  message: string;
   timestamp: Date;
-  actionInitial: string; 
+  actionInitial: string;
 }
 
 /* ---------- Shape the backend actually returns ---------- */
 interface BackendActivity {
   id: string;
-  action: string;        
-  entity: string;       
+  action: string;
+  entity: string;
   user: string;
   timestamp: string;
 }
@@ -37,7 +37,7 @@ export interface DashboardStats {
 }
 
 /* ---------- Hook ---------- */
-export const useDashboardStats = () => {
+export const useDashboardStats = ({ enabled = true } = {}) => {
   const { get } = useApi();
 
   const {
@@ -47,9 +47,10 @@ export const useDashboardStats = () => {
     error,
     refetch,
   } = get('/dashboard/stats', {
-    queryKey: ['/dashboard/stats'],
+    enabled, // ✅ CRITICAL: controls execution without breaking hook order
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const stats: DashboardStats | null = raw?.success
@@ -69,14 +70,13 @@ export const useDashboardStats = () => {
   /* ---------- Build UI-ready activities ---------- */
   const recentActivities: Activity[] = (stats?.recentActivities ?? []).map(
     (a) => {
-      /* 1. Fix broken spacing */
       let entity = (a.entity ?? '').replace(/([a-z])([A-Z])/g, '$1 $2');
       const words = entity.trim().split(/\s+/);
       if (!words.length) words.push('Unknown');
 
-      /* 2. Extract entity type & verb from action */
-      const [type, verbKey] = a.action.split('_');               // e.g. ["student","create"]
-      const entityType = type;                                   // "student"
+      const [type, verbKey] = a.action.split('_');
+      const entityType = type;
+
       const verbMap: Record<string, string> = {
         create: 'created',
         update: 'updated',
@@ -85,19 +85,22 @@ export const useDashboardStats = () => {
       };
       const verb = verbMap[verbKey] ?? verbKey;
 
-      /* 3. Actor (first 1-2 words) */
       let actor = words[0];
       if (
         words.length > 1 &&
-        !['created', 'updated', 'deleted', 'enrolled'].includes(words[1].toLowerCase())
+        !['created', 'updated', 'deleted', 'enrolled'].includes(
+          words[1].toLowerCase()
+        )
       ) {
         actor = `${words[0]} ${words[1]}`;
       }
 
-      /* 4. Target (everything after the verb) */
       const verbIdx = words.findIndex((w) =>
-        ['created', 'updated', 'deleted', 'enrolled'].includes(w.toLowerCase())
+        ['created', 'updated', 'deleted', 'enrolled'].includes(
+          w.toLowerCase()
+        )
       );
+
       let target = '';
       if (verbIdx >= 0 && verbIdx < words.length - 1) {
         actor = words.slice(0, verbIdx).join(' ');
@@ -106,9 +109,7 @@ export const useDashboardStats = () => {
         target = words.slice(actor.split(' ').length).join(' ');
       }
 
-      /* 5. Final message with entity type */
       const message = `${actor} ${verb} ${entityType} ${target}`.trim();
-
       const actionInitial = verb.charAt(0).toUpperCase();
 
       return {

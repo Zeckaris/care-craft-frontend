@@ -12,15 +12,32 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useUser } from "@/context/UserContext";
 
 export const DashboardPage = () => {
-  const {
-    totalStudents,
-    totalTeachers,
-    genderBreakdown,
-    totalInGenderChart,
-    recentActivities,
-  } = useDashboardStats();
+  const { user } = useUser();
+
+  // ALWAYS call hooks (Rules of Hooks)
+  const stats = useDashboardStats();
+
+  // Provide safe default values
+  const totalStudents = user ? (stats.totalStudents ?? 0) : 0;
+  const totalTeachers = user ? (stats.totalTeachers ?? 0) : 0;
+  const genderBreakdown = user ? (stats.genderBreakdown ?? []) : [];
+  const totalInGenderChart = user ? (stats.totalInGenderChart ?? 0) : 0;
+  const recentActivities = user ? (stats.recentActivities ?? []) : [];
+
+  // Render a message if the user is not signed in
+  if (!user) {
+    return (
+      <div style={{ padding: 40, textAlign: "center" }}>
+        <h2>Welcome!</h2>
+        <p>
+          Please <a href="/signin">login</a> to view the dashboard.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-page">
