@@ -25,13 +25,18 @@ import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsP
 import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
+import { RequireAuth } from "@/components/common/RequireAuth";
 
 const { Title, Text } = Typography;
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AdminLayout />,
+    element: (
+      <RequireAuth>
+        <AdminLayout />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
 
@@ -39,14 +44,6 @@ export const router = createBrowserRouter([
         path: "dashboard",
         element: <DashboardPage />,
         handle: { crumb: () => "Dashboard" },
-      },
-      {
-        path: "signin",
-        element: <SignInPage />,
-      },
-      {
-        path: "signup",
-        element: <AdminSignupPage />,
       },
       {
         path: "/school-info",
@@ -166,7 +163,6 @@ export const router = createBrowserRouter([
             element: <BadgeCriteriaPage />,
             handle: { crumb: () => "Criteria" },
           },
-          // Placeholder for future Awards page
           {
             path: "awards",
             element: (
@@ -186,7 +182,15 @@ export const router = createBrowserRouter([
     element: <AdminSignupPage />,
   },
   {
+    path: "signin",
+    element: <SignInPage />,
+  },
+  {
     path: "/invite",
-    element: <InviteAdminPage />,
+    element: (
+      <RequireAuth roles={["admin", "coordinator"]}>
+        <InviteAdminPage />
+      </RequireAuth>
+    ),
   },
 ]);
