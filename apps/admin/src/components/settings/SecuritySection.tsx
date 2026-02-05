@@ -241,6 +241,15 @@ export const SecuritySection = () => {
               </Space>
             )}
           </Col>
+          <div style={{ marginTop: 32, textAlign: "center" }}>
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={() => navigate("/invite")}
+            >
+              Send Invite to New User
+            </Button>
+          </div>
         </Row>
       </Card>
 
@@ -264,16 +273,6 @@ export const SecuritySection = () => {
           style={{ marginTop: 12 }}
         />
       </Modal>
-
-      <div style={{ marginTop: 32, textAlign: "center" }}>
-        <Button
-          type="primary"
-          icon={<UserAddOutlined />}
-          onClick={() => navigate("/invite")}
-        >
-          Send Invite to New Admin
-        </Button>
-      </div>
     </>
   );
 };
