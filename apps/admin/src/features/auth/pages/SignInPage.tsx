@@ -7,6 +7,7 @@ import {
   Alert,
   message,
   Spin,
+  Divider,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useLogin } from "@/hooks/useLogin";
@@ -19,6 +20,14 @@ export default function SignInPage() {
   const { login, loading, error, setError } = useLogin();
 
   const [showMfaInput, setShowMfaInput] = useState(false);
+
+  const handleTryDemo = () => {
+    form.setFieldsValue({
+      email: "test@example.com",
+      password: "password123",
+    });
+    message.info("Demo credentials loaded! Click 'Sign In' to continue.");
+  };
 
   const onFinish = async (values: {
     email: string;
@@ -65,6 +74,42 @@ export default function SignInPage() {
         >
           Sign In
         </Title>
+
+        {/* ── NEW DEMO SECTION ── */}
+        <div
+          style={{
+            background: "#f6ffed",
+            border: "1px solid #b7eb8f",
+            borderRadius: 8,
+            padding: "16px",
+            marginBottom: 24,
+            textAlign: "center",
+          }}
+        >
+          <Text
+            strong
+            style={{ display: "block", marginBottom: 8, color: "#389e0d" }}
+          >
+            Just exploring? Try the demo!
+          </Text>
+          <Text type="secondary" style={{ display: "block", marginBottom: 12 }}>
+            See the full dashboard in seconds — no signup required.
+          </Text>
+          <Button
+            type="primary"
+            size="large"
+            onClick={handleTryDemo}
+            block
+            style={{
+              background: "#52c41a",
+              borderColor: "#52c41a",
+              fontWeight: 600,
+            }}
+          >
+            Load Demo Account
+          </Button>
+        </div>
+        {/* ── END DEMO SECTION ── */}
 
         {error && (
           <Alert
@@ -142,7 +187,6 @@ export default function SignInPage() {
             {showMfaInput ? "Verify & Sign In" : "Sign In"}
           </Button>
 
-          {/* Clear loading feedback below button */}
           {loading && (
             <div style={{ textAlign: "center", marginTop: 16 }}>
               <Spin size="default" />
