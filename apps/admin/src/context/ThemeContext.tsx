@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useSchoolInfo } from "@/hooks/useSchoolInfo";
+import { useUser } from "@/context/UserContext";
 
 interface ThemeState {
   palette: string;
@@ -51,14 +52,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [palette, setPaletteState] = useState<string | null>(null);
   const [fontFamily, setFontFamilyState] = useState<string>("Roboto");
 
-  // Check if user is logged in
-  const storedUser = localStorage.getItem("user");
-  const isAuthenticated = !!storedUser;
+  const { user } = useUser();
+  const isAuthenticated = !!user;
 
-  // Only call useSchoolInfo when authenticated
-  const schoolInfoResult = isAuthenticated ? useSchoolInfo() : null;
-  const schoolInfo = schoolInfoResult?.schoolInfo || null;
-  const schoolLoading = schoolInfoResult ? schoolInfoResult.isLoading : false;
+  // Call the hook unconditionally (enabled param is optional, defaults to true)
+  const schoolInfoResult = useSchoolInfo(isAuthenticated);
+
+  // Use the pre-processed fields from your hook
+  const schoolInfo = schoolInfoResult.schoolInfo;
+  const schoolLoading = schoolInfoResult.isLoading;
 
   const setPalette = (id: string) => {
     const normalizedId = id.startsWith("palette-") ? id : `palette-${id}`;
@@ -70,20 +72,27 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (schoolLoading) return;
 
-    if (schoolInfo?.theme) {
-      setPalette(schoolInfo.theme);
+    const dbTheme = schoolInfo?.theme;
+    if (dbTheme) {
+      setPalette(dbTheme);
     } else {
-      const saved = localStorage.getItem("user-palette");
-      setPalette(saved || "palette-1");
+      const saved = localStorage.getItem("user-palette") || "palette-1";
+      setPalette(saved);
     }
 
-    if (schoolInfo?.fontFamily) {
-      setFontFamilyState(schoolInfo.fontFamily);
+    const dbFont = schoolInfo?.fontFamily;
+    if (dbFont) {
+      setFontFamilyState(dbFont);
     } else {
       const savedFont = localStorage.getItem("user-font");
       setFontFamilyState(savedFont || "Roboto");
     }
-  }, [schoolInfo, schoolLoading]);
+  }, [
+    schoolInfo?.theme,
+    schoolInfo?.fontFamily,
+    schoolLoading,
+    isAuthenticated,
+  ]);
 
   useEffect(() => {
     if (!fontFamily) return;
@@ -96,14 +105,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       link.onload = () => {
         document.documentElement.style.setProperty(
           "--font-family-base",
-          fontFamily
+          fontFamily,
         );
       };
       document.head.appendChild(link);
     } else {
       document.documentElement.style.setProperty(
         "--font-family-base",
-        fontFamily
+        fontFamily,
       );
     }
 
@@ -115,7 +124,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   if (palette === null || (isAuthenticated && schoolLoading)) {
-    return null;
+    return <div>Loading theme...</div>;
   }
 
   return (

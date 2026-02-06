@@ -39,16 +39,17 @@ export interface ISchoolInfo {
   createdAt?: string;
   updatedAt?: string;
 }
-export const useSchoolInfo = () => {
+
+export const useSchoolInfo = (enabled = true) => { 
   const { get, post, put, patch, del, postMutation, putMutation, patchMutation, deleteMutation } = useApi();
-  const queryClient = useQueryClient(); // For invalidating queries after update
+  const queryClient = useQueryClient(); 
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const basePath = '/general/school-info';
 
-  // Fetch full school info
-  const { data: rawData, isLoading, refetch } = get(basePath); // refetch is already available from useQuery
+  // Fetch full school info – now respects enabled
+  const { data: rawData, isLoading, refetch } = get(basePath, { enabled });  // ← Only line changed: added { enabled }
 
   const schoolInfo: ISchoolInfo | null = rawData?.success
     ? {
@@ -103,15 +104,15 @@ export const useSchoolInfo = () => {
     return put({ url: basePath, body: formData });
   };
 
-  // Updated: Partial update for branding only - now calls mutateAsync
-const updateBranding = async (branding: { theme?: string; fontFamily?: string }) => {
+  // Partial update for branding only
+  const updateBranding = async (branding: { theme?: string; fontFamily?: string }) => {
     const payload: { theme?: string; fontFamily?: string } = {};
     if (branding.theme !== undefined) payload.theme = branding.theme;
     if (branding.fontFamily !== undefined) payload.fontFamily = branding.fontFamily;
 
-    // Correct call: patch is already mutateAsync
     await patch({ url: `${basePath}/branding`, body: payload });
   };
+
   const remove = () => del({ url: basePath });
 
   return {
