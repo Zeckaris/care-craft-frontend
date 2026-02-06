@@ -2,16 +2,14 @@
 body {
   margin: 0;
   padding: 0;
-  background: var(
-    --page-bg
-  ); /* Changed from var(--background) to use palette-specific page bg */
+  background: var(--page-bg);
   color: var(--text-dark);
   font-family: var(--font-family-base, "Roboto");
 }
 
 /* ================= LAYOUT ROOT ================= */
 .admin-layout .ant-layout {
-  background: var(--page-bg); /* Changed from var(--background) */
+  background: var(--page-bg);
 }
 
 /* ================= SIDEBAR ================= */
@@ -24,7 +22,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  position: relative; /* necessary for absolute trigger */
+  position: relative;
 }
 .ant-layout-sider {
   will-change: width;
@@ -132,7 +130,7 @@ body {
   background: transparent !important;
   border-radius: 0 !important;
   margin: 0 !important;
-  padding: 8px 0 8px 56px !important; /* Deep indent */
+  padding: 8px 0 8px 56px !important;
   height: auto !important;
   line-height: 1.5 !important;
   font-size: 14.5px !important;
@@ -253,9 +251,7 @@ body {
 }
 
 .admin-content {
-  background: var(
-    --content-bg
-  ); /* Changed from var(--white) to palette-specific */
+  background: var(--content-bg);
   color: var(--text-dark);
   margin: 16px;
   padding: 24px;
@@ -263,7 +259,7 @@ body {
   box-shadow: var(--shadow-sm);
   min-height: calc(100vh - 96px);
   overflow: auto;
-  border: 1px solid var(--border-color); /* Added subtle palette border */
+  border: 1px solid var(--border-color);
 }
 
 .admin-content-inner {
@@ -296,4 +292,69 @@ body {
 
 .admin-content::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.25);
+}
+
+/* ────────────────────────────────────────────────
+   MOBILE RESPONSIVE STYLES (all additions below)
+───────────────────────────────────────────────── */
+
+.mobile-hamburger {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Header adjustments */
+  .admin-header {
+    padding: 0 12px;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--header-height);
+    justify-content: space-between;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .mobile-hamburger {
+    display: flex;
+    align-items: center;
+    margin-right: 16px;
+  }
+
+  .header-search {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 16px;
+    margin-left: auto;
+  }
+
+  .header-username {
+    display: none;
+  }
+
+  .header-actions .anticon,
+  .header-actions .ant-avatar {
+    font-size: 22px;
+  }
+
+  .header-actions .ant-avatar {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .main-layout {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .admin-content {
+    margin: 8px !important;
+    padding: 12px !important;
+    width: calc(100% - 16px) !important;
+    box-sizing: border-box;
+    border-radius: 0 !important;
+    overflow-x: hidden !important;
+  }
 }

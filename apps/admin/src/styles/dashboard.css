@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--page-bg); /* Changed from var(--background) */
+  background: var(--page-bg);
   color: var(--text-dark);
 }
 
@@ -61,19 +61,19 @@
 }
 
 .metric-card {
-  background: var(--card-bg); /* Changed from var(--white) */
+  background: var(--card-bg);
   border-radius: var(--border-radius);
   padding: 20px;
   box-shadow: var(--shadow-sm);
   text-align: center;
   transition: var(--transition);
-  border: 1px solid var(--border-color); /* Updated to palette border */
+  border: 1px solid var(--border-color);
 }
 
 .metric-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  background: var(--card-bg-hover); /* Added hover tint */
+  background: var(--card-bg-hover);
 }
 
 .metric-value {
@@ -103,7 +103,7 @@
   display: flex;
   flex-direction: column;
   min-height: 280px;
-  border: 1px solid var(--border-color); /* Updated border */
+  border: 1px solid var(--border-color);
 }
 
 .chart-card h3 {
@@ -114,12 +114,12 @@
 }
 
 .feed-card {
-  background: var(--card-bg); /* Changed from var(--white) */
+  background: var(--card-bg);
   border-radius: var(--border-radius);
   padding: 20px;
   box-shadow: var(--shadow-sm);
   min-height: 280px;
-  border: 1px solid var(--border-color); /* Updated border */
+  border: 1px solid var(--border-color);
 }
 
 .feed-card h3 {
@@ -150,7 +150,6 @@
   border-bottom: none;
 }
 
-/* Critical: Force avatar text to be white and visible */
 .activity-avatar {
   color: white !important;
   background: var(--primary) !important;
@@ -163,7 +162,7 @@
 }
 
 .quick-link {
-  background: var(--card-bg); /* Changed from var(--white) */
+  background: var(--card-bg);
   border-radius: var(--border-radius);
   padding: 16px;
   box-shadow: var(--shadow-sm);
@@ -174,7 +173,7 @@
   font-weight: 500;
   color: var(--text-dark);
   transition: var(--transition);
-  border: 1px solid var(--border-color); /* Updated border */
+  border: 1px solid var(--border-color);
   text-decoration: none;
   cursor: pointer;
 }
@@ -182,7 +181,7 @@
 .quick-link:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  background: var(--card-bg-hover); /* Updated hover */
+  background: var(--card-bg-hover);
 }
 
 .quick-link .anticon {
@@ -200,14 +199,116 @@
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
-  .quick-links {
-    grid-template-columns: 1fr;
+  .dashboard-page {
+    padding: 0;
   }
 
-  .chart-full {
-    grid-column: span 1;
+  .dashboard-header {
+    padding: 0 12px;
+    margin-bottom: 16px;
+  }
+
+  .dashboard-content {
+    padding: 0 0 16px !important;
+  }
+
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 36px;
+  }
+
+  .metric-title {
+    font-size: 13px;
+  }
+
+  .chart-card,
+  .feed-card {
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .qlink-feed-container,
+  .chart-full,
+  .full-width {
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+    width: calc(100% + 24px) !important;
+    box-sizing: border-box;
+  }
+
+  .quick-link {
+    height: 70px !important;
+    font-size: 15px;
+    padding: 0 12px;
+  }
+
+  .quick-link .anticon {
+    font-size: 24px;
+  }
+
+  .activity-item {
+    padding: 10px 0;
+    min-height: 48px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .activity-item .ant-typography strong {
+    font-size: 14px;
+    white-space: normal;
+  }
+
+  .activity-list {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .activity-avatar {
+    margin-left: 0 !important;
+  }
+
+  .chart-full .ant-card-body > div:last-child {
+    font-size: 28px;
+    margin-top: 12px;
+  }
+
+  /* Grade Trend Chart fixes */
+  .recharts-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .recharts-xAxis .recharts-cartesian-axis-tick text {
+    font-size: 9px !important;
+    transform: rotate(-60deg) translate(-10px, -2px) !important;
+    text-anchor: end !important;
+  }
+
+  .recharts-xAxis {
+    height: 60px !important;
+  }
+
+  .recharts-yAxis .recharts-cartesian-axis-tick text {
+    font-size: 10px !important;
+  }
+
+  .recharts-yAxis {
+    width: 28px !important;
+  }
+
+  .recharts-legend-wrapper {
+    bottom: -8px !important;
+    top: auto !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
   }
 }
 
@@ -230,7 +331,7 @@
   color: var(--primary);
   margin: 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color); /* Updated from hardcoded */
+  border-bottom: 1px solid var(--border-color);
 }
 
 .full-width {

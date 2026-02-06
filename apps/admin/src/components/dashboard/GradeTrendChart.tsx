@@ -1,4 +1,3 @@
-// src/components/dashboard/GradeTrendChart.tsx
 import {
   LineChart,
   Line,

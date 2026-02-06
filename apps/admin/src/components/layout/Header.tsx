@@ -14,6 +14,7 @@ import {
   BellOutlined,
   CrownOutlined,
   TeamOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/hooks/useLogout";
@@ -24,7 +25,11 @@ const { Search } = Input;
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
 
-const Header = () => {
+interface HeaderProps {
+  setMobileMenuOpen: (open: boolean) => void;
+}
+
+const Header = ({ setMobileMenuOpen }: HeaderProps) => {
   const navigate = useNavigate();
   const { logout } = useLogout();
   const { user } = useUser();
@@ -32,7 +37,6 @@ const Header = () => {
   const avatarIcon =
     user?.role === "admin" ? <CrownOutlined /> : <TeamOutlined />;
 
-  // Always call the hook, but disable fetch if no user
   const notificationData = useNotificationCounts({ enabled: !!user });
   const unreadCount = notificationData.unreadCount ?? 0;
   const isLoading = notificationData.isLoading ?? false;
@@ -61,7 +65,14 @@ const Header = () => {
 
   return (
     <AntHeader className="admin-header">
-      {/* LEFT: Search */}
+      <div className="mobile-hamburger">
+        <MenuOutlined
+          style={{ fontSize: 24, color: "var(--white)", cursor: "pointer" }}
+          onClick={() => setMobileMenuOpen(true)}
+        />
+      </div>
+
+      {/* LEFT: Search (hidden on mobile via existing CSS) */}
       <div className="header-search">
         <Search
           placeholder="Search students, teachers, subjects..."
