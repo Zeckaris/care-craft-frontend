@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import type { IStudent } from "@/hooks/useStudents";
 import { useState, useEffect } from "react";
 import type { UploadProps } from "antd";
+import { ASSETS_BASE } from "@/services/api-client";
 
 const { Text } = Typography;
 
@@ -141,7 +142,16 @@ export const StudentDrawer = ({
       title={
         <Space>
           {isView && (
-            <Avatar size={48} icon={<UserOutlined />} src={previewUrl} />
+            <Avatar
+              size={48}
+              icon={<UserOutlined />}
+              src={
+                previewUrl ||
+                (student?.profileImage
+                  ? `${ASSETS_BASE}${student.profileImage}`
+                  : null)
+              }
+            />
           )}
           {isView
             ? `${student?.firstName || ""} ${student?.lastName || ""}`.trim() ||
@@ -174,7 +184,16 @@ export const StudentDrawer = ({
         {/* Profile Image */}
         <Form.Item label="Profile Image">
           <Space direction="vertical" align="center" style={{ width: "100%" }}>
-            <Avatar size={96} icon={<UserOutlined />} src={previewUrl} />
+            <Avatar
+              size={96}
+              icon={<UserOutlined />}
+              src={
+                previewUrl ||
+                (student?.profileImage
+                  ? `${ASSETS_BASE}${student.profileImage}`
+                  : null)
+              }
+            />
             {isEdit && (
               <Upload {...uploadProps}>
                 {fileList.length === 0 && (
