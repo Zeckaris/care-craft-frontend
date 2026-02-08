@@ -41,6 +41,11 @@ interface UseStudentsParams {
   search?: string;
 }
 
+// Type guard for File
+function isFile(value: unknown): value is File {
+  return value instanceof File;
+}
+
 export const useStudents = ({
   gradeId,
   pagination = { page: 1, pageSize: 10 },
@@ -66,18 +71,59 @@ export const useStudents = ({
     isError,
     error,
     refetch,
-  } = get(fetchUrl, {
-    queryKey,
-    keepPreviousData: true,
-    staleTime: 30_000,
-  });
+  } = get(fetchUrl, { enabled: true });
 
-  const students: IStudent[] = raw?.success ? (raw.data as IStudent[]) : [];
-  const paginationMeta: PaginationMeta = raw?.pagination ?? { total: 0, page: 1, limit: 10 };
+  const students: IStudent[] = raw?.data || [];
+  const paginationMeta: PaginationMeta = raw?.meta || { total: 0, page: 1, limit: 10 };
 
-  // === MUTATIONS ===
-  const create = async (data: Omit<IStudent, '_id'>) => {
-    const result = await post({ url: '/student', body: data });
+
+  const create = async (data: Omit<IStudent, '_id'> | FormData) => {
+
+    let body: FormData;
+
+    if (data instanceof FormData) {
+      body = data;
+    } else {
+      body = new FormData();
+      for (const [key, value] of Object.entries(data)) {
+        if (value !== undefined && value !== null) {
+          if (key === 'profileImage' && isFile(value)) {
+            body.append(key, value);
+          } else {
+            body.append(key, String(value));
+          }
+        }
+      }
+    }
+
+
+    const result = await post({ url: '/student', body });
+    queryClient.invalidateQueries({ queryKey: ['/student'] });
+    return result;
+  };
+
+
+  const update = async (id: string, data: Partial<IStudent> | FormData) => {
+
+    let body: FormData;
+
+    if (data instanceof FormData) {
+      body = data;
+    } else {
+      body = new FormData();
+      for (const [key, value] of Object.entries(data)) {
+        if (value !== undefined && value !== null) {
+          if (key === 'profileImage' && isFile(value)) {
+            body.append(key, value);
+          } else {
+            body.append(key, String(value));
+          }
+        }
+      }
+    }
+
+
+    const result = await put({ url: `/student/${id}`, body });
     queryClient.invalidateQueries({ queryKey: ['/student'] });
     return result;
   };
@@ -91,12 +137,6 @@ export const useStudents = ({
       body: formData,
     });
 
-    queryClient.invalidateQueries({ queryKey: ['/student'] });
-    return result;
-  };
-
-  const update = async (id: string, data: Partial<IStudent>) => {
-    const result = await put({ url: `/student/${id}`, body: data });
     queryClient.invalidateQueries({ queryKey: ['/student'] });
     return result;
   };

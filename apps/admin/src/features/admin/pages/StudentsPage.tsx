@@ -63,9 +63,7 @@ export default function StudentsPage() {
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     key?: Key;
-  }>({
-    open: false,
-  });
+  }>({ open: false });
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -75,17 +73,6 @@ export default function StudentsPage() {
   const openDrawer = (student: IStudent | null, mode: "view" | "edit") => {
     setSelectedStudent(student);
     setDrawerMode(mode);
-    if (student && mode === "edit") {
-      form.setFieldsValue({
-        firstName: student.firstName,
-        middleName: student.middleName || "",
-        lastName: student.lastName,
-        gender: student.gender,
-        dateOfBirth: student.dateOfBirth ? dayjs(student.dateOfBirth) : null,
-      });
-    } else {
-      form.resetFields();
-    }
     setDrawerOpen(true);
   };
 
@@ -134,25 +121,18 @@ export default function StudentsPage() {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleStudentSubmit = async (formData: FormData) => {
     try {
-      const values = await form.validateFields();
-
-      if (values.dateOfBirth) {
-        values.dateOfBirth = values.dateOfBirth.toISOString();
-      }
-      delete values.profileImage;
-
       if (selectedStudent) {
-        await update(selectedStudent._id, values);
-        message.success("Student updated");
+        await update(selectedStudent._id, formData);
+        message.success("Student updated successfully");
       } else {
-        await create(values);
-        message.success("Student created");
+        await create(formData);
+        message.success("Student created successfully");
       }
       closeDrawer();
     } catch (err) {
-      console.error("Submit error:", err);
+      message.error("Failed to save student");
     }
   };
 
@@ -172,7 +152,11 @@ export default function StudentsPage() {
         <Avatar
           size="small"
           icon={<UserOutlined />}
-          src={student.profileImage}
+          src={
+            typeof student.profileImage === "string"
+              ? student.profileImage
+              : null
+          }
           style={{ backgroundColor: "var(--primary)" }}
         />
       ),
@@ -182,7 +166,7 @@ export default function StudentsPage() {
       title: "Full Name",
       sorter: (a: IStudent, b: IStudent) =>
         `${a.firstName} ${a.lastName}`.localeCompare(
-          `${b.firstName} ${b.lastName}`
+          `${b.firstName} ${b.lastName}`,
         ),
       render: (student: IStudent) => (
         <Space>
@@ -211,6 +195,7 @@ export default function StudentsPage() {
           ? dayjs(student.dateOfBirth).format("MMM D, YYYY")
           : "—",
     },
+    // ... rest of columns remain unchanged
     {
       key: "grade",
       title: "Grade",
@@ -305,7 +290,7 @@ export default function StudentsPage() {
         <Alert
           type="error"
           message="Failed to load students"
-          description={fetchError.message || "Check console or try again later"}
+          description={fetchError.message || "Try again later"}
           showIcon
           closable
           onClose={() => refetch()}
@@ -313,7 +298,7 @@ export default function StudentsPage() {
         />
       )}
 
-      {/* Empty State */}
+      {/* Empty State or Table */}
       {students.length === 0 && !isLoading ? (
         <Empty
           description="No students found"
@@ -346,7 +331,7 @@ export default function StudentsPage() {
         />
       )}
 
-      {/* Delete Modal */}
+      {/* Delete Confirmation */}
       <Modal
         title="Confirm Delete"
         open={confirmDelete.open}
@@ -360,14 +345,13 @@ export default function StudentsPage() {
         <p>This action cannot be undone.</p>
       </Modal>
 
-      {/* Student Drawer */}
       <StudentDrawer
         open={drawerOpen}
         onClose={closeDrawer}
         student={selectedStudent}
         mode={drawerMode}
         form={form}
-        onSubmit={handleSubmit}
+        onSubmit={handleStudentSubmit}
         loading={isCreating || isUpdating}
       />
     </>
