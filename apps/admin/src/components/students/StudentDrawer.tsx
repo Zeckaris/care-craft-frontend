@@ -47,7 +47,10 @@ export const StudentDrawer = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [profileFile, setProfileFile] = useState<File | null>(null);
 
-  // Initialize when drawer opens
+  const displayImageSrc =
+    previewUrl ||
+    (student?.profileImage ? `${ASSETS_BASE}${student.profileImage}` : null);
+
   useEffect(() => {
     if (open) {
       form.resetFields();
@@ -55,12 +58,6 @@ export const StudentDrawer = ({
       setProfileFile(null);
 
       if (student) {
-        setPreviewUrl(
-          typeof student.profileImage === "string"
-            ? student.profileImage
-            : null,
-        );
-
         if (isEdit) {
           form.setFieldsValue({
             firstName: student.firstName,
@@ -145,12 +142,7 @@ export const StudentDrawer = ({
             <Avatar
               size={48}
               icon={<UserOutlined />}
-              src={
-                previewUrl ||
-                (student?.profileImage
-                  ? `${ASSETS_BASE}${student.profileImage}`
-                  : null)
-              }
+              src={displayImageSrc} // ← changed to use the computed value
             />
           )}
           {isView
@@ -187,12 +179,7 @@ export const StudentDrawer = ({
             <Avatar
               size={96}
               icon={<UserOutlined />}
-              src={
-                previewUrl ||
-                (student?.profileImage
-                  ? `${ASSETS_BASE}${student.profileImage}`
-                  : null)
-              }
+              src={displayImageSrc} // ← changed to use the computed value
             />
             {isEdit && (
               <Upload {...uploadProps}>
