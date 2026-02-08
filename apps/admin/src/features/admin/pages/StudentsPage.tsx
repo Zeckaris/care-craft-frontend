@@ -20,6 +20,7 @@ import dayjs from "dayjs";
 import { Avatar, Empty } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import type { Key } from "antd/es/table/interface";
+import { ASSETS_BASE } from "@/services/api-client";
 
 const { Text } = Typography;
 
@@ -153,8 +154,8 @@ export default function StudentsPage() {
           size="small"
           icon={<UserOutlined />}
           src={
-            typeof student.profileImage === "string"
-              ? student.profileImage
+            student.profileImage
+              ? `${ASSETS_BASE}${student.profileImage}`
               : null
           }
           style={{ backgroundColor: "var(--primary)" }}
