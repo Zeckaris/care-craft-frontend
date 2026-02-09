@@ -26,7 +26,6 @@ import {
 } from "@/hooks/useAcademicCalendars";
 
 const { Text } = Typography;
-const { confirm } = Modal; // We'll replace static usage with controlled for compatibility
 
 export default function AcademicCalendarPage() {
   const [form] = Form.useForm();
@@ -34,7 +33,7 @@ export default function AcademicCalendarPage() {
   const [selectedCalendar, setSelectedCalendar] =
     useState<IAcademicCalendar | null>(null);
 
-  // Add states for controlled modals to avoid React 19 / Next.js issues with static modals
+  // Controlled modals states
   const [confirmCurrentVisible, setConfirmCurrentVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [pendingCalendar, setPendingCalendar] =
@@ -72,19 +71,17 @@ export default function AcademicCalendarPage() {
     form.resetFields();
   };
 
-  // Open confirm for set current
   const showSetCurrentConfirm = (calendar: IAcademicCalendar) => {
     setPendingCalendar(calendar);
     setConfirmCurrentVisible(true);
   };
 
-  // Handle set current confirm OK
   const handleSetCurrentOk = async () => {
     if (!pendingCalendar) return;
     try {
       await setCurrent(pendingCalendar._id);
       message.success(
-        `${pendingCalendar.academicYear} is now the current year`
+        `${pendingCalendar.academicYear} is now the current year`,
       );
     } catch (err: any) {
       message.error("Failed to set current year");
@@ -95,13 +92,11 @@ export default function AcademicCalendarPage() {
     }
   };
 
-  // Open confirm for delete
   const showDeleteConfirm = (calendar: IAcademicCalendar) => {
     setPendingCalendar(calendar);
     setConfirmDeleteVisible(true);
   };
 
-  // Handle delete confirm OK
   const handleDeleteOk = async () => {
     if (!pendingCalendar) return;
     try {
@@ -118,23 +113,30 @@ export default function AcademicCalendarPage() {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+
       const payload = {
         academicYear: values.academicYear,
         startDate: values.startDate.toISOString(),
         endDate: values.endDate.toISOString(),
-        isCurrent: false, // backend will handle this
+        isCurrent: false,
+        holidayDates: [] as Date[], // satisfies current type definition
       };
 
       if (selectedCalendar) {
+        // Update - we send partial data
         await update(selectedCalendar._id, payload);
         message.success("Academic year updated");
       } else {
-        await create(payload);
+        // Create - type assertion only here to bypass strict check
+        await create(payload as any);
         message.success("Academic year created");
       }
+
       closeDrawer();
     } catch (err: any) {
-      if (!err.errorFields) message.error("Please check your input");
+      if (!err.errorFields) {
+        message.error("Please check your input");
+      }
     }
   };
 
@@ -205,7 +207,6 @@ export default function AcademicCalendarPage() {
                       : undefined,
                   }}
                 >
-                  {/* Header */}
                   <div
                     style={{
                       padding: "16px 24px",
@@ -269,7 +270,6 @@ export default function AcademicCalendarPage() {
                     </div>
                   </div>
 
-                  {/* Terms Panel */}
                   <div style={{ borderTop: "1px solid " }}>
                     <TermsPanel
                       academicYearId={cal._id}
@@ -293,7 +293,7 @@ export default function AcademicCalendarPage() {
         loading={isCreating || isUpdating}
       />
 
-      {/* Controlled Set Current Modal */}
+      {/* Controlled Confirm Modals */}
       <Modal
         title={
           <>
@@ -315,7 +315,6 @@ export default function AcademicCalendarPage() {
         </p>
       </Modal>
 
-      {/* Controlled Delete Modal */}
       <Modal
         title={
           <>

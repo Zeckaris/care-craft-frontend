@@ -8,7 +8,7 @@ import {
   DatePicker,
   Tag,
 } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { IAcademicCalendar } from "@/hooks/useAcademicCalendars";
 
@@ -38,6 +38,11 @@ export function AcademicCalendarDrawer({
     return dayjs(date).format("DD MMMM YYYY");
   };
 
+  const formatDateArray = (dates: Date[] | undefined): string => {
+    if (!dates || dates.length === 0) return "-";
+    return dates.map((d) => formatDate(d)).join(", ");
+  };
+
   return (
     <Drawer
       title={
@@ -52,8 +57,8 @@ export function AcademicCalendarDrawer({
             {isView
               ? "Academic Year Details"
               : calendar?._id
-              ? "Edit Academic Year"
-              : "Create Academic Year"}
+                ? "Edit Academic Year"
+                : "Create Academic Year"}
           </span>
           <CloseOutlined
             onClick={onClose}
@@ -97,6 +102,21 @@ export function AcademicCalendarDrawer({
           <Descriptions.Item label="End Date">
             {formatDate(calendar?.endDate)}
           </Descriptions.Item>
+          <Descriptions.Item label="Registration Start">
+            {formatDate(calendar?.registrationStartDate)}
+          </Descriptions.Item>
+          <Descriptions.Item label="Registration End">
+            {formatDate(calendar?.registrationEndDate)}
+          </Descriptions.Item>
+          <Descriptions.Item label="New Student Reg. Start">
+            {formatDate(calendar?.newStudentRegistrationStartDate)}
+          </Descriptions.Item>
+          <Descriptions.Item label="New Student Reg. End">
+            {formatDate(calendar?.newStudentRegistrationEndDate)}
+          </Descriptions.Item>
+          <Descriptions.Item label="Holidays">
+            {formatDateArray(calendar?.holidayDates)}
+          </Descriptions.Item>
           <Descriptions.Item label="Created At">
             {formatDate(calendar?.createdAt)}
           </Descriptions.Item>
@@ -133,7 +153,7 @@ export function AcademicCalendarDrawer({
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error("Start date must be before end date")
+                    new Error("Start date must be before end date"),
                   );
                 },
               }),
@@ -157,6 +177,89 @@ export function AcademicCalendarDrawer({
               disabled={loading}
             />
           </Form.Item>
+
+          {/* Registration Dates */}
+          <Form.Item
+            name="registrationStartDate"
+            label="Registration Start Date"
+          >
+            <DatePicker
+              style={{ width: "100%" }}
+              format="DD MMMM YYYY"
+              disabled={loading}
+            />
+          </Form.Item>
+
+          <Form.Item name="registrationEndDate" label="Registration End Date">
+            <DatePicker
+              style={{ width: "100%" }}
+              format="DD MMMM YYYY"
+              disabled={loading}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="newStudentRegistrationStartDate"
+            label="New Student Registration Start"
+          >
+            <DatePicker
+              style={{ width: "100%" }}
+              format="DD MMMM YYYY"
+              disabled={loading}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="newStudentRegistrationEndDate"
+            label="New Student Registration End"
+          >
+            <DatePicker
+              style={{ width: "100%" }}
+              format="DD MMMM YYYY"
+              disabled={loading}
+            />
+          </Form.Item>
+
+          {/* Holidays - Form.List for multiple dates */}
+          <Form.List name="holidayDates">
+            {(fields, { add, remove }) => (
+              <Form.Item label="Holiday Dates">
+                {fields.map(({ key, name, ...restField }) => (
+                  <Space
+                    key={key}
+                    style={{ display: "flex", marginBottom: 8 }}
+                    align="baseline"
+                  >
+                    <Form.Item
+                      {...restField}
+                      name={name}
+                      rules={[{ required: true, message: "Select date" }]}
+                      style={{ marginBottom: 0, width: 300 }}
+                    >
+                      <DatePicker
+                        format="DD MMMM YYYY"
+                        style={{ width: "100%" }}
+                        disabled={loading}
+                      />
+                    </Form.Item>
+                    <CloseOutlined
+                      onClick={() => remove(name)}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </Space>
+                ))}
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                  disabled={loading}
+                >
+                  Add Holiday Date
+                </Button>
+              </Form.Item>
+            )}
+          </Form.List>
         </Form>
       )}
     </Drawer>

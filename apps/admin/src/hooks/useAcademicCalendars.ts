@@ -7,13 +7,19 @@ export interface IAcademicCalendar {
   startDate: string | Date;
   endDate: string | Date;
   isCurrent: boolean;
+
+  registrationStartDate?: string | Date;
+  registrationEndDate?: string | Date;
+  newStudentRegistrationStartDate?: string | Date;
+  newStudentRegistrationEndDate?: string | Date;
+  holidayDates: Date[]; 
+
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
 
 export const useAcademicCalendars = () => {
   const queryClient = useQueryClient();
-  // MAKE SURE YOU DESTRUCTURE 'patch' HERE
   const { get, post, put, del, patch, postMutation, putMutation, deleteMutation } = useApi();
 
   const urlPath = '/calendar';
@@ -35,6 +41,28 @@ export const useAcademicCalendars = () => {
     : [];
 
   const currentCalendar = calendars.find(c => c.isCurrent) || null;
+
+  // NEW: Derived values from currentCalendar (for enrollment UI)
+  const today = new Date();
+
+  const regStart = currentCalendar?.registrationStartDate 
+    ? new Date(currentCalendar.registrationStartDate) 
+    : null;
+
+  const newRegEnd = currentCalendar?.newStudentRegistrationEndDate 
+    ? new Date(currentCalendar.newStudentRegistrationEndDate) 
+    : null;
+
+  const isEnrollmentOpen = 
+    !!currentCalendar &&
+    (!regStart || today >= regStart) &&
+    (!newRegEnd || today <= newRegEnd);
+
+  const registrationWindowText = currentCalendar
+    ? `${regStart ? regStart.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} — ${
+        newRegEnd ? newRegEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'
+      }`
+    : 'No active calendar set';
 
   const create = async (data: Omit<IAcademicCalendar, '_id'>) => {
     const result = await post({ url: urlPath, body: data });
@@ -63,6 +91,11 @@ export const useAcademicCalendars = () => {
   return {
     calendars,
     currentCalendar,
+
+    // NEW: added these for enrollment components
+    isEnrollmentOpen,
+    registrationWindowText,
+
     isLoading,
     isError,
     error: error as any,
