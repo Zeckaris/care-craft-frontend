@@ -1,7 +1,8 @@
-import { Form, Select, Input, Button, Space } from "antd";
+import { Form, Select, Input, Button, Space, Alert } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useStudents } from "@/hooks/useStudents";
 import { useGrades } from "@/hooks/useGrades";
+import { useAcademicCalendars } from "@/hooks/useAcademicCalendars";
 import { useEffect } from "react";
 
 const { Option } = Select;
@@ -20,7 +21,10 @@ export const EnrollmentFormRow = ({
   const { students } = useStudents({ pagination: { page: 1, pageSize: 1000 } });
   const { grades } = useGrades();
 
-  // Filter out already enrolled students (optional — can enhance later)
+  const { currentCalendar, isEnrollmentOpen, registrationWindowText } =
+    useAcademicCalendars();
+
+  // Filter out already enrolled students
   const availableStudents = students.filter((s) => !s.enrollmentId?.isActive);
 
   return (
@@ -90,13 +94,24 @@ export const EnrollmentFormRow = ({
         </Select>
       </Form.Item>
 
-      {/* School Year */}
-      <Form.Item
-        name={[name, "schoolYear"]}
-        style={{ marginBottom: 0, width: 120 }}
-      >
-        <Input placeholder="2024-25" />
+      {/* NEW: School Year - read-only display (no input, uses current calendar) */}
+      <Form.Item label="School Year" style={{ marginBottom: 0, width: 160 }}>
+        <Input
+          value={currentCalendar?.academicYear || "No active calendar"}
+          disabled
+        />
       </Form.Item>
+
+      {/* NEW: Warning if enrollment period is closed */}
+      {!isEnrollmentOpen && currentCalendar && (
+        <Alert
+          message="Enrollment Period Closed"
+          description={`Window: ${registrationWindowText}`}
+          type="warning"
+          showIcon
+          style={{ marginLeft: 8, marginBottom: 0 }}
+        />
+      )}
 
       {/* Remove Button */}
       {!isFirst && (

@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useApi } from '@/hooks/useApi';
+import type { IAcademicCalendar } from './useAcademicCalendars';
 
 export interface IEnrollment {
   _id: string;
@@ -34,6 +35,55 @@ interface UseEnrollmentsParams {
   search?: string;
 }
 
+
+const useCurrentAcademicCalendar = () => {
+  const { get } = useApi();
+
+  const { 
+    data: raw, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = get('/calendar/current', {
+    queryKey: ['/calendar/current'],
+    staleTime: 60_000,
+  });
+
+  const currentCalendar = raw?.success ? (raw.data as IAcademicCalendar) : null;
+
+  const today = new Date();
+
+  const regStart = currentCalendar?.registrationStartDate 
+    ? new Date(currentCalendar.registrationStartDate) 
+    : null;
+
+  const newRegEnd = currentCalendar?.newStudentRegistrationEndDate 
+    ? new Date(currentCalendar.newStudentRegistrationEndDate) 
+    : null;
+
+  const isEnrollmentOpen = 
+    !!currentCalendar &&
+    (!regStart || today >= regStart) &&
+    (!newRegEnd || today <= newRegEnd);
+
+  const registrationWindowText = currentCalendar
+    ? `${regStart ? regStart.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} — ${
+        newRegEnd ? newRegEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'
+      }`
+    : 'No active calendar set';
+
+  return {
+    currentCalendar,
+    isEnrollmentOpen,
+    registrationWindowText,
+    isLoadingCalendar: isLoading,
+    isErrorCalendar: isError,
+    errorCalendar: error as any,
+    refetchCurrent: refetch,
+  };
+};
+
 export const useEnrollments = ({
   gradeId,
   schoolYear,
@@ -42,7 +92,7 @@ export const useEnrollments = ({
   search = '',
 }: UseEnrollmentsParams = {}) => {
   const queryClient = useQueryClient();
-  const { get, post, put, del, postMutation, putMutation, deleteMutation,patch } = useApi();
+  const { get, post, put, del, postMutation, putMutation, deleteMutation, patch } = useApi();
 
   const params = new URLSearchParams();
   if (gradeId) params.set('gradeId', gradeId);
@@ -72,14 +122,23 @@ export const useEnrollments = ({
   const enrollments: IEnrollment[] = raw?.success ? (raw.data as IEnrollment[]) : [];
   const paginationMeta: PaginationMeta = raw?.pagination ?? { total: 0, page: 1, limit: 10 };
 
+  const { 
+    currentCalendar, 
+    isEnrollmentOpen, 
+    registrationWindowText,
+    isLoadingCalendar,
+    isErrorCalendar,
+    errorCalendar,
+  } = useCurrentAcademicCalendar();
+
   // === MUTATIONS ===
-  const create = async (data: { studentId: string; gradeId: string; schoolYear?: string }) => {
+  const create = async (data: { studentId: string; gradeId: string }) => {
     const result = await post({ url: '/enrollment', body: data });
     queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
     return result;
   };
 
-  const bulkCreate = async (data: { studentIds: string[]; gradeId: string; schoolYear?: string }) => {
+  const bulkCreate = async (data: { studentIds: string[]; gradeId: string }) => {
     const result = await post({ url: '/enrollment/bulk', body: data });
     queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
     return result;
@@ -91,11 +150,12 @@ export const useEnrollments = ({
     return result;
   };
 
-const toggleActive = async (id: string) => {
-  const result = await patch({ url: `/enrollment/${id}/active`, body: {} });
-  queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
-  return result;
-};
+  const toggleActive = async (id: string) => {
+    const result = await patch({ url: `/enrollment/${id}/active`, body: {} });
+    queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
+    return result;
+  };
+
   const remove = async (id: string) => {
     const result = await del({ url: `/enrollment/${id}` });
     queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
@@ -113,6 +173,14 @@ const toggleActive = async (id: string) => {
     total: paginationMeta.total,
     currentPage: paginationMeta.page,
     pageSize: paginationMeta.limit,
+
+    // Current calendar & enrollment status
+    currentCalendar,
+    isEnrollmentOpen,
+    registrationWindowText,
+    isLoadingCalendar,
+    isErrorCalendar,
+    errorCalendar,
 
     // Loading & Error
     isLoading,

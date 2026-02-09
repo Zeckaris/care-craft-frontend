@@ -94,7 +94,7 @@ export default function EnrollPage() {
   // === Handlers ===
   const openSingleDrawer = (
     enrollment: IEnrollment | null,
-    mode: "view" | "edit"
+    mode: "view" | "edit",
   ) => {
     setSelectedEnrollment(enrollment);
     setDrawerMode(mode);
@@ -171,12 +171,12 @@ export default function EnrollPage() {
         await update(selectedEnrollment._id, values);
         message.success("Enrollment updated");
       } else {
-        const { studentId, gradeId, schoolYear } = values;
+        const { studentId, gradeId } = values;
         if (!studentId) {
           message.error("Please select a student");
           return;
         }
-        await create({ studentId, gradeId, schoolYear });
+        await create({ studentId, gradeId });
         message.success("Student enrolled successfully");
       }
       closeSingleDrawer();

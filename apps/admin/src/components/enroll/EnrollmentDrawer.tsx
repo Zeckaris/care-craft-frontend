@@ -7,10 +7,12 @@ import {
   Space,
   Avatar,
   Typography,
+  Alert,
 } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useGrades } from "@/hooks/useGrades";
 import { useStudents } from "@/hooks/useStudents";
+import { useAcademicCalendars } from "@/hooks/useAcademicCalendars"; // NEW import
 import { useEffect } from "react";
 
 const { Text } = Typography;
@@ -60,6 +62,10 @@ export const EnrollmentDrawer = ({
   const { students } = useStudents({ pagination: { page: 1, pageSize: 1000 } });
   const { grades } = useGrades();
 
+  // NEW: Get current calendar info
+  const { currentCalendar, isEnrollmentOpen, registrationWindowText } =
+    useAcademicCalendars();
+
   const student = enrollment?.studentId;
   const profileUrl = student?.profileImage || null;
 
@@ -68,7 +74,7 @@ export const EnrollmentDrawer = ({
       form.setFieldsValue({
         studentId: enrollment.studentId._id,
         gradeId: enrollment.gradeId._id,
-        schoolYear: enrollment.schoolYear,
+        // NEW: Do NOT set schoolYear — backend forces it
       });
     } else {
       form.resetFields();
@@ -86,8 +92,8 @@ export const EnrollmentDrawer = ({
             ? `${student?.firstName || ""} ${student?.lastName || ""}`.trim() ||
               "Enrollment Details"
             : enrollment
-            ? "Edit Enrollment"
-            : "New Enrollment"}
+              ? "Edit Enrollment"
+              : "New Enrollment"}
         </Space>
       }
       width={640}
@@ -176,14 +182,24 @@ export const EnrollmentDrawer = ({
           </Select>
         </Form.Item>
 
-        {/* School Year */}
-        <Form.Item
-          name="schoolYear"
-          label="School Year"
-          rules={[{ required: true, message: "Enter school year" }]}
-        >
-          <Input placeholder="2024-25" disabled={isView} />
+        {/* School Year - read-only display from current calendar */}
+        <Form.Item label="School Year">
+          <Input
+            value={currentCalendar?.academicYear || "No active calendar"}
+            disabled
+          />
         </Form.Item>
+
+        {/* Warning if enrollment period is closed */}
+        {!isEnrollmentOpen && currentCalendar && (
+          <Alert
+            message="Enrollment Period Closed"
+            description={`Current window: ${registrationWindowText}`}
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
 
         {/* Status */}
         <Form.Item label="Status">
