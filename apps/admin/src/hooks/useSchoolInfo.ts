@@ -51,14 +51,16 @@ export const useSchoolInfo = (enabled = true) => {
   // Fetch full school info – now respects enabled
   const { data: rawData, isLoading, refetch } = get(basePath, { enabled });  // ← Only line changed: added { enabled }
 
-  const schoolInfo: ISchoolInfo | null = rawData?.success
-    ? {
-        ...rawData.data,
-        logo: rawData.data.logo
-          ? `${ASSETS_BASE}${rawData.data.logo}`
-          : null,
-      }
-    : null;
+ const schoolInfo: ISchoolInfo | null = rawData?.success
+  ? {
+      ...rawData.data,
+      logo: rawData.data.logo
+        ? rawData.data.logo.startsWith("http")
+          ? rawData.data.logo 
+          : `${ASSETS_BASE}${rawData.data.logo}`  
+        : null,
+    }
+  : null;
 
   const serverError = rawData && !rawData.success ? rawData.message : null;
 

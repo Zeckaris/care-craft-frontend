@@ -49,7 +49,11 @@ export const StudentDrawer = ({
 
   const displayImageSrc =
     previewUrl ||
-    (student?.profileImage ? `${ASSETS_BASE}${student.profileImage}` : null);
+    (student?.profileImage?.startsWith("http")
+      ? student.profileImage
+      : student?.profileImage
+        ? `${ASSETS_BASE}${student.profileImage}`
+        : null);
 
   useEffect(() => {
     if (open) {

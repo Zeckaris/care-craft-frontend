@@ -154,9 +154,11 @@ export default function StudentsPage() {
           size="small"
           icon={<UserOutlined />}
           src={
-            student.profileImage
-              ? `${ASSETS_BASE}${student.profileImage}`
-              : null
+            student.profileImage?.startsWith("http")
+              ? student.profileImage
+              : student.profileImage
+                ? `${ASSETS_BASE}${student.profileImage}`
+                : null
           }
           style={{ backgroundColor: "var(--primary)" }}
         />

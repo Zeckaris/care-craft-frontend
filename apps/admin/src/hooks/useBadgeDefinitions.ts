@@ -50,7 +50,6 @@ export const useBadgeDefinitions = ({
   const queryClient = useQueryClient();
   const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
 
-  // Build query params
   const params = new URLSearchParams();
   if (name) params.set('name', name);
   if (level !== undefined) params.set('level', String(level));
@@ -76,33 +75,36 @@ export const useBadgeDefinitions = ({
   const definitions: IBadgeDefinition[] = raw?.success ? (raw.data as IBadgeDefinition[]) : [];
   const paginationMeta: PaginationMeta = raw?.pagination ?? { total: 0, page: 1, limit: 10 };
 
-  // Helper to build body (FormData or plain object)
   const buildBody = (
     data: {
-      name: string;
-      description: string;
-      level: number;
+      name?: string;
+      description?: string;
+      level?: number;
       criteria?: string[];
     },
     iconFile?: File
   ) => {
-    if (!iconFile) {
-      return data; // Plain JSON
-    }
-
     const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('description', data.description);
-    formData.append('level', String(data.level));
-    if (data.criteria && data.criteria.length > 0) {
+
+    if (data.name !== undefined && data.name?.trim()) {
+      formData.append('name', data.name.trim());
+    }
+    if (data.description !== undefined && data.description?.trim()) {
+      formData.append('description', data.description.trim());
+    }
+    if (data.level !== undefined && !isNaN(data.level)) {
+      formData.append('level', String(data.level));
+    }
+    if (data.criteria !== undefined && Array.isArray(data.criteria)) {
       data.criteria.forEach((c) => formData.append('criteria', c));
     }
-    formData.append('icon', iconFile);
+    if (iconFile) {
+      formData.append('icon', iconFile);
+    }
 
     return formData;
   };
 
-  // CREATE
   const create = async (
     data: {
       name: string;
@@ -118,7 +120,6 @@ export const useBadgeDefinitions = ({
     return result;
   };
 
-  // UPDATE
   const update = async (
     id: string,
     data: {
@@ -129,7 +130,7 @@ export const useBadgeDefinitions = ({
     },
     iconFile?: File
   ) => {
-    const body = buildBody(data as any, iconFile); // 'as any' because partial fields are optional in FormData too
+    const body = buildBody(data, iconFile);
     const result = await put({ url: `/badge/${id}`, body });
     queryClient.invalidateQueries({ queryKey: ['/badge'] });
     return result;
@@ -142,24 +143,20 @@ export const useBadgeDefinitions = ({
   };
 
   return {
-    // Data
     definitions,
     total: paginationMeta.total,
     currentPage: paginationMeta.page,
     pageSize: paginationMeta.limit,
 
-    // Loading & Error
     isLoading,
     isError,
     fetchError: error as any,
 
-    // Actions
     refetch,
     create,
     update,
     remove,
 
-    // Mutation states
     isCreating: postMutation.isPending,
     isUpdating: putMutation.isPending,
     isDeleting: deleteMutation.isPending,
