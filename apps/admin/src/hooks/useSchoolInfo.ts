@@ -48,8 +48,8 @@ export const useSchoolInfo = (enabled = true) => {
 
   const basePath = '/general/school-info';
 
-  // Fetch full school info – now respects enabled
-  const { data: rawData, isLoading, refetch } = get(basePath, { enabled });  // ← Only line changed: added { enabled }
+ 
+  const { data: rawData, isLoading, refetch } = get(basePath, { enabled });  
 
  const schoolInfo: ISchoolInfo | null = rawData?.success
   ? {

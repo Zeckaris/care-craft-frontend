@@ -59,7 +59,7 @@ export const BadgeDefinitionDrawer = ({
   // Local state for file and preview
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState<string>(
-    definition?.icon || ""
+    definition?.icon || "",
   );
 
   const hasNoCriteriaAvailable = availableCriteria.length === 0;
@@ -77,13 +77,8 @@ export const BadgeDefinitionDrawer = ({
   // Reset on open/change mode
   useEffect(() => {
     if (open) {
-      if (mode === "edit" && definition) {
-        setIconPreview(definition.icon || "");
-        setIconFile(null); // No file initially for edit
-      } else {
-        setIconPreview("");
-        setIconFile(null);
-      }
+      setIconPreview(definition?.icon || "");
+      setIconFile(null);
     }
   }, [open, mode, definition]);
 
@@ -122,8 +117,8 @@ export const BadgeDefinitionDrawer = ({
           {isView
             ? definition?.name || "Badge Details"
             : isCreate
-            ? "Create New Badge Definition"
-            : "Edit Badge Definition"}
+              ? "Create New Badge Definition"
+              : "Edit Badge Definition"}
         </Space>
       }
       width={680}
