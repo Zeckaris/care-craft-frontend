@@ -44,7 +44,7 @@ const Header = ({ setMobileMenuOpen }: HeaderProps) => {
   const userMenu = user ? (
     <Menu
       onClick={({ key }) => {
-        if (key === "profile") navigate("/admin/profile");
+        if (key === "profile") navigate("/app/admin/profile");
         if (key === "logout") logout();
       }}
     >
@@ -90,7 +90,7 @@ const Header = ({ setMobileMenuOpen }: HeaderProps) => {
             <Badge count={isLoading ? 0 : unreadCount} overflowCount={99}>
               <BellOutlined
                 className="anticon"
-                onClick={() => navigate("/notifications")}
+                onClick={() => navigate("/app/notifications")}
                 style={{ cursor: "pointer" }}
               />
             </Badge>
@@ -100,7 +100,7 @@ const Header = ({ setMobileMenuOpen }: HeaderProps) => {
         <Tooltip title="Settings">
           <SettingOutlined
             className="anticon"
-            onClick={() => navigate("/settings")}
+            onClick={() => navigate("/app/settings")}
           />
         </Tooltip>
 
