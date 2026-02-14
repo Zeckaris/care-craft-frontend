@@ -26,19 +26,37 @@ import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
 import { RequireAuth } from "@/components/common/RequireAuth";
+import LandingPage from "@/public/pages/LandingPage";
 
 const { Title, Text } = Typography;
 
 export const router = createBrowserRouter([
+  // 1. Public root
   {
     path: "/",
+    element: <LandingPage />,
+  },
+
+  // 2. Auth pages (public)
+  {
+    path: "/signup",
+    element: <AdminSignupPage />,
+  },
+  {
+    path: "/signin",
+    element: <SignInPage />,
+  },
+
+  // 3. Protected admin routes
+  {
+    path: "/app",
     element: (
       <RequireAuth>
         <AdminLayout />
       </RequireAuth>
     ),
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
+      { index: true, element: <Navigate to="/app/dashboard" replace /> },
 
       {
         path: "dashboard",
@@ -46,32 +64,32 @@ export const router = createBrowserRouter([
         handle: { crumb: () => "Dashboard" },
       },
       {
-        path: "/school-info",
+        path: "school-info",
         element: <SchoolInfoPage />,
         handle: { crumb: () => "School Info" },
       },
       {
-        path: "/grades",
+        path: "grades",
         element: <GradesPage />,
         handle: { crumb: () => "Grades" },
       },
       {
-        path: "/students",
+        path: "students",
         element: <StudentsPage />,
         handle: { crumb: () => "Students" },
       },
       {
-        path: "/subjects",
+        path: "subjects",
         element: <SubjectsPage />,
         handle: { crumb: () => "Subjects" },
       },
       {
-        path: "/parents",
+        path: "parents",
         element: <ParentsPage />,
         handle: { crumb: () => "Parents" },
       },
       {
-        path: "/teachers",
+        path: "teachers",
         element: <TeachersPage />,
         handle: { crumb: () => "Teachers" },
       },
@@ -81,27 +99,27 @@ export const router = createBrowserRouter([
         handle: { crumb: () => "Settings" },
       },
       {
-        path: "/notifications",
+        path: "notifications",
         element: <NotificationsPage />,
         handle: { crumb: () => "Notifications" },
       },
       {
-        path: "/coordinators",
+        path: "coordinators",
         element: <CoordinatorsPage />,
         handle: { crumb: () => "Coordinators" },
       },
       {
-        path: "/enroll",
+        path: "enroll",
         element: <EnrollPage />,
         handle: { crumb: () => "Enroll" },
       },
       {
-        path: "/calendar",
+        path: "calendar",
         element: <AcademicCalendarPage />,
         handle: { crumb: () => "Calendar" },
       },
       {
-        path: "/observations",
+        path: "observations",
         element: <ObservationsPage />,
         handle: { crumb: () => "Observations" },
       },
@@ -109,10 +127,7 @@ export const router = createBrowserRouter([
         path: "assessments",
         handle: { crumb: () => "Assessments" },
         children: [
-          {
-            index: true,
-            element: <Navigate to="types" replace />,
-          },
+          { index: true, element: <Navigate to="types" replace /> },
           {
             path: "types",
             element: <AssessmentTypesPage />,
@@ -126,33 +141,30 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/gsa",
+        path: "gsa",
         element: <GradeSubjectAssessmentsPage />,
         handle: { crumb: () => "Assign Subject & Assessment Setup For Grades" },
       },
       {
-        path: "/attribute-categories",
+        path: "attribute-categories",
         element: <AttributeCategoriesPage />,
         handle: { crumb: () => "Attribute Category" },
       },
       {
-        path: "/attribute-evaluations",
+        path: "attribute-evaluations",
         element: <AttributeEvaluationsPage />,
         handle: { crumb: () => "Attribute Evaluation" },
       },
       {
-        path: "/action-plans",
+        path: "action-plans",
         element: <ActionPlansPage />,
         handle: { crumb: () => "Action Plans" },
       },
       {
-        path: "/badges",
+        path: "badges",
         handle: { crumb: () => "Badges" },
         children: [
-          {
-            index: true,
-            element: <Navigate to="definitions" replace />,
-          },
+          { index: true, element: <Navigate to="definitions" replace /> },
           {
             path: "definitions",
             element: <BadgeDefinitionsPage />,
@@ -177,20 +189,26 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "/signup",
-    element: <AdminSignupPage />,
-  },
-  {
-    path: "signin",
-    element: <SignInPage />,
-  },
+
+  // 4. Protected invite
   {
     path: "/invite",
     element: (
       <RequireAuth roles={["admin", "coordinator"]}>
         <InviteAdminPage />
       </RequireAuth>
+    ),
+  },
+
+  // 5. 404 fallback
+  {
+    path: "*",
+    element: (
+      <div style={{ padding: "60px 20px", textAlign: "center" }}>
+        <h1>404 - Page Not Found</h1>
+        <p>Sorry, the page you're looking for doesn't exist.</p>
+        <a href="/">Back to Home</a>
+      </div>
     ),
   },
 ]);

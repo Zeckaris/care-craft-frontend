@@ -50,7 +50,7 @@ export default function SignInPage() {
     if (result) {
       message.success("Login successful!");
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/app/dashboard";
       }, 1000);
     }
   };
