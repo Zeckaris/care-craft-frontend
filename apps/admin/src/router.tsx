@@ -27,6 +27,7 @@ import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import LandingPage from "@/public/pages/LandingPage";
+import FeaturesPage from "@/public/pages/FeaturesPage";
 
 const { Title, Text } = Typography;
 
@@ -36,7 +37,10 @@ export const router = createBrowserRouter([
     path: "/",
     element: <LandingPage />,
   },
-
+  {
+    path: "/features",
+    element: <FeaturesPage />,
+  },
   // 2. Auth pages (public)
   {
     path: "/signup",
