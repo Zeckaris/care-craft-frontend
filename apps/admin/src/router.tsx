@@ -28,6 +28,7 @@ import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import LandingPage from "@/public/pages/LandingPage";
 import FeaturesPage from "@/public/pages/FeaturesPage";
+import AboutPage from "@/public/pages/AboutPage";
 
 const { Title, Text } = Typography;
 
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
   {
     path: "/features",
     element: <FeaturesPage />,
+  },
+  {
+    path: "/about",
+    element: <AboutPage />,
   },
   // 2. Auth pages (public)
   {
