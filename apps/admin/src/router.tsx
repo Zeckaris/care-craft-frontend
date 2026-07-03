@@ -29,6 +29,7 @@ import { RequireAuth } from "@/components/common/RequireAuth";
 import LandingPage from "@/public/pages/LandingPage";
 import FeaturesPage from "@/public/pages/FeaturesPage";
 import AboutPage from "@/public/pages/AboutPage";
+import PublicLayout from "@/public/PublicLayout";
 
 const { Title, Text } = Typography;
 
@@ -36,15 +37,21 @@ export const router = createBrowserRouter([
   // 1. Public root
   {
     path: "/",
-    element: <LandingPage />,
-  },
-  {
-    path: "/features",
-    element: <FeaturesPage />,
-  },
-  {
-    path: "/about",
-    element: <AboutPage />,
+    element: <PublicLayout />,
+    children: [
+      {
+        index: true,
+        element: <LandingPage />,
+      },
+      {
+        path: "features",
+        element: <FeaturesPage />,
+      },
+      {
+        path: "about",
+        element: <AboutPage />,
+      },
+    ],
   },
   // 2. Auth pages (public)
   {

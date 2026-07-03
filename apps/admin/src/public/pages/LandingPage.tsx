@@ -1,25 +1,17 @@
 import { Helmet } from "@dr.pogodin/react-helmet";
-import {
-  Button,
-  Typography,
-  Row,
-  Col,
-  Carousel,
-  Space,
-  Card,
-  Collapse,
-} from "antd";
+import { Button, Typography, Row, Col, Carousel, Space, Collapse } from "antd";
 import { Link } from "react-router-dom";
-import "@/public/styles/public.css";
 import {
-  LinkedinOutlined,
-  SendOutlined,
-  TwitterOutlined,
-  GithubOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ReadOutlined,
+  BulbOutlined,
+  TeamOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
+import "@/public/styles/public.css";
 
 const { Title, Paragraph } = Typography;
-const { Panel } = Collapse;
 
 export default function LandingPage() {
   return (
@@ -52,7 +44,7 @@ export default function LandingPage() {
                   action plans. Build stronger school communities.
                 </Paragraph>
 
-                <Space size="large" wrap>
+                <Space size="large" wrap style={{ marginTop: "16px" }}>
                   <Link to="/signin">
                     <Button size="large" className="cc-btn-gold">
                       Try Demo Account
@@ -68,8 +60,12 @@ export default function LandingPage() {
               </div>
             </Col>
 
-            <Col xs={24} md={12}>
-              <div className="hero-image-wrapper">
+            <Col
+              xs={24}
+              md={12}
+              style={{ display: "flex", justifyContent: "center" }}
+            >
+              <div className="hero-image-container">
                 <img
                   src="/images/childrenLearning.avif"
                   alt="Children learning in classroom"
@@ -81,35 +77,44 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SLIDER */}
+      {/* SLIDER / IN ACTION */}
       <section className="landing-slider">
-        <Title level={2} className="section-title">
-          See CareCraft in Action
-        </Title>
+        <div className="container">
+          <Title level={2} className="section-title">
+            See CareCraft in Action
+          </Title>
 
-        <Carousel autoplay arrows dots={false}>
-          <div>
-            <img src="/images/sc1.png" alt="Dashboard" />
+          <div className="carousel-container">
+            <Carousel
+              autoplay
+              speed={800}
+              autoplaySpeed={4000}
+              dots={true}
+              arrows={true}
+            >
+              <div className="carousel-slide">
+                <img src="/images/sc1.png" alt="Dashboard" />
+              </div>
+              <div className="carousel-slide">
+                <img src="/images/sc2.png" alt="Badges" />
+              </div>
+              <div className="carousel-slide">
+                <img src="/images/sc3.png" alt="Assessment" />
+              </div>
+              <div className="carousel-slide">
+                <img src="/images/sc5.png" alt="Attributes" />
+              </div>
+            </Carousel>
           </div>
-          <div>
-            <img src="/images/sc2.png" alt="Badges" />
-          </div>
-          <div>
-            <img src="/images/sc3.png" alt="Assessment" />
-          </div>
-          <div>
-            <img src="/images/sc5.png" alt="Attributes" />
-          </div>
-        </Carousel>
+        </div>
       </section>
 
-      {/* CORE VISION / WHY CARECRAFT */}
+      {/* WHY CARECRAFT (CORE VISION) */}
       <section className="landing-vision">
         <div className="container">
           <Title level={2} className="section-title">
             Why CareCraft?
           </Title>
-
           <Paragraph className="vision-text">
             CareCraft is not just a messaging app. It's a structured student
             development collaboration platform that turns everyday observations
@@ -117,56 +122,97 @@ export default function LandingPage() {
             skills, and personal development.
           </Paragraph>
 
-          <Row gutter={[40, 40]} justify="center" className="vision-icons">
-            <Col xs={24} sm={12} md={8}>
-              <Card hoverable bordered={false} className="icon-card">
-                <img src="/images/academics.jfif" alt="Academics" />
-                <Title level={4}>Academics</Title>
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card hoverable bordered={false} className="icon-card">
-                <img src="/images/softSkills.jpg" alt="Soft Skills" />
-                <Title level={4}>Soft Skills</Title>
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card hoverable bordered={false} className="icon-card">
-                <img src="/images/socialSkills.jfif" alt="Social Skills" />
-                <Title level={4}>Social Skills</Title>
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Card hoverable bordered={false} className="icon-card">
-                <img src="/images/emotional.jpg" alt="Emotional Growth" />
-                <Title level={4}>Emotional Growth</Title>
-              </Card>
-            </Col>
-          </Row>
+          <div className="vision-cards-grid">
+            {/* ACADEMICS */}
+            <div className="vision-card vision-card--burgundy">
+              <div className="vision-card-inner">
+                <div className="vision-card-icon-wrap">
+                  <ReadOutlined className="vision-card-icon" />
+                </div>
+                <h4 className="vision-card-title">Academics</h4>
+                <p className="vision-card-desc">
+                  Track grades, assignments and subject progress with structured
+                  assessments across every subject area.
+                </p>
+                <div className="vision-card-tag">Growth Tracking</div>
+              </div>
+              <div className="vision-card-fill" />
+            </div>
+
+            {/* SOFT SKILLS */}
+            <div className="vision-card vision-card--blue">
+              <div className="vision-card-inner">
+                <div className="vision-card-icon-wrap">
+                  <BulbOutlined className="vision-card-icon" />
+                </div>
+                <h4 className="vision-card-title">Soft Skills</h4>
+                <p className="vision-card-desc">
+                  Build confidence, communication and leadership through daily
+                  observations and collaborative growth plans.
+                </p>
+                <div className="vision-card-tag">Character Building</div>
+              </div>
+              <div className="vision-card-fill" />
+            </div>
+
+            {/* SOCIAL SKILLS */}
+            <div className="vision-card vision-card--gold">
+              <div className="vision-card-inner">
+                <div className="vision-card-icon-wrap">
+                  <TeamOutlined className="vision-card-icon" />
+                </div>
+                <h4 className="vision-card-title">Social Skills</h4>
+                <p className="vision-card-desc">
+                  Nurture teamwork, empathy and peer relationships with targeted
+                  teacher notes and parent insights.
+                </p>
+                <div className="vision-card-tag">Collaboration</div>
+              </div>
+              <div className="vision-card-fill" />
+            </div>
+
+            {/* EMOTIONAL GROWTH */}
+            <div className="vision-card vision-card--green">
+              <div className="vision-card-inner">
+                <div className="vision-card-icon-wrap">
+                  <HeartOutlined className="vision-card-icon" />
+                </div>
+                <h4 className="vision-card-title">Emotional Growth</h4>
+                <p className="vision-card-desc">
+                  Monitor well-being trends, flag emotional concerns early and
+                  celebrate resilience milestones together.
+                </p>
+                <div className="vision-card-tag">Well-being</div>
+              </div>
+              <div className="vision-card-fill" />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* HOW CARECRAFT WORKS */}
+      {/* HOW IT WORKS */}
       <section className="landing-how-it-works">
         <div className="container">
           <Title level={2} className="section-title">
             How CareCraft Works
           </Title>
 
-          <Row gutter={[40, 40]}>
+          <Row gutter={[32, 32]} style={{ marginTop: "24px" }}>
             <Col xs={24} md={8}>
-              <Card hoverable bordered={false} className="step-card">
+              <div className="step-card">
+                <div className="step-badge">1</div>
                 <Title level={4}>Step 1: School Sets Up & Invites</Title>
                 <Paragraph>
                   Admin creates classes, assigns teachers, adds students, and
                   generates secure invitation codes. Parents and teachers sign
                   up securely no public access.
                 </Paragraph>
-              </Card>
+              </div>
             </Col>
 
             <Col xs={24} md={8}>
-              <Card hoverable bordered={false} className="step-card">
+              <div className="step-card">
+                <div className="step-badge">2</div>
                 <Title level={4}>Step 2: Teachers Share Insights</Title>
                 <Paragraph>
                   Teachers log structured observations with ratings on
@@ -174,18 +220,19 @@ export default function LandingPage() {
                   and extracurriculars. Flags trigger alerts and collaborative
                   action plans for growth.
                 </Paragraph>
-              </Card>
+              </div>
             </Col>
 
             <Col xs={24} md={8}>
-              <Card hoverable bordered={false} className="step-card">
+              <div className="step-card">
+                <div className="step-badge">3</div>
                 <Title level={4}>Step 3: Parents & Teachers Collaborate</Title>
                 <Paragraph>
                   Parents receive alerts, contribute to action plans, track
                   progress, and celebrate achievements together with badges and
                   trend reports.
                 </Paragraph>
-              </Card>
+              </div>
             </Col>
           </Row>
         </div>
@@ -200,42 +247,90 @@ export default function LandingPage() {
 
           <Row gutter={[40, 40]}>
             <Col xs={24} md={12}>
-              <Card
-                hoverable
-                bordered={false}
-                className="comparison-card telegram-card"
-              >
+              <div className="comparison-card telegram-card">
                 <Title level={4}>Telegram</Title>
-                <ul>
-                  <li>Public or shareable groups → privacy risks</li>
-                  <li>Lost/delayed personal updates</li>
-                  <li>Chaotic group chats → hard to track child's progress</li>
-                  <li>No structured follow-up or action plans</li>
+                <ul className="comparison-list">
+                  <li className="comparison-item">
+                    <CloseCircleOutlined
+                      style={{ color: "#ff4d4f", fontSize: "18px" }}
+                    />
+                    <span>Public or shareable groups → privacy risks</span>
+                  </li>
+                  <li className="comparison-item">
+                    <CloseCircleOutlined
+                      style={{ color: "#ff4d4f", fontSize: "18px" }}
+                    />
+                    <span>Lost/delayed personal updates</span>
+                  </li>
+                  <li className="comparison-item">
+                    <CloseCircleOutlined
+                      style={{ color: "#ff4d4f", fontSize: "18px" }}
+                    />
+                    <span>
+                      Chaotic group chats → hard to track child's progress
+                    </span>
+                  </li>
+                  <li className="comparison-item">
+                    <CloseCircleOutlined
+                      style={{ color: "#ff4d4f", fontSize: "18px" }}
+                    />
+                    <span>No structured follow-up or action plans</span>
+                  </li>
                 </ul>
-              </Card>
+              </div>
             </Col>
 
             <Col xs={24} md={12}>
-              <Card
-                hoverable
-                bordered={false}
-                className="comparison-card carecraft-card"
-              >
+              <div className="comparison-card carecraft-card">
+                <div className="recommended-badge">Recommended</div>
                 <Title level={4}>CareCraft Advantages</Title>
-                <ul>
-                  <li>Private per-student chats → fully secure</li>
-                  <li>Digital updates → no lost notes</li>
-                  <li>
-                    Structured growth tracking → academics, soft skills,
-                    emotional development
+                <ul className="comparison-list">
+                  <li className="comparison-item">
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: "18px" }}
+                    />
+                    <span>Private per-student chats → fully secure</span>
                   </li>
-                  <li>
-                    Joint action plans, badges, trends → celebrate achievements
+                  <li className="comparison-item">
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: "18px" }}
+                    />
+                    <span>Digital updates → no lost notes</span>
                   </li>
-                  <li>Optional admin tools → registration, fees, enrollment</li>
-                  <li>Mobile-friendly → low-data optimized</li>
+                  <li className="comparison-item">
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: "18px" }}
+                    />
+                    <span>
+                      Structured growth tracking → academics, soft skills,
+                      emotional development
+                    </span>
+                  </li>
+                  <li className="comparison-item">
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: "18px" }}
+                    />
+                    <span>
+                      Joint action plans, badges, trends → celebrate
+                      achievements
+                    </span>
+                  </li>
+                  <li className="comparison-item">
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: "18px" }}
+                    />
+                    <span>
+                      Optional admin tools → registration, fees, enrollment
+                    </span>
+                  </li>
+                  <li className="comparison-item">
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: "18px" }}
+                    />
+                    <span>Mobile-friendly → low-data optimized</span>
+                  </li>
                 </ul>
-              </Card>
+              </div>
             </Col>
           </Row>
         </div>
@@ -248,169 +343,101 @@ export default function LandingPage() {
             Frequently Asked Questions
           </Title>
 
-          <Collapse accordion bordered={false} className="faq-collapse">
-            {[
-              {
-                question: "What is CareCraft?",
-                answer:
-                  "CareCraft is a secure parent teacher communication app in Ethiopia designed for schools. It goes beyond messaging to track academics, confidence, social skills, emotional growth, and extracurriculars, with shared action plans and dashboards.",
-              },
-              {
-                question:
-                  "Why do Ethiopian schools and parents need CareCraft?",
-                answer:
-                  "CareCraft turns Ethiopia's cultural strengths into structured growth. Teachers can flag concerns, share observations, create joint action plans, and track progress in skills like communication, confidence, teamwork, and emotional resilience.",
-              },
-              {
-                question: "Is CareCraft free to use?",
-                answer:
-                  "Yes. Core features are completely free. Optional low-cost hosting/support is available. No ads or hidden fees.",
-              },
-              {
-                question: "How do parents sign up?",
-                answer:
-                  "Parents receive a secure invitation code from the school. They sign up and link to their child securely. Multiple children can be managed in one account.",
-              },
-              {
-                question: "Does CareCraft support Amharic?",
-                answer:
-                  "Yes. English is available now; Amharic support is rolling out for full accessibility across Ethiopia.",
-              },
-              {
-                question: "How private and secure is CareCraft?",
-                answer:
-                  "All student data is encrypted and accessible only by assigned teachers and parents. No data is sold. No ads.",
-              },
-              {
-                question: "Can teachers and parents chat privately?",
-                answer:
-                  "Yes. Each student has a private chat for their assigned teacher and parent(s), ideal for sensitive topics.",
-              },
-              {
-                question: "What updates can teachers share?",
-                answer:
-                  "Structured observations with ratings on academics, soft skills, social skills, emotional well-being, and extracurriculars giving a full picture of the child’s growth.",
-              },
-              {
-                question:
-                  "How does CareCraft build confidence and communication skills?",
-                answer:
-                  "Flagged concerns trigger shared action plans where parents and teachers collaborate on steps. Progress is tracked and positive achievements rewarded with badges.",
-              },
-              {
-                question: "Do parents receive alerts for concerns?",
-                answer:
-                  "Yes. Alerts show ratings, trends, and progress in real-time, keeping parents proactively involved.",
-              },
-              {
-                question: "Can CareCraft be used on phones with limited data?",
-                answer:
-                  "Yes. Mobile-first, lightweight design optimized for low-data connections in Ethiopia.",
-              },
-            ].map((faq, idx) => (
-              <Panel header={faq.question} key={idx}>
-                <Paragraph>{faq.answer}</Paragraph>
-              </Panel>
-            ))}
-          </Collapse>
+          <div className="faq-two-col">
+            <Collapse
+              accordion={false}
+              bordered={false}
+              className="faq-collapse faq-collapse-col"
+            >
+              {[
+                {
+                  question: "What is CareCraft?",
+                  answer:
+                    "CareCraft is a secure parent teacher communication app in Ethiopia designed for schools. It goes beyond messaging to track academics, confidence, social skills, emotional growth, and extracurriculars, with shared action plans and dashboards.",
+                },
+                {
+                  question:
+                    "Why do Ethiopian schools and parents need CareCraft?",
+                  answer:
+                    "CareCraft turns Ethiopia's cultural strengths into structured growth. Teachers can flag concerns, share observations, create joint action plans, and track progress in skills like communication, confidence, teamwork, and emotional resilience.",
+                },
+                {
+                  question: "Is CareCraft free to use?",
+                  answer:
+                    "Yes. Core features are completely free. Optional low-cost hosting/support is available. No ads or hidden fees.",
+                },
+                {
+                  question: "How do parents sign up?",
+                  answer:
+                    "Parents receive a secure invitation code from the school. They sign up and link to their child securely. Multiple children can be managed in one account.",
+                },
+                {
+                  question: "Does CareCraft support Amharic?",
+                  answer:
+                    "Yes. English is available now; Amharic support is rolling out for full accessibility across Ethiopia.",
+                },
+                {
+                  question: "How private and secure is CareCraft?",
+                  answer:
+                    "All student data is encrypted and accessible only by assigned teachers and parents. No data is sold. No ads.",
+                },
+                {
+                  question: "Can teachers and parents chat privately?",
+                  answer:
+                    "Yes. Each student has a private chat for their assigned teacher and parent(s), ideal for sensitive topics.",
+                },
+                {
+                  question: "What updates can teachers share?",
+                  answer:
+                    "Structured observations with ratings on academics, soft skills, social skills, emotional well-being, and extracurriculars giving a full picture of the child’s growth.",
+                },
+                {
+                  question:
+                    "How does CareCraft build confidence and communication skills?",
+                  answer:
+                    "Flagged concerns trigger shared action plans where parents and teachers collaborate on steps. Progress is tracked and positive achievements rewarded with badges.",
+                },
+                {
+                  question: "Do parents receive alerts for concerns?",
+                  answer:
+                    "Yes. Alerts show ratings, trends, and progress in real-time, keeping parents proactively involved.",
+                },
+                {
+                  question:
+                    "Can CareCraft be used on phones with limited data?",
+                  answer:
+                    "Yes. Mobile-first, lightweight design optimized for low-data connections in Ethiopia.",
+                },
+              ].map((faq, idx) => (
+                <Collapse.Panel header={faq.question} key={idx}>
+                  <Paragraph style={{ margin: 0 }}>{faq.answer}</Paragraph>
+                </Collapse.Panel>
+              ))}
+            </Collapse>
+          </div>
         </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="landing-features">
-        <Title level={2} className="section-title">
-          Why Schools Choose CareCraft
-        </Title>
-
-        <Row gutter={[40, 48]} justify="center">
-          <Col xs={24} md={8}>
-            <Card hoverable bordered={false}>
-              <Title level={4}>Private Chat per Student</Title>
-              <Paragraph>
-                Secure, focused messaging between teachers and parents.
-              </Paragraph>
-            </Card>
-          </Col>
-
-          <Col xs={24} md={8}>
-            <Card hoverable bordered={false}>
-              <Title level={4}>Daily Growth Tracking</Title>
-              <Paragraph>
-                Academics, behavior, emotions and soft skills in one place.
-              </Paragraph>
-            </Card>
-          </Col>
-
-          <Col xs={24} md={8}>
-            <Card hoverable bordered={false}>
-              <Title level={4}>Shared Action & Alerts</Title>
-              <Paragraph>
-                Flag concerns early. Plan together. Stay aligned.
-              </Paragraph>
-            </Card>
-          </Col>
-        </Row>
       </section>
 
       {/* CTA */}
       <section className="landing-cta">
-        <Title level={2}>Ready to Connect Your School Community?</Title>
+        <div className="container">
+          <Title level={2}>Ready to Connect Your School Community?</Title>
 
-        <Space size="large" wrap>
-          <Link to="/signin">
-            <Button size="large" className="cc-btn-gold">
-              Try Demo Account
-            </Button>
-          </Link>
+          <Space size="large" wrap style={{ marginTop: "24px" }}>
+            <Link to="/signin">
+              <Button size="large" className="cc-btn-gold">
+                Try Demo Account
+              </Button>
+            </Link>
 
-          <Link to="/features">
-            <Button size="large" className="cc-btn-blue">
-              Explore Features
-            </Button>
-          </Link>
-        </Space>
+            <Link to="/features">
+              <Button size="large" className="cc-btn-blue">
+                Explore Features
+              </Button>
+            </Link>
+          </Space>
+        </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="public-footer">
-        <Space size="large">
-          <a
-            href="https://x.com/amanuelzcoder"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <TwitterOutlined />
-          </a>
-
-          <a
-            href="https://www.linkedin.com/in/amanfisseha/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <LinkedinOutlined />
-          </a>
-
-          <a
-            href="https://github.com/Zeckaris"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GithubOutlined />
-          </a>
-
-          <a
-            href="https://t.me/amanfisseha"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <SendOutlined />
-          </a>
-        </Space>
-
-        <Paragraph>
-          © {new Date().getFullYear()} CareCraft • Built for Elementary schools
-        </Paragraph>
-      </footer>
     </>
   );
 }
