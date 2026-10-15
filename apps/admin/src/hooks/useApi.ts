@@ -1,42 +1,18 @@
+/**
+ * Admin useApi hook.
+ *
+ * Binds the shared `makeUseApi` factory (from `@carecraft/query-core`) to:
+ *   • the admin's singleton Axios instance
+ *   • antd `message.success` / `message.error` as the toast handlers
+ *
+ * Usage inside admin hooks and components is identical to before:
+ *   const { get, post, put, patch, del } = useApi();
+ */
 import { message } from 'antd';
-import {apiClient} from '@/services/api-client'; 
-import { useMutation, useQuery, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
+import { makeUseApi } from '@carecraft/query-core';
+import { apiClient } from '@/services/api-client';
 
-
-export const useApi = () => {
-  const queryClient= useQueryClient();
-
-  const get= (url: string, options={})=>{
-    return useQuery({
-      queryKey: [url],
-      queryFn: ()=>apiClient.get(url).then((r:any) =>r.data),
-      ...options,
-    })
-  }
-  const createMutation = <TData= any, TVariables = any>( method: 'post' | 'put' | 'patch' | 'delete', options?: UseMutationOptions<TData, any, TVariables>)=>{
-    return useMutation({
-      mutationFn: (vars : any)=> apiClient[method](vars.url, vars.body).then((r:any) => r.data),
-      onSuccess: (res: any, variables : any)=>{
-        message.success(res.message || 'Success!')
-        const base = variables.url.split('/')[1];
-        queryClient.invalidateQueries({ queryKey: [base] });
-      },
-      onError: (error:any)=>{
-        const msg= error.response?.data?.message || 'Request Failed'
-        message.error(msg);
-      },
-       ...options,
-    })
-  }
-
-  const post= createMutation('post');
-  const put= createMutation('put')
-  const del= createMutation('delete')
-  const patch = createMutation('patch');
-  
-
-
-  return { loading: false, get , post: post.mutateAsync, put : put.mutateAsync, patch: patch.mutateAsync,
-    del: del.mutateAsync, postMutation: post, putMutation: put, patchMutation: patch, deleteMutation: del,
-   };
-};
+export const useApi = makeUseApi(apiClient, {
+  onSuccess: (msg) => message.success(msg),
+  onError:   (msg) => message.error(msg),
+});

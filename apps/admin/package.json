@@ -11,6 +11,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
+    "@carecraft/api-client": "workspace:*",
+    "@carecraft/auth-hooks": "workspace:*",
+    "@carecraft/query-core": "workspace:*",
+    "@carecraft/types": "workspace:*",
+    "@carecraft/utils": "workspace:*",
     "@dr.pogodin/react-helmet": "^3.0.6",
     "@tanstack/react-query": "^5.90.6",
     "@tanstack/react-query-devtools": "^5.90.2",

@@ -1,4 +1,5 @@
-export const capitalizeFirstLetter = (str: string): string => {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
+/**
+ * Re-exports from @carecraft/utils for backwards compatibility.
+ * Admin code can keep importing from '@/utils/string'.
+ */
+export { capitalizeFirstLetter } from '@carecraft/utils';
