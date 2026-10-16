@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@carecraft/api-client": "workspace:*",
+    "@carecraft/attendance": "workspace:*",
     "@carecraft/auth-hooks": "workspace:*",
     "@carecraft/branding": "workspace:*",
     "@carecraft/query-core": "workspace:*",

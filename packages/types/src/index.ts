@@ -520,3 +520,9 @@ export interface ITeachingAssignment {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// ---------------------------------------------------------------------------
+// Attendance
+// ---------------------------------------------------------------------------
+
+export * from './attendance';
