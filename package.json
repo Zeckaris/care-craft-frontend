@@ -13,6 +13,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "devDependencies": {
-    "@types/react": "^19.2.2"
+    "@types/react": "^19.2.2",
+    "turbo": "^2.11.8"
   }
 }
