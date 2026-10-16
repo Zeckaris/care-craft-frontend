@@ -6,11 +6,11 @@
  *  • Grade level, section name, academic year
  *  • Assigned subjects taught by teacher
  *  • Student count
- *  • Prominent "Take attendance" entry action
+ *  • Prominent attendance entry action — "Take" for homeroom, "View" otherwise
  *  • Looks great on phone, tablet, and desktop
  */
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, ClipboardCheck, ArrowUpRight } from 'lucide-react';
+import { Users, BookOpen, ClipboardCheck, Eye, ArrowUpRight, CloudOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -21,9 +21,11 @@ import { cn } from '@/lib/utils';
 interface SectionCardProps {
   item: MySectionItem;
   className?: string;
+  /** True when attendance for this section is saved on-device but unsynced. */
+  pendingSync?: boolean;
 }
 
-export function SectionCard({ item, className }: SectionCardProps) {
+export function SectionCard({ item, className, pendingSync }: SectionCardProps) {
   const navigate = useNavigate();
   const { section, isHomeroom, subjects, studentCount } = item;
 
@@ -31,6 +33,10 @@ export function SectionCard({ item, className }: SectionCardProps) {
 
   const handleOpenDetail = () => {
     navigate(`/app/sections/${section._id}`);
+  };
+
+  const handleTakeAttendance = () => {
+    navigate(`/app/sections/${section._id}/attendance`);
   };
 
   return (
@@ -56,6 +62,11 @@ export function SectionCard({ item, className }: SectionCardProps) {
               <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
                 {title}
               </h3>
+              {pendingSync && (
+                <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--color-warning)]">
+                  <CloudOff size={11} /> Saved on this device, waiting to sync
+                </span>
+              )}
             </div>
 
             {/* Role indicator */}
@@ -116,13 +127,13 @@ export function SectionCard({ item, className }: SectionCardProps) {
 
             <Button
               id={`take-attendance-${section._id}`}
-              variant="default"
+              variant={isHomeroom ? 'default' : 'secondary'}
               size="sm"
               className="font-semibold shadow-xs flex items-center gap-1.5"
-              onClick={handleOpenDetail}
+              onClick={handleTakeAttendance}
             >
-              <ClipboardCheck size={15} />
-              <span>Take Attendance</span>
+              {isHomeroom ? <ClipboardCheck size={15} /> : <Eye size={15} />}
+              <span>{isHomeroom ? 'Take Attendance' : 'View Attendance'}</span>
             </Button>
           </div>
         </div>

@@ -13,11 +13,28 @@ import { SectionCardSkeleton } from '@/components/sections/SectionCardSkeleton';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { useMySections } from '@/hooks/useMySections';
+import { usePrefetchHomeroomRosters } from '@/hooks/useAttendanceRoster';
+import { useAttendanceQueue } from '@/context/AttendanceQueueContext';
 import { useUser } from '@/context/UserContext';
 
 export default function HomePage() {
   const { user } = useUser();
   const { sections, isLoading, error, refetch } = useMySections();
+  const { entries } = useAttendanceQueue();
+
+  // Keep today's homeroom rosters available offline.
+  usePrefetchHomeroomRosters(sections);
+
+  const pendingSectionIds = new Set(
+    entries
+      .filter(
+        (e) =>
+          e.pending.length > 0 ||
+          e.conflicts.length > 0 ||
+          e.outcomes.some((o) => o.action === 'rejected'),
+      )
+      .map((e) => e.sectionId),
+  );
 
   const firstName = user?.firstName ?? 'Teacher';
 
@@ -191,7 +208,11 @@ export default function HomePage() {
         {!isLoading && !error && sections.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
             {sections.map((item) => (
-              <SectionCard key={item.section._id} item={item} />
+              <SectionCard
+                key={item.section._id}
+                item={item}
+                pendingSync={pendingSectionIds.has(item.section._id)}
+              />
             ))}
           </div>
         )}
