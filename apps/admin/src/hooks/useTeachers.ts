@@ -27,9 +27,11 @@ export const useTeachers = ({
   const params = new URLSearchParams();
   params.set('page', String(currentPage));
   params.set('limit', String(pageSize));
+  // The admin teacher directory must show suspended teachers so they can be unsuspended.
+  params.set('includeSuspended', 'true');
 
   const fetchUrl = `/adminUser/teachers?${params.toString()}`;
-  const queryKey = ['/adminUser/teachers', { page: currentPage, pageSize }];
+  const queryKey = ['/adminUser/teachers', { page: currentPage, pageSize, includeSuspended: true }];
 
   const {
     data: raw,

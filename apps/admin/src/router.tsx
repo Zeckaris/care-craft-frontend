@@ -25,6 +25,7 @@ import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsP
 import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
+import SectionsPage from "./features/admin/pages/SectionsPage";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import LandingPage from "@/public/pages/LandingPage";
 import FeaturesPage from "@/public/pages/FeaturesPage";
@@ -160,6 +161,11 @@ export const router = createBrowserRouter([
         path: "gsa",
         element: <GradeSubjectAssessmentsPage />,
         handle: { crumb: () => "Assign Subject & Assessment Setup For Grades" },
+      },
+      {
+        path: "sections",
+        element: <SectionsPage />,
+        handle: { crumb: () => "Sections" },
       },
       {
         path: "attribute-categories",

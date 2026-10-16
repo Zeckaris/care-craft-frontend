@@ -15,6 +15,7 @@ import {
   AppstoreOutlined,
   RadarChartOutlined,
   StrikethroughOutlined,
+  BarsOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -37,6 +38,7 @@ const menuItems = [
   { key: "/app/teachers", icon: <TeamOutlined />, label: "Teachers" },
   { key: "/app/subjects", icon: <BookOutlined />, label: "Subjects" },
   { key: "/app/grades", icon: <TrophyOutlined />, label: "Grades" },
+  { key: "/app/sections", icon: <BarsOutlined />, label: "Sections" },
   { key: "/app/parents", icon: <HeartFilled />, label: "Parents" },
   { key: "/app/school-info", icon: <BankOutlined />, label: "School Info" },
   {

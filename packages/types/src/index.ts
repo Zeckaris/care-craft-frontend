@@ -464,3 +464,49 @@ export interface Activity {
   timestamp: Date;
   path: string;
 }
+
+// ---------------------------------------------------------------------------
+// Sections
+// ---------------------------------------------------------------------------
+
+export interface ISection {
+  _id: string;
+  name: string;
+  schoolYear: string;
+  isActive: boolean;
+  gradeId: {
+    _id: string;
+    level: string;
+    description?: string | null;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Teaching Assignments
+// ---------------------------------------------------------------------------
+
+export type TeachingRole = 'homeroom' | 'subject';
+
+export interface ITeachingAssignment {
+  _id: string;
+  sectionId: {
+    _id: string;
+    name: string;
+    schoolYear: string;
+  };
+  teacherId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  role: TeachingRole;
+  subjectId?: {
+    _id: string;
+    name: string;
+  } | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
