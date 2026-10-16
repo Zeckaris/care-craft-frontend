@@ -112,7 +112,13 @@ export const useSchoolInfo = (enabled = true) => {
     if (branding.theme !== undefined) payload.theme = branding.theme;
     if (branding.fontFamily !== undefined) payload.fontFamily = branding.fontFamily;
 
-    await patch({ url: `${basePath}/branding`, body: payload });
+    // Invalidate the school-info query so the saved theme/font reflect back
+    // into the UI (and the Save button resets once there are no changes).
+    await patch({
+      url: `${basePath}/branding`,
+      body: payload,
+      invalidateKey: [basePath],
+    });
   };
 
   const remove = () => del({ url: basePath });

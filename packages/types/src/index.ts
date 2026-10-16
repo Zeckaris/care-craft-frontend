@@ -181,6 +181,16 @@ export interface ISchoolInfo {
   updatedAt?: string;
 }
 
+/**
+ * Public/authenticated school branding returned by GET /general/school-info/branding.
+ */
+export interface BrandingInfo {
+  name: string;
+  logo?: string | null;
+  theme: string;
+  fontFamily: string;
+}
+
 // ---------------------------------------------------------------------------
 // Assessments
 // ---------------------------------------------------------------------------
