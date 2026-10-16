@@ -5,15 +5,18 @@
  * teacher UserContext for user state.
  */
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { AxiosError } from 'axios';
 import { useApi } from '@/hooks/useApi';
 import { useUser } from '@/context/UserContext';
+import { idbPersister } from '@/lib/idb-persister';
 import { capitalizeFirstLetter } from '@carecraft/utils';
 
 export const useLogin = () => {
   const { post, postMutation } = useApi();
   const { setUser } = useUser();
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
   const login = async (email: string, password: string, mfaCode?: string) => {
@@ -39,6 +42,11 @@ export const useLogin = () => {
           return null;
         }
 
+        // Purge any data cached for a previously signed-in account (identity,
+        // sections, rosters) before switching the session to this teacher, so a
+        // re-login can never hydrate the wrong teacher's sections.
+        queryClient.clear();
+        void idbPersister.removeClient();
         setUser({ id: _id, firstName: capitalizeFirstLetter(firstName), role, email: userEmail });
         toast.success(res.message || 'Welcome back!');
         return res.data.user;

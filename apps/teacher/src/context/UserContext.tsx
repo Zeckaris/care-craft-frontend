@@ -7,6 +7,7 @@
  */
 import {
   createContext,
+  useCallback,
   useContext,
   useState,
   useEffect,
@@ -27,23 +28,56 @@ interface UserContextValue {
   setUser: (user: TeacherUser | null) => void;
   isLoading: boolean;
   refetchUser: () => void;
+  /**
+   * Increments on every successful sign-in (including the MFA step). Consumers
+   * that need to react to a re-login of the *same* account can depend on this
+   * instead of the user id, which would not change.
+   */
+  sessionKey: number;
 }
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
+/**
+ * `/auth/me` returns the raw Mongoose user document, which uses `_id` and
+ * serialises no `id` virtual. Normalise it to the `TeacherUser` shape so
+ * consumers (e.g. attendance queue ownership) always get a stable `id`.
+ */
+function normalizeUser(raw: (TeacherUser & { _id?: string }) | null): TeacherUser | null {
+  if (!raw) return null;
+  const id = raw.id || raw._id;
+  if (!id) return null;
+  return {
+    id,
+    firstName: raw.firstName,
+    role: raw.role,
+    email: raw.email,
+    mfaEnabled: raw.mfaEnabled,
+  };
+}
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { user: currentUser, isLoading, refetch } = useCurrentUser();
   const [user, setUser] = useState<TeacherUser | null>(null);
+  const [sessionKey, setSessionKey] = useState(0);
+
+  const setUserAndBumpSession = useCallback((next: TeacherUser | null) => {
+    const normalized = normalizeUser(next);
+    setUser(normalized);
+    if (normalized) setSessionKey((key) => key + 1);
+  }, []);
 
   // Sync user from /auth/me response
   useEffect(() => {
     if (currentUser) {
-      setUser(currentUser);
+      setUserAndBumpSession(currentUser);
     }
-  }, [currentUser]);
+  }, [currentUser, setUserAndBumpSession]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading, refetchUser: refetch }}>
+    <UserContext.Provider
+      value={{ user, setUser: setUserAndBumpSession, isLoading, refetchUser: refetch, sessionKey }}
+    >
       {children}
     </UserContext.Provider>
   );
