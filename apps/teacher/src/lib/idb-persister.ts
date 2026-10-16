@@ -2,47 +2,27 @@
  * IndexedDB persister for TanStack Query.
  *
  * Persists the query cache to IndexedDB so recently loaded data
- * (e.g. section list) is still visible when the app opens offline.
- *
- * Uses the `idb` library for a promise-based IDB API.
- * The future offline write-queue (attendance) will share this same
- * database and add its own object-store.
+ * (e.g. the section list and an opened attendance roster) is still visible
+ * when the app opens offline.
  */
-import { openDB, type IDBPDatabase } from 'idb';
 import type { PersistedClient, Persister } from '@tanstack/react-query-persist-client';
+import { getDb, QUERY_CACHE_STORE } from '@/lib/idb';
 
-const DB_NAME    = 'carecraft-teacher';
-const STORE_NAME = 'query-cache';
-const DB_VERSION = 1;
-
-let dbPromise: Promise<IDBPDatabase> | null = null;
-
-function getDb(): Promise<IDBPDatabase> {
-  if (!dbPromise) {
-    dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME);
-        }
-      },
-    });
-  }
-  return dbPromise;
-}
+const CLIENT_KEY = 'tanstack-query';
 
 export const idbPersister: Persister = {
   persistClient: async (client: PersistedClient) => {
     const db = await getDb();
-    await db.put(STORE_NAME, client, 'tanstack-query');
+    await db.put(QUERY_CACHE_STORE, client, CLIENT_KEY);
   },
 
   restoreClient: async () => {
     const db = await getDb();
-    return db.get(STORE_NAME, 'tanstack-query');
+    return db.get(QUERY_CACHE_STORE, CLIENT_KEY);
   },
 
   removeClient: async () => {
     const db = await getDb();
-    await db.delete(STORE_NAME, 'tanstack-query');
+    await db.delete(QUERY_CACHE_STORE, CLIENT_KEY);
   },
 };

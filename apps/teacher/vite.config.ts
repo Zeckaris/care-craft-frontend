@@ -36,6 +36,14 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
         runtimeCaching: [
           {
+            // Attendance writes are never cached or replayed by the service
+            // worker — the app-level queue owns offline writes. Registered
+            // before the generic API rule so it always wins.
+            urlPattern: /\/api\/attendance\//,
+            method: 'POST',
+            handler: 'NetworkOnly',
+          },
+          {
             // Branding must always be fetched from the network. Never let the
             // service worker serve a cached palette (registered before the
             // general API rule so it wins).
@@ -43,7 +51,10 @@ export default defineConfig({
             handler: 'NetworkOnly',
           },
           {
+            // Only GETs are cached; POST/PUT/PATCH/DELETE always hit the
+            // network so mutations are never replayed by the SW.
             urlPattern: /^https?:\/\/.*\/api\//,
+            method: 'GET',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
