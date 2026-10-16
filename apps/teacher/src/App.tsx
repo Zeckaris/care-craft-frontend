@@ -13,6 +13,7 @@ import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { UserProvider } from '@/context/UserContext';
 import { BrandingProvider } from '@/context/BrandingContext';
+import { AttendanceQueueProvider } from '@/context/AttendanceQueueContext';
 import { BRANDING_QUERY_KEY } from '@/lib/query-keys';
 import { idbPersister } from '@/lib/idb-persister';
 import { router } from '@/router';
@@ -48,16 +49,18 @@ export default function App() {
     >
       <UserProvider>
         <BrandingProvider>
-          <RouterProvider router={router} />
-          <Toaster
-            position="top-center"
-            richColors
-            closeButton
-            toastOptions={{
-              duration: 3500,
-              className: 'font-sans text-sm',
-            }}
-          />
+          <AttendanceQueueProvider>
+            <RouterProvider router={router} />
+            <Toaster
+              position="top-center"
+              richColors
+              closeButton
+              toastOptions={{
+                duration: 3500,
+                className: 'font-sans text-sm',
+              }}
+            />
+          </AttendanceQueueProvider>
         </BrandingProvider>
       </UserProvider>
     </PersistQueryClientProvider>

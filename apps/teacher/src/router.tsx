@@ -15,6 +15,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import SignupPage from '@/pages/auth/SignupPage';
 import HomePage from '@/pages/home/HomePage';
 import SectionDetailPage from '@/pages/sections/SectionDetailPage';
+import AttendancePage from '@/pages/attendance/AttendancePage';
 import ProfilePage from '@/pages/profile/ProfilePage';
 import { AppShell } from '@/components/layout/AppShell';
 import { RequireAuth } from '@/components/common/RequireAuth';
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
       {
         path: 'sections/:sectionId',
         element: <SectionDetailPage />,
+      },
+      {
+        path: 'sections/:sectionId/attendance',
+        element: <AttendancePage />,
       },
       {
         path: 'profile',

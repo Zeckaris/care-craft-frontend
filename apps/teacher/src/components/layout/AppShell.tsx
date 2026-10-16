@@ -9,6 +9,7 @@ import { AppHeader } from './AppHeader';
 import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
 import { OnlineIndicator } from '@/components/common/OnlineIndicator';
+import { AttendanceAuthBanner } from '@/components/attendance/AttendanceAuthBanner';
 
 /** Map route paths to human-readable page titles. */
 const PAGE_TITLES: Record<string, string> = {
@@ -43,6 +44,7 @@ export function AppShell() {
           className="flex-1 overflow-y-auto pb-[calc(var(--bottom-nav-h)+var(--safe-bottom))] lg:pb-12"
         >
           <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-5">
+            <AttendanceAuthBanner />
             <Outlet />
           </div>
         </main>

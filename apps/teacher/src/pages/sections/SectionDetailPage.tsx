@@ -5,12 +5,16 @@
  * Attendance, roster, and grading features will be built here in future tasks.
  */
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Construction } from 'lucide-react';
+import { ArrowLeft, ClipboardCheck, Eye, Construction } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { useMySections } from '@/hooks/useMySections';
 
 export default function SectionDetailPage() {
   const { sectionId } = useParams<{ sectionId: string }>();
   const navigate = useNavigate();
+  const { sections } = useMySections();
+  // Only homeroom teachers record attendance; everyone else views it.
+  const isHomeroom = sections.find((s) => s.section._id === sectionId)?.isHomeroom ?? false;
 
   return (
     <div className="px-4 pt-4 pb-2 fade-in">
@@ -31,9 +35,20 @@ export default function SectionDetailPage() {
         </div>
         <h2 className="text-base font-bold text-[var(--color-text)] mb-2">Coming soon</h2>
         <p className="text-sm text-[var(--color-text-secondary)] max-w-xs">
-          The section detail view (roster, attendance, and grading) will be built
-          in the next task.
+          Roster and grading views will be built in a later task. Attendance is ready now.
         </p>
+
+        <Button
+          id={`section-detail-attendance-${sectionId}`}
+          variant="default"
+          size="sm"
+          className="mt-5 font-semibold"
+          onClick={() => navigate(`/app/sections/${sectionId}/attendance`)}
+        >
+          {isHomeroom ? <ClipboardCheck size={15} /> : <Eye size={15} />}
+          {isHomeroom ? 'Take Attendance' : 'View Attendance'}
+        </Button>
+
         <p className="mt-4 text-xs text-[var(--color-text-muted)] font-mono bg-[var(--color-surface-raised)] rounded px-2 py-1">
           Section ID: {sectionId}
         </p>

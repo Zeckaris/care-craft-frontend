@@ -5,6 +5,7 @@
  * slot. Accounts for the device safe-area-inset-top.
  */
 import { useUser } from '@/context/UserContext';
+import { SyncStatusButton } from '@/components/common/SyncStatusButton';
 
 interface AppHeaderProps {
   title: string;
@@ -24,8 +25,10 @@ export function AppHeader({ title }: AppHeaderProps) {
           {title}
         </h1>
 
-        {/* Right — notification bell slot & user greeting */}
+        {/* Right — sync status, notification bell slot & user greeting */}
         <div className="flex items-center gap-3 shrink-0">
+          <SyncStatusButton />
+
           {/* Notification bell slot reserved for future task */}
           <div
             id="header-notifications-slot"
