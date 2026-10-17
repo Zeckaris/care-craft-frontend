@@ -135,11 +135,13 @@ export interface IEnrollment {
     middleName?: string;
     lastName: string;
     profileImage?: string;
+    gender?: 'male' | 'female' | 'other';
   };
   gradeId: {
     _id: string;
     level: string;
   };
+  sectionId: { _id: string; name: string } | null;
   schoolYear: string;
   isActive: boolean;
   createdAt?: string;
@@ -491,6 +493,103 @@ export interface ISection {
   };
   createdAt?: string;
   updatedAt?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Section generation / student assignment
+// ---------------------------------------------------------------------------
+
+/** Body for POST /api/section/generate (one grade per call). */
+export interface ISectionGenerationInput {
+  gradeId: string;
+  schoolYear: string;
+  targetSize: number;
+  minSize: number;
+  maxSize: number;
+}
+
+/** A single planned section in a generation preview/result. */
+export interface ISectionGenerationPlan {
+  sectionId: string | null;
+  name: string;
+  size: number;
+  isNew: boolean;
+}
+
+/** Envelope data returned by POST /api/section/generate (dry run or real run). */
+export interface ISectionGenerationResult {
+  dryRun: boolean;
+  gradeId: string;
+  schoolYear: string;
+  totalStudents: number;
+  targetSize: number;
+  minSize: number;
+  maxSize: number;
+  sectionCount: number;
+  sections: ISectionGenerationPlan[];
+  createdSectionIds: string[];
+  warning: string | null;
+}
+
+/** Active enrollment with no section, from GET /api/enrollment/unassigned. */
+export interface IUnassignedEnrollment {
+  _id: string;
+  studentId: {
+    _id: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    profileImage?: string;
+    gender?: 'male' | 'female' | 'other';
+  };
+  gradeId: {
+    _id: string;
+    level: string;
+  };
+  sectionId: null;
+  schoolYear: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Enrollment shape returned by GET /api/section/:id/roster. */
+export interface ISectionRosterEnrollment {
+  _id: string;
+  studentId: {
+    _id: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    profileImage?: string;
+    gender?: 'male' | 'female' | 'other';
+  };
+  gradeId: {
+    _id: string;
+    level: string;
+  };
+  sectionId: {
+    _id: string;
+    name: string;
+  } | null;
+  schoolYear: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Data returned by GET /api/section/:id/roster. */
+export interface ISectionRoster {
+  section: ISection;
+  enrollments: ISectionRosterEnrollment[];
+}
+
+/** Data returned by POST /api/enrollment/bulk-move-section. */
+export interface IBulkMoveSectionResult {
+  successCount: number;
+  failedCount: number;
+  total: number;
+  errors: string[];
 }
 
 // ---------------------------------------------------------------------------
