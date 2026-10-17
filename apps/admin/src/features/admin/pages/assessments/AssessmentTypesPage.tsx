@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EmptyState } from "@/components/common/EmptyState";
 import { AssessmentTypeDrawer } from "@/components/assessments/AssessmentTypeDrawer";
 import {
@@ -141,12 +142,8 @@ export default function AssessmentTypesPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} assessment types deleted`);
-        } catch {
-          message.error("Some items could not be deleted");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "assessment type");
       },
     });
   };

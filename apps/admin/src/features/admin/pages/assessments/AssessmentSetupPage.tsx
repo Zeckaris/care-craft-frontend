@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EmptyState } from "@/components/common/EmptyState";
 import { AssessmentSetupDrawer } from "@/components/assessments/AssessmentSetupDrawer";
 import {
@@ -146,12 +147,8 @@ export default function AssessmentSetupPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} assessment setups deleted`);
-        } catch {
-          message.error("Some items could not be deleted");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "assessment setup");
       },
     });
   };

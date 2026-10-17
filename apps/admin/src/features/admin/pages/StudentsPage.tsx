@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { StudentDrawer } from "@/components/students/StudentDrawer";
 import { ImportStudentsButton } from "@/components/students/ImportStudentsButton";
 import { useStudents, type IStudent } from "@/hooks/useStudents";
@@ -112,12 +113,8 @@ export default function StudentsPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} students deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "student");
       },
     });
   };

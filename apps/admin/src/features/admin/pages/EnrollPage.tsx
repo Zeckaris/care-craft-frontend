@@ -18,6 +18,7 @@ import {
   UserAddOutlined,
 } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EnrollmentDrawer } from "@/components/enroll/EnrollmentDrawer";
 import { BulkEnrollmentDrawer } from "@/components/enroll/BulkEnrollmentDrawer";
 import { useEnrollments, type IEnrollment } from "@/hooks/useEnrollments";
@@ -154,12 +155,8 @@ export default function EnrollPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} enrollments deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "enrollment");
       },
     });
   };

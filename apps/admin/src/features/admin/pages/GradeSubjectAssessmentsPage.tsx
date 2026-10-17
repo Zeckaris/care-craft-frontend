@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button, Input, Modal, Typography, message, Tag } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { GSADrawer } from "@/components/gsa/GSADrawer";
 import { useGSA, type IGSA } from "@/hooks/useGSA";
 import { useForm } from "antd/es/form/Form";
@@ -97,12 +98,8 @@ export default function GradeSubjectAssessmentsPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} GSA records deleted`);
-        } catch {
-          message.error("Failed to delete some records");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "GSA record");
       },
     });
   };

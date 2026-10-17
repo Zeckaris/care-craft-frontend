@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button, Input, Modal, message, Typography } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { AttributeCategoryDrawer } from "@/components/attributeCategories/AttributeCategoryDrawer";
 import {
   useAttributeCategories,
@@ -112,12 +113,8 @@ export default function AttributeCategoriesPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} categories deleted`);
-        } catch {
-          message.error("Failed to delete some categories");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "category");
       },
     });
   };

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Input, Modal, message, Typography, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { DataTable, type Column } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { AttributeEvaluationDrawer } from "@/components/attributeEvaluations/AttributeEvaluationDrawer";
 import {
   useAttributeEvaluations,
@@ -124,12 +125,8 @@ export default function AttributeEvaluationsPage() {
     Modal.confirm({
       title: `Delete ${keys.length} evaluation${keys.length > 1 ? "s" : ""}?`,
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success("Deleted");
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "evaluation");
       },
     });
   };

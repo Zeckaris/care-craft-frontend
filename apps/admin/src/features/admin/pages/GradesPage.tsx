@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, message, Form, Modal, Input, Space, Typography } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { GradeDrawer } from "@/components/grades/GradeDrawer";
 import { useGrades } from "@/hooks/useGrades";
 import type { IGrade as HookIGrade } from "@/hooks/useGrades";
@@ -104,12 +105,8 @@ export default function GradesPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} grades deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "grade");
       },
     });
   };
