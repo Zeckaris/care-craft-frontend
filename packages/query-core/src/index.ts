@@ -72,6 +72,117 @@ export interface MutationVars {
   invalidateKey?: QueryKey | false;
 }
 
+/** Outcome of a fan-out batch of mutations (e.g. bulk delete). */
+export interface BatchMutationResult {
+  /** Number of mutations attempted. */
+  total: number;
+  /** Number of mutations that resolved successfully. */
+  successCount: number;
+  /** Number of mutations that failed. */
+  failedCount: number;
+  /** Human-readable messages for each failure (first message first). */
+  errors: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Error extraction
+// ---------------------------------------------------------------------------
+
+/**
+ * Pulls a human-readable message out of an error thrown by the API layer.
+ *
+ * Handles every shape the backend produces:
+ *   • envelope on an error response:   { success, message, data, error }
+ *   • middleware-style error response: { message }
+ *   • nested error object:             { error: { message } }
+ *   • plain string body / Error object
+ *
+ * `error.response.data` is preferred because our own failure detection attaches
+ * the original response body there when it turns a `{ success: false }` 2xx
+ * envelope into a rejection.
+ */
+export function extractApiErrorMessage(error: unknown): string {
+  const err = error as
+    | {
+        response?: { data?: unknown };
+        message?: string;
+      }
+    | undefined;
+
+  const data = err?.response?.data;
+
+  if (typeof data === 'string' && data.trim()) return data;
+
+  if (data && typeof data === 'object') {
+    const body = data as {
+      message?: unknown;
+      error?: unknown;
+    };
+
+    if (typeof body.message === 'string' && body.message.trim()) {
+      return body.message;
+    }
+
+    if (typeof body.error === 'string' && body.error.trim()) {
+      return body.error;
+    }
+
+    if (
+      body.error &&
+      typeof body.error === 'object' &&
+      typeof (body.error as { message?: unknown }).message === 'string' &&
+      (body.error as { message: string }).message.trim()
+    ) {
+      return (body.error as { message: string }).message;
+    }
+  }
+
+  if (typeof err?.message === 'string' && err.message.trim()) return err.message;
+
+  return 'Request Failed';
+}
+
+/** True when a resolved 2xx body is an envelope that reports failure. */
+function isFailureEnvelope(res: unknown): res is {
+  success: false;
+  message?: unknown;
+  error?: unknown;
+} {
+  return (
+    !!res &&
+    typeof res === 'object' &&
+    (res as { success?: unknown }).success === false
+  );
+}
+
+/**
+ * Runs a fan-out batch of mutation promises and summarises partial failures
+ * instead of rejecting on the first one (`Promise.all` behaviour).
+ */
+export async function settleMutations<T>(
+  tasks: Array<Promise<T>>,
+): Promise<BatchMutationResult> {
+  const results = await Promise.allSettled(tasks);
+
+  const errors: string[] = [];
+  let successCount = 0;
+
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      successCount += 1;
+    } else {
+      errors.push(extractApiErrorMessage(result.reason));
+    }
+  }
+
+  return {
+    total: results.length,
+    successCount,
+    failedCount: errors.length,
+    errors,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Factory
 // ---------------------------------------------------------------------------
@@ -121,11 +232,26 @@ export function makeUseApi(
 
       return useMutation<TData, any, TVariables>({
         ...restOptions,
-        mutationFn: (vars: TVariables) => {
-          if (method === 'delete') {
-            return client.delete(vars.url, { data: vars.body }).then((r: any) => r.data);
+        mutationFn: async (vars: TVariables) => {
+          const response =
+            method === 'delete'
+              ? await client.delete(vars.url, { data: vars.body })
+              : await (client as any)[method](vars.url, vars.body);
+
+          const data = (response as any)?.data;
+
+          // A rejected operation can still come back as HTTP 2xx with a
+          // `{ success: false, message, error }` envelope. Axios resolves these,
+          // so without this check the mutation is treated as a success and the
+          // backend's message never reaches `onError`.
+          if (isFailureEnvelope(data)) {
+            const failure: any = new Error(extractApiErrorMessage({ response }));
+            failure.response = response;
+            failure.isApiFailure = true;
+            throw failure;
           }
-          return (client as any)[method](vars.url, vars.body).then((r: any) => r.data);
+
+          return data;
         },
 
         onSuccess: (res: any, variables: TVariables, context: any) => {
@@ -152,8 +278,7 @@ export function makeUseApi(
         },
 
         onError: (error: any, variables: TVariables, context: any) => {
-          const msg = error.response?.data?.message || 'Request Failed';
-          globalOnError(msg);
+          globalOnError(extractApiErrorMessage(error));
           (customOnError as any)?.(error, variables, context);
         },
       });
