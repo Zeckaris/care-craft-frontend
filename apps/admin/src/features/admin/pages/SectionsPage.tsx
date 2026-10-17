@@ -7,13 +7,23 @@ import {
   Modal,
   Select,
   Tag,
+  Tabs,
   Typography,
   Alert,
 } from "antd";
-import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  TeamOutlined,
+  ThunderboltOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
 import { SectionDrawer } from "@/components/sections/SectionDrawer";
 import { SectionAssignmentsDrawer } from "@/components/sections/SectionAssignmentsDrawer";
+import { SectionRosterDrawer } from "@/components/sections/SectionRosterDrawer";
+import { GenerateSectionsPanel } from "@/components/sections/GenerateSectionsPanel";
+import { UnassignedStudentsPanel } from "@/components/sections/UnassignedStudentsPanel";
+import type { GenerationInfo } from "@/components/sections/studentAssignmentUtils";
 import { useSections } from "@/hooks/useSections";
 import { useGrades } from "@/hooks/useGrades";
 import { useAcademicCalendars } from "@/hooks/useAcademicCalendars";
@@ -33,6 +43,15 @@ export default function SectionsPage() {
     null
   );
   const [assignmentsOpen, setAssignmentsOpen] = useState(false);
+
+  // Selected section for the student roster drawer
+  const [rosterSection, setRosterSection] = useState<ISection | null>(null);
+  const [rosterOpen, setRosterOpen] = useState(false);
+
+  // Remember the last generation's sizes so assignment panels can show a hint
+  const [generationInfo, setGenerationInfo] = useState<GenerationInfo | null>(
+    null
+  );
 
   // Calendar for default school year
   const { currentCalendar } = useAcademicCalendars();
@@ -126,6 +145,16 @@ export default function SectionsPage() {
     setAssignmentSection(null);
   };
 
+  const openRoster = (section: ISection) => {
+    setRosterSection(section);
+    setRosterOpen(true);
+  };
+
+  const closeRoster = () => {
+    setRosterOpen(false);
+    setRosterSection(null);
+  };
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -191,6 +220,22 @@ export default function SectionsPage() {
       ),
     },
     {
+      key: "students",
+      title: "Students",
+      render: (s: ISection) => (
+        <Button
+          size="small"
+          icon={<UserOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            openRoster(s);
+          }}
+        >
+          Students
+        </Button>
+      ),
+    },
+    {
       key: "assignments",
       title: "Teachers",
       render: (s: ISection) => (
@@ -242,69 +287,105 @@ export default function SectionsPage() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        <Text strong>Filter by:</Text>
-        <Select
-          style={{ width: 160 }}
-          options={gradeOptions}
-          value={gradeId || ""}
-          onChange={(v) => setGradeId(v || undefined)}
-          placeholder="All Grades"
-          allowClear
-        />
-        <Input
-          placeholder="School Year (e.g. 2024-25)"
-          value={schoolYear}
-          onChange={(e) => setSchoolYear(e.target.value || undefined)}
-          style={{ width: 200 }}
-          allowClear
-        />
-      </div>
-
-      {/* Error */}
-      {isError && fetchError && (
-        <Alert
-          type="error"
-          message="Failed to load sections"
-          description={fetchError.message || "Try again later"}
-          showIcon
-          closable
-          onClose={() => refetch()}
-          style={{ marginBottom: 16 }}
-        />
-      )}
-
-      {/* Table */}
-      <DataTable
-        data={sections}
-        columns={columns}
-        loading={isLoading}
-        rowKey="_id"
-        onView={(s) => openDrawer(s, "view")}
-        onEdit={(s) => openDrawer(s, "edit")}
-        onDelete={(key) => setConfirmDelete({ open: true, id: String(key) })}
-        pagination={{
-          current: currentPage,
-          pageSize: ps,
-          total,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          onChange: (p) => setPage(p),
-        }}
-        extraRowActions={(s: ISection) => [
+      <Tabs
+        defaultActiveKey="sections"
+        items={[
           {
-            key: "assignments",
-            label: "Assignments",
-            onClick: (record: ISection) => openAssignments(record),
+            key: "sections",
+            label: "Sections",
+            children: (
+              <>
+                {/* Filters */}
+                <div
+                  style={{
+                    marginBottom: 16,
+                    display: "flex",
+                    gap: 12,
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Text strong>Filter by:</Text>
+                  <Select
+                    style={{ width: 160 }}
+                    options={gradeOptions}
+                    value={gradeId || ""}
+                    onChange={(v) => setGradeId(v || undefined)}
+                    placeholder="All Grades"
+                    allowClear
+                  />
+                  <Input
+                    placeholder="School Year (e.g. 2024-25)"
+                    value={schoolYear}
+                    onChange={(e) =>
+                      setSchoolYear(e.target.value || undefined)
+                    }
+                    style={{ width: 200 }}
+                    allowClear
+                  />
+                </div>
+
+                {/* Error */}
+                {isError && fetchError && (
+                  <Alert
+                    type="error"
+                    message="Failed to load sections"
+                    description={fetchError.message || "Try again later"}
+                    showIcon
+                    closable
+                    onClose={() => refetch()}
+                    style={{ marginBottom: 16 }}
+                  />
+                )}
+
+                {/* Table */}
+                <DataTable
+                  data={sections}
+                  columns={columns}
+                  loading={isLoading}
+                  rowKey="_id"
+                  onView={(s) => openDrawer(s, "view")}
+                  onEdit={(s) => openDrawer(s, "edit")}
+                  onDelete={(key) =>
+                    setConfirmDelete({ open: true, id: String(key) })
+                  }
+                  pagination={{
+                    current: currentPage,
+                    pageSize: ps,
+                    total,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                    onChange: (p) => setPage(p),
+                  }}
+                  extraRowActions={() => [
+                    {
+                      key: "students",
+                      label: "Students",
+                      onClick: (record: ISection) => openRoster(record),
+                    },
+                    {
+                      key: "assignments",
+                      label: "Assignments",
+                      onClick: (record: ISection) => openAssignments(record),
+                    },
+                  ]}
+                />
+              </>
+            ),
+          },
+          {
+            key: "assign",
+            label: (
+              <span>
+                <ThunderboltOutlined /> Auto-Assign Students
+              </span>
+            ),
+            children: (
+              <>
+                <GenerateSectionsPanel onGenerated={setGenerationInfo} />
+                <UnassignedStudentsPanel generationInfo={generationInfo} />
+              </>
+            ),
           },
         ]}
       />
@@ -344,6 +425,14 @@ export default function SectionsPage() {
         open={assignmentsOpen}
         onClose={closeAssignments}
         section={assignmentSection}
+      />
+
+      {/* Section student roster drawer */}
+      <SectionRosterDrawer
+        open={rosterOpen}
+        onClose={closeRoster}
+        section={rosterSection}
+        generationInfo={generationInfo}
       />
     </>
   );
