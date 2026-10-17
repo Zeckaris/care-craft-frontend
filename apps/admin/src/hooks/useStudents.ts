@@ -72,10 +72,14 @@ export const useStudents = ({
     isError,
     error,
     refetch,
-  } = get(fetchUrl, { enabled: true });
+  } = get(fetchUrl, {
+    queryKey,
+    staleTime: 30_000,
+  });
 
   const students: IStudent[] = raw?.data || [];
-  const paginationMeta: PaginationMeta = raw?.meta || { total: 0, page: 1, limit: 10 };
+  const paginationMeta: PaginationMeta =
+    raw?.pagination ?? { total: 0, page: 1, limit: 10 };
 
 
   const create = async (data: Omit<IStudent, '_id'> | FormData) => {

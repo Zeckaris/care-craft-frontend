@@ -36,8 +36,6 @@ export default function StudentsPage() {
   const {
     students,
     total,
-    currentPage,
-    pageSize,
     isLoading,
     isError,
     fetchError,
@@ -132,13 +130,6 @@ export default function StudentsPage() {
     } catch (err) {
       message.error("Failed to save student");
     }
-  };
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination({
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
   };
 
   const columns = [
@@ -319,8 +310,8 @@ export default function StudentsPage() {
           onDelete={handleDelete}
           onBulkDelete={handleBulkDelete}
           pagination={{
-            current: currentPage,
-            pageSize: pageSize,
+            current: pagination.page,
+            pageSize: pagination.pageSize,
             total: total,
             showSizeChanger: true,
             showQuickJumper: true,
