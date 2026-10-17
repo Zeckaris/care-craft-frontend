@@ -2,6 +2,7 @@ import { message } from 'antd';
 import { apiClient } from '@/services/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '@/hooks/useApi';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface ISubject {
   _id: string;
@@ -48,10 +49,7 @@ export const useSubjects = () => {
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
 
   return {
     subjects,

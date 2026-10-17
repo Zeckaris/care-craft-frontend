@@ -1,5 +1,6 @@
 import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IGSA {
   _id: string;
@@ -83,10 +84,7 @@ export const useGSA = (
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
 
   return {
     gsas,

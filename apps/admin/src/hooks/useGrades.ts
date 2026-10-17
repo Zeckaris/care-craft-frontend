@@ -1,5 +1,6 @@
 import { useApi } from '@/hooks/useApi';
-import { useQueryClient } from '@tanstack/react-query'; 
+import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IGrade {
   _id: string;
@@ -61,10 +62,7 @@ export const useGrades = (
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(_id => remove(_id)));
-    return results;
-  };
+  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
 
   return {
     grades,

@@ -1,5 +1,6 @@
 import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IAttributeItem {
   attributeId: {
@@ -119,10 +120,7 @@ export const useAttributeEvaluations = (
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
 
   return {
     evaluations,

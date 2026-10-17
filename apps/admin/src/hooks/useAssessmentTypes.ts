@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 import { useApi } from '@/hooks/useApi';
 
 export interface IAssessmentType {
@@ -47,10 +48,7 @@ export const useAssessmentTypes = () => {
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
 
   return {
     // Data
