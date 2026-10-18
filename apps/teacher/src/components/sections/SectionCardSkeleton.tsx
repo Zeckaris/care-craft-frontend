@@ -1,5 +1,5 @@
 /**
- * SectionCardSkeleton — loading placeholder for SectionCard.
+ * SectionCardSkeleton: loading placeholder for SectionCard.
  */
 import { cn } from '@/lib/utils';
 

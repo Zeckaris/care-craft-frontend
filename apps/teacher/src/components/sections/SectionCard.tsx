@@ -1,12 +1,12 @@
 /**
- * SectionCard — displays one section in the teacher's day overview.
+ * SectionCard: displays one section in the teacher's classes overview.
  *
  * Requirements:
  *  • Homeroom vs. Subject role prominently displayed
  *  • Grade level, section name, academic year
  *  • Assigned subjects taught by teacher
  *  • Student count
- *  • Prominent attendance entry action — "Take" for homeroom, "View" otherwise
+ *  • Prominent attendance entry action: "Take" for homeroom, "View" otherwise
  *  • Looks great on phone, tablet, and desktop
  */
 import { useNavigate } from 'react-router-dom';
@@ -107,13 +107,13 @@ export function SectionCard({ item, className, pendingSync }: SectionCardProps) 
         </div>
 
         {/* Bottom row: Student count + Prominent Take Attendance Action */}
-        <div className="pt-4 mt-3 border-t border-[var(--color-border)] flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[var(--color-text-secondary)]">
-            <Users size={16} className="shrink-0 text-[var(--color-text-muted)]" />
-            <span className="font-medium">{studentCount} student{studentCount !== 1 ? 's' : ''}</span>
+        <div className="pt-4 mt-3 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap text-xs sm:text-sm text-[var(--color-text-secondary)]">
+            <Users size={15} className="shrink-0 text-[var(--color-text-muted)]" />
+            <span className="font-medium tabular-nums">{studentCount} student{studentCount !== 1 ? 's' : ''}</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               id={`section-detail-${section._id}`}
               variant="ghost"

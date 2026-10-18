@@ -1,12 +1,13 @@
 /**
- * HomePage — structured as the "Teacher's Day" overview.
+ * HomePage: the teacher's classes overview.
  *
  * Highlights:
- *  • Day orientation: date, friendly greeting, and daily metrics overview
+ *  • Date and friendly greeting with a summary of assigned classes
  *  • Section overview cards with prominent homeroom/subject badges
  *  • Dedicated "Take Attendance" entry action per section
  *  • Fully responsive grid: comfortable on phones, tablets, and wide monitors
  */
+import { type ReactNode } from 'react';
 import { BookOpen, RefreshCw, Calendar, Users, Award, LayoutGrid } from 'lucide-react';
 import { SectionCard } from '@/components/sections/SectionCard';
 import { SectionCardSkeleton } from '@/components/sections/SectionCardSkeleton';
@@ -16,6 +17,39 @@ import { useMySections } from '@/hooks/useMySections';
 import { usePrefetchHomeroomRosters } from '@/hooks/useAttendanceRoster';
 import { useAttendanceQueue } from '@/context/AttendanceQueueContext';
 import { useUser } from '@/context/UserContext';
+import { cn } from '@/lib/utils';
+
+/** A single cell in the classes summary strip (icon, number, label). */
+function SummaryStat({
+  icon,
+  value,
+  label,
+  iconClass,
+}: {
+  icon: ReactNode;
+  value: number;
+  label: string;
+  iconClass: string;
+}) {
+  return (
+    <div className="flex min-w-0 flex-col items-center text-center">
+      <div
+        className={cn(
+          'mb-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-lg)] sm:h-10 sm:w-10',
+          iconClass,
+        )}
+      >
+        {icon}
+      </div>
+      <p className="text-base font-bold leading-none text-[var(--color-text)] sm:text-xl">
+        {value}
+      </p>
+      <p className="mt-0.5 max-w-full break-words text-[10px] font-medium leading-tight text-[var(--color-text-muted)] sm:text-[11px]">
+        {label}
+      </p>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const { user } = useUser();
@@ -62,7 +96,7 @@ export default function HomePage() {
               Good day, {firstName}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
-              Here is your teaching schedule and homeroom sections for today.
+              Here are your classes and homeroom sections.
             </p>
           </div>
 
@@ -82,58 +116,35 @@ export default function HomePage() {
 
         {/* Quick summary stats strip */}
         {!isLoading && !error && sections.length > 0 && (
-          <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-[var(--color-border)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary-light)] text-[var(--color-primary)] shrink-0">
-                <LayoutGrid size={18} />
-              </div>
-              <div>
-                <p className="text-lg sm:text-xl font-bold text-[var(--color-text)] leading-none">
-                  {sections.length}
-                </p>
-                <p className="text-[11px] text-[var(--color-text-muted)] font-medium mt-0.5">
-                  Assigned Sections
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 border-x border-[var(--color-border)] px-3 sm:px-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-homeroom-light)] text-[var(--color-homeroom)] shrink-0">
-                <Award size={18} />
-              </div>
-              <div>
-                <p className="text-lg sm:text-xl font-bold text-[var(--color-text)] leading-none">
-                  {homeroomCount}
-                </p>
-                <p className="text-[11px] text-[var(--color-text-muted)] font-medium mt-0.5">
-                  Homeroom {homeroomCount === 1 ? 'Role' : 'Roles'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pl-1 sm:pl-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-success-light)] text-[var(--color-success)] shrink-0">
-                <Users size={18} />
-              </div>
-              <div>
-                <p className="text-lg sm:text-xl font-bold text-[var(--color-text)] leading-none">
-                  {totalStudents}
-                </p>
-                <p className="text-[11px] text-[var(--color-text-muted)] font-medium mt-0.5">
-                  Total Students
-                </p>
-              </div>
-            </div>
+          <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-[var(--color-border)] sm:gap-3">
+            <SummaryStat
+              icon={<LayoutGrid size={18} />}
+              value={sections.length}
+              label="Assigned Sections"
+              iconClass="bg-[var(--color-primary-light)] text-[var(--color-primary)]"
+            />
+            <SummaryStat
+              icon={<Award size={18} />}
+              value={homeroomCount}
+              label={homeroomCount === 1 ? 'Homeroom Role' : 'Homeroom Roles'}
+              iconClass="bg-[var(--color-homeroom-light)] text-[var(--color-homeroom)]"
+            />
+            <SummaryStat
+              icon={<Users size={18} />}
+              value={totalStudents}
+              label="Total Students"
+              iconClass="bg-[var(--color-success-light)] text-[var(--color-success)]"
+            />
           </div>
         )}
       </div>
 
-      {/* ── Sections Schedule & Overview ── */}
+      {/* ── Classes overview ── */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-[var(--color-text)]">
-              Today's Sections
+              Your classes
             </h2>
             <p className="text-xs text-[var(--color-text-muted)]">
               Select a section to manage records or jump straight into attendance.
