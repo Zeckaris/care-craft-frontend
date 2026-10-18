@@ -36,6 +36,18 @@ export const getErrorStatus = (err: unknown): number | undefined => {
   return e?.response?.status;
 };
 
+/**
+ * Extracts the envelope's `data` payload from an API error. The Schedule
+ * endpoints put structured failure details (precheck, violations, drift,
+ * unplaced, conflict ids) here.
+ */
+export const getErrorData = (err: unknown): unknown => {
+  const e = err as
+    | { response?: { data?: { data?: unknown } } }
+    | undefined;
+  return e?.response?.data?.data;
+};
+
 /** antd validateFields rejects with an object carrying `errorFields`. */
 export const isFormValidationError = (err: unknown): boolean =>
   typeof err === "object" && err !== null && "errorFields" in err;
