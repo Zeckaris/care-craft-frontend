@@ -14,7 +14,7 @@ export type UserRole = 'admin' | 'coordinator' | 'teacher' | 'parent' | 'student
 
 /**
  * Lightweight user shape stored in context / returned by /auth/me.
- * Deliberately minimal — the full admin-user object is IUser below.
+ * Deliberately minimal; the full admin-user object is IUser below.
  */
 export interface AuthUser {
   id: string;
@@ -625,3 +625,4 @@ export interface ITeachingAssignment {
 // ---------------------------------------------------------------------------
 
 export * from './attendance';
+export * from './schedule';

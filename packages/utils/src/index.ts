@@ -72,6 +72,45 @@ export const timeAgo = (date: Date | string): string => {
 };
 
 // ---------------------------------------------------------------------------
+// Time helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Formats a time as a 12-hour string with AM/PM.
+ *
+ * Accepts either an `HH:mm` string (24-hour, minutes since midnight) or a
+ * number of minutes since midnight. Values that are not a valid time are
+ * returned unchanged so callers never render `undefined`.
+ *
+ * Midnight and noon are handled correctly: `"00:00"`/`0` → `"12:00 AM"`,
+ * `"12:00"`/`720` → `"12:00 PM"`.
+ *
+ * @example formatTime12Hour('08:30') // "8:30 AM"
+ * @example formatTime12Hour(890)     // "2:50 PM"
+ */
+export const formatTime12Hour = (value: string | number): string => {
+  let minutes: number;
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    minutes = Math.round(value);
+  } else if (typeof value === 'string') {
+    const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value.trim());
+    if (!match) return value;
+    minutes = Number(match[1]) * 60 + Number(match[2]);
+  } else {
+    return String(value);
+  }
+
+  const normalized = ((minutes % 1440) + 1440) % 1440;
+  const hours24 = Math.floor(normalized / 60);
+  const mins = normalized % 60;
+  const suffix = hours24 < 12 ? 'AM' : 'PM';
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+
+  return `${hours12}:${String(mins).padStart(2, '0')} ${suffix}`;
+};
+
+// ---------------------------------------------------------------------------
 // React hooks
 // ---------------------------------------------------------------------------
 
