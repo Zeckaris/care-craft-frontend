@@ -1,5 +1,5 @@
 /**
- * AppShell — the authenticated app layout.
+ * AppShell: the authenticated app layout.
  *
  * Renders the AppHeader, main content area (with bottom-nav padding),
  * and the BottomNav. All authenticated routes render inside this shell.
@@ -13,8 +13,9 @@ import { AttendanceAuthBanner } from '@/components/attendance/AttendanceAuthBann
 
 /** Map route paths to human-readable page titles. */
 const PAGE_TITLES: Record<string, string> = {
-  '/app/home':    'Teacher Dashboard',
-  '/app/profile': 'Teacher Profile',
+  '/app/home':     'Teacher Dashboard',
+  '/app/schedule': 'My Schedule',
+  '/app/profile':  'Teacher Profile',
 };
 
 function usePageTitle(): string {
