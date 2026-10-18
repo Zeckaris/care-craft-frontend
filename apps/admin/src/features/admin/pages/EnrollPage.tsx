@@ -252,7 +252,7 @@ export default function EnrollPage() {
             strong
             style={{ color: grade ? "var(--primary)" : "var(--text-disabled)" }}
           >
-            {grade ? grade.level : "—"}
+            {grade ? grade.level : "-"}
           </Text>
         );
       },
@@ -262,7 +262,7 @@ export default function EnrollPage() {
       title: "School Year",
       render: (enrollment: IEnrollment) => {
         const year = enrollment.schoolYear;
-        if (!year) return <Text type="secondary">—</Text>;
+        if (!year) return <Text type="secondary">-</Text>;
         return <Text strong>{year}</Text>;
       },
     },
@@ -285,7 +285,7 @@ export default function EnrollPage() {
               day: "numeric",
               year: "numeric",
             })
-          : "—",
+          : "-",
     },
     {
       key: "toggle",

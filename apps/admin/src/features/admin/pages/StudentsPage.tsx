@@ -184,7 +184,7 @@ export default function StudentsPage() {
       render: (student: IStudent) =>
         student.dateOfBirth
           ? dayjs(student.dateOfBirth).format("MMM D, YYYY")
-          : "—",
+          : "-",
     },
     // ... rest of columns remain unchanged
     {
@@ -215,7 +215,7 @@ export default function StudentsPage() {
       render: (student: IStudent) =>
         student.admissionDate
           ? dayjs(student.admissionDate).format("MMM D, YYYY")
-          : "—",
+          : "-",
     },
   ];
 

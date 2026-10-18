@@ -195,7 +195,7 @@ export default function AssessmentSetupPage() {
             ))}
           </Space>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
@@ -211,7 +211,7 @@ export default function AssessmentSetupPage() {
       key: "createdAt",
       title: "Created",
       render: (setup: IAssessmentSetup) =>
-        setup.createdAt ? dayjs(setup.createdAt).format("MMM D, YYYY") : "—",
+        setup.createdAt ? dayjs(setup.createdAt).format("MMM D, YYYY") : "-",
     },
   ];
 

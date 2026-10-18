@@ -238,7 +238,7 @@ export default function AttributeEvaluationsPage() {
         }}
       >
         <h2>Attribute Evaluations</h2>
-        <Text type="secondary">Admin monitoring tool — use with care</Text>
+        <Text type="secondary">Admin monitoring tool. Use with care.</Text>
       </div>
 
       <div style={{ marginBottom: 16 }}>

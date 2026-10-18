@@ -193,14 +193,14 @@ export default function AssessmentTypesPage() {
         type.description ? (
           <Text style={{ maxWidth: 300 }}>{type.description}</Text>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
       key: "createdAt",
       title: "Created",
       render: (type: IAssessmentType) =>
-        type.createdAt ? dayjs(type.createdAt).format("MMM D, YYYY") : "—",
+        type.createdAt ? dayjs(type.createdAt).format("MMM D, YYYY") : "-",
     },
   ];
 

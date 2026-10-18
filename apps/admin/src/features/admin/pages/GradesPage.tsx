@@ -161,7 +161,7 @@ export default function GradesPage() {
         </Button>
       </div>
 
-      {/* SEARCH BAR — NOW ON TOP! */}
+      {/* Search bar, now on top */}
       <div style={{ marginBottom: 16 }}>
         <Input
           placeholder="Search grades by level or description..."

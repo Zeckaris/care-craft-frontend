@@ -203,7 +203,7 @@ export default function SectionsPage() {
     {
       key: "grade",
       title: "Grade",
-      render: (s: ISection) => s.gradeId?.level ?? "—",
+      render: (s: ISection) => s.gradeId?.level ?? "-",
     },
     {
       key: "schoolYear",

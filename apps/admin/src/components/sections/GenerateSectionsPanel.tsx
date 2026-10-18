@@ -171,7 +171,7 @@ export function GenerateSectionsPanel({
     >
       <Text type="secondary">
         Assign every unassigned student of one grade and school year to
-        alphabet-named sections. Preview first — nothing is written until you
+        alphabet-named sections. Preview first. Nothing is written until you
         generate.
       </Text>
 

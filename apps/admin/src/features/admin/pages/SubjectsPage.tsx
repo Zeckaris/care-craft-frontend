@@ -156,7 +156,7 @@ export default function SubjectsPage() {
         subject.description ? (
           <Text style={{ maxWidth: 300 }}>{subject.description}</Text>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
@@ -165,7 +165,7 @@ export default function SubjectsPage() {
       render: (subject: ISubject) =>
         subject.createdAt
           ? dayjs(subject.createdAt).format("MMM D, YYYY")
-          : "—",
+          : "-",
     },
   ];
 
@@ -243,7 +243,7 @@ export default function SubjectsPage() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onBulkDelete={handleBulkDelete}
-          pagination={false} // No pagination – small dataset
+          pagination={false} // No pagination (small dataset)
         />
       )}
 

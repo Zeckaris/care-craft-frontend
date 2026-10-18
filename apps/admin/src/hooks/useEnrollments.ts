@@ -69,7 +69,7 @@ const useCurrentAcademicCalendar = () => {
     (!newRegEnd || today <= newRegEnd);
 
   const registrationWindowText = currentCalendar
-    ? `${regStart ? regStart.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} — ${
+    ? `${regStart ? regStart.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} to ${
         newRegEnd ? newRegEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'
       }`
     : 'No active calendar set';

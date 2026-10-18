@@ -161,7 +161,7 @@ export default function AttributeCategoriesPage() {
       title: "Score Range",
       render: (cat: IAttributeCategory) => (
         <Text strong>
-          {cat.minScore} – {cat.maxScore}
+          {cat.minScore} to {cat.maxScore}
         </Text>
       ),
       width: 120,

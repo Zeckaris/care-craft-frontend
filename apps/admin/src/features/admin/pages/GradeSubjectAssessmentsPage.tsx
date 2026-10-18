@@ -153,7 +153,7 @@ export default function GradeSubjectAssessmentsPage() {
       title: "Assessment Setup",
       render: (gsa: IGSA) => (
         <span>
-          {gsa.assessmentSetupId?.name ?? "—"}
+          {gsa.assessmentSetupId?.name ?? "-"}
           {gsa.assessmentSetupId?.name === "Full Term Assessment" && (
             <Tag color="green" style={{ marginLeft: 6, fontSize: 10 }}>
               DEFAULT

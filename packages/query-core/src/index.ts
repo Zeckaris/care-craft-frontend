@@ -1,7 +1,7 @@
 /**
  * @carecraft/query-core
  *
- * Provides the `useApi` hook — a thin wrapper around @tanstack/react-query
+ * Provides the `useApi` hook, a thin wrapper around @tanstack/react-query
  * that exposes typed `get`, `post`, `put`, `patch`, and `del` helpers backed
  * by an Axios instance you supply at the call-site.
  *
@@ -290,7 +290,7 @@ export function makeUseApi(
     const patch = createMutation('patch');
 
     return {
-      /** @deprecated kept for compatibility — always `false` */
+      /** @deprecated kept for compatibility; always `false` */
       loading: false as const,
       get,
       post: post.mutateAsync,

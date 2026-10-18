@@ -20,7 +20,7 @@ export function StudentCell({ student }: { student: AssignmentStudent }) {
 }
 
 export function GenderTag({ gender }: { gender?: string }) {
-  if (!gender) return <Text type="secondary">—</Text>;
+  if (!gender) return <Text type="secondary">-</Text>;
   const color =
     gender === "male" ? "blue" : gender === "female" ? "magenta" : "default";
   return (
