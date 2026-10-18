@@ -26,6 +26,7 @@ import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
 import SectionsPage from "./features/admin/pages/SectionsPage";
+import SchedulePage from "./features/admin/pages/SchedulePage";
 import { RequireAuth } from "@/components/common/RequireAuth";
 import LandingPage from "@/public/pages/LandingPage";
 import FeaturesPage from "@/public/pages/FeaturesPage";
@@ -166,6 +167,11 @@ export const router = createBrowserRouter([
         path: "sections",
         element: <SectionsPage />,
         handle: { crumb: () => "Sections" },
+      },
+      {
+        path: "schedule",
+        element: <SchedulePage />,
+        handle: { crumb: () => "Schedule" },
       },
       {
         path: "attribute-categories",

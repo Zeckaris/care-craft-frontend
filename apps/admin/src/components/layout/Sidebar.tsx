@@ -16,18 +16,28 @@ import {
   RadarChartOutlined,
   StrikethroughOutlined,
   BarsOutlined,
+  FieldTimeOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { MdPlaylistAddCheck } from "react-icons/md";
 import { RiMedal2Line } from "react-icons/ri";
 import { EyeOutlined } from "@ant-design/icons";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface SidebarProps {
   collapsed: boolean;
 }
 
-const menuItems = [
+interface SidebarMenuItemType {
+  key: string;
+  icon: ReactNode;
+  label: ReactNode;
+  roles?: string[];
+  children?: { key: string; label: ReactNode }[];
+}
+
+const menuItems: SidebarMenuItemType[] = [
   { key: "/app/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   { key: "/app/students", icon: <UserOutlined />, label: "Students" },
   {
@@ -39,6 +49,12 @@ const menuItems = [
   { key: "/app/subjects", icon: <BookOutlined />, label: "Subjects" },
   { key: "/app/grades", icon: <TrophyOutlined />, label: "Grades" },
   { key: "/app/sections", icon: <BarsOutlined />, label: "Sections" },
+  {
+    key: "/app/schedule",
+    icon: <FieldTimeOutlined />,
+    label: "Schedule",
+    roles: ["admin", "coordinator"],
+  },
   { key: "/app/parents", icon: <HeartFilled />, label: "Parents" },
   { key: "/app/school-info", icon: <BankOutlined />, label: "School Info" },
   {
@@ -115,6 +131,7 @@ const menuItems = [
 const Sidebar = ({ collapsed }: SidebarProps) => {
   const location = useLocation();
   const selectedKey = location.pathname;
+  const { user } = useCurrentUser();
 
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
@@ -141,7 +158,10 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
     }
   };
 
-  const items = menuItems.map((item) => {
+  const canSeeItem = (roles?: string[]) =>
+    !roles || (!!user && roles.includes(user.role));
+
+  const items = menuItems.filter((item) => canSeeItem(item.roles)).map((item) => {
     if (item.children) {
       return {
         key: item.key,
