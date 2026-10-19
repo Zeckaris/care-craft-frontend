@@ -10,6 +10,7 @@ import StudentsPage from "./features/admin/pages/StudentsPage";
 import SubjectsPage from "./features/admin/pages/SubjectsPage";
 import AssessmentTypesPage from "./features/admin/pages/assessments/AssessmentTypesPage";
 import AssessmentSetupPage from "./features/admin/pages/assessments/AssessmentSetupPage";
+import AssessmentResultsPage from "./features/admin/pages/assessments/AssessmentResultsPage";
 import ParentsPage from "./features/admin/pages/users/ParentsPage";
 import TeachersPage from "./features/admin/pages/users/TeachersPage";
 import CoordinatorsPage from "./features/admin/pages/users/CoordinatorsPage";
@@ -155,6 +156,15 @@ export const router = createBrowserRouter([
             path: "setup",
             element: <AssessmentSetupPage />,
             handle: { crumb: () => "Setup" },
+          },
+          {
+            path: "results",
+            element: (
+              <RequireAuth roles={["admin", "coordinator"]}>
+                <AssessmentResultsPage />
+              </RequireAuth>
+            ),
+            handle: { crumb: () => "Results" },
           },
         ],
       },

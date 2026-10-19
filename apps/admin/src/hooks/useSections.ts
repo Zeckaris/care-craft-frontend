@@ -10,6 +10,8 @@ interface UseSectionsParams {
   isActive?: boolean;
   page?: number;
   pageSize?: number;
+  /** Set false to defer the request until the required pickers are chosen. */
+  enabled?: boolean;
 }
 
 export const useSections = ({
@@ -18,6 +20,7 @@ export const useSections = ({
   isActive,
   page = 1,
   pageSize = 10,
+  enabled = true,
 }: UseSectionsParams = {}) => {
   const queryClient = useQueryClient();
   const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
@@ -38,6 +41,7 @@ export const useSections = ({
     queryKey,
     keepPreviousData: true,
     staleTime: 30_000,
+    enabled,
   });
 
   const sections: ISection[] = raw?.success ? (raw.data as ISection[]) : [];

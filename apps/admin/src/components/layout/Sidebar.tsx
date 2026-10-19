@@ -34,7 +34,7 @@ interface SidebarMenuItemType {
   icon: ReactNode;
   label: ReactNode;
   roles?: string[];
-  children?: { key: string; label: ReactNode }[];
+  children?: { key: string; label: ReactNode; roles?: string[] }[];
 }
 
 const menuItems: SidebarMenuItemType[] = [
@@ -74,6 +74,11 @@ const menuItems: SidebarMenuItemType[] = [
       {
         key: "/app/assessments/setup",
         label: <Link to="/app/assessments/setup">Setup</Link>,
+      },
+      {
+        key: "/app/assessments/results",
+        label: <Link to="/app/assessments/results">Results</Link>,
+        roles: ["admin", "coordinator"],
       },
     ],
   },
@@ -167,10 +172,12 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
         key: item.key,
         icon: item.icon,
         label: item.label,
-        children: item.children.map((child) => ({
-          key: child.key,
-          label: child.label, // Already has <Link>
-        })),
+        children: item.children
+          .filter((child) => canSeeItem(child.roles))
+          .map((child) => ({
+            key: child.key,
+            label: child.label, // Already has <Link>
+          })),
       };
     }
     return {
