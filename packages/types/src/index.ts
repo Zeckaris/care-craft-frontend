@@ -52,31 +52,57 @@ export interface SearchUser {
 // Academic structures
 // ---------------------------------------------------------------------------
 
+/** Computed lifecycle status shared by calendars and terms. */
+export type AcademicStatus = 'upcoming' | 'current' | 'past';
+
+/** Reference to a calendar when it is populated by the API. */
+export interface IAcademicCalendarRef {
+  _id: string;
+  academicYear: string;
+}
+
 export interface IAcademicCalendar {
   _id: string;
   academicYear: string;
-  startDate: string | Date;
-  endDate: string | Date;
+  startDate: string;
+  endDate: string;
+  registrationStartDate: string | null;
+  registrationEndDate: string | null;
+  newStudentRegistrationStartDate: string | null;
+  newStudentRegistrationEndDate: string | null;
+  holidayDates: string[];
+  status: AcademicStatus;
   isCurrent: boolean;
-  registrationStartDate?: string | Date;
-  registrationEndDate?: string | Date;
-  newStudentRegistrationStartDate?: string | Date;
-  newStudentRegistrationEndDate?: string | Date;
-  holidayDates: Date[];
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IAcademicTerm {
   _id: string;
+  calendarId: string | IAcademicCalendarRef;
   name: string;
-  calendarId: string;
-  sequence?: number;
-  startDate: string | Date;
-  endDate: string | Date;
-  isCurrent?: boolean;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  sequence: number;
+  startDate: string;
+  endDate: string;
+  status: AcademicStatus;
+  isCurrent: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Phases returned by GET /calendar/current-context. */
+export type AcademicContextPhase =
+  | 'in-term'
+  | 'between-terms'
+  | 'before-first-term'
+  | 'between-years'
+  | 'none';
+
+export interface ICurrentAcademicContext {
+  today: string;
+  phase: AcademicContextPhase;
+  currentCalendar: IAcademicCalendar | null;
+  currentTerm: IAcademicTerm | null;
 }
 
 export interface IGrade {
