@@ -1,21 +1,18 @@
-import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import type { IAcademicTerm } from '@carecraft/types';
+import { useApi } from '@/hooks/useApi';
 
-export interface IAcademicTerm {
-  _id: string;
-  name: string;
+export interface AcademicTermInput {
   calendarId: string;
-  sequence?: number;
-  startDate: string | Date;
-  endDate: string | Date;
-  isCurrent?: boolean;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  name: string;
+  sequence: number;
+  startDate: string;
+  endDate: string;
 }
 
 export const useAcademicTerms = (academicYearId?: string) => {
   const queryClient = useQueryClient();
-  const { get, post, put, del, patch, postMutation, putMutation, deleteMutation, patchMutation } = useApi();
+  const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
 
   const urlPath = '/term';
 
@@ -38,30 +35,31 @@ export const useAcademicTerms = (academicYearId?: string) => {
     ? (raw.data as IAcademicTerm[])
     : [];
 
-  const currentTerm = terms.find(t => t.isCurrent) || null;
+  const currentTerm = terms.find((term) => term.isCurrent) ?? null;
 
-  const create = async (data: Omit<IAcademicTerm, '_id'>) => {
+  const invalidateAcademicData = () => {
+    queryClient.invalidateQueries({ queryKey: ['/term'] });
+    queryClient.invalidateQueries({ queryKey: ['/term/current'] });
+    queryClient.invalidateQueries({ queryKey: ['/calendar'] });
+    queryClient.invalidateQueries({ queryKey: ['/calendar/current'] });
+    queryClient.invalidateQueries({ queryKey: ['/calendar/current-context'] });
+  };
+
+  const create = async (data: AcademicTermInput) => {
     const result = await post({ url: urlPath, body: data });
-    queryClient.invalidateQueries({ queryKey: [urlPath] });
+    invalidateAcademicData();
     return result;
   };
 
-  const update = async (id: string, data: Partial<Omit<IAcademicTerm, '_id'>>) => {
+  const update = async (id: string, data: Partial<AcademicTermInput>) => {
     const result = await put({ url: `${urlPath}/${id}`, body: data });
-    queryClient.invalidateQueries({ queryKey: [urlPath] });
+    invalidateAcademicData();
     return result;
   };
 
   const remove = async (id: string) => {
     const result = await del({ url: `${urlPath}/${id}` });
-    queryClient.invalidateQueries({ queryKey: [urlPath] });
-    return result;
-  };
-
-
-  const setCurrent = async (id: string) => {
-    const result = await patch({ url: `${urlPath}/${id}/current`, body: {} });
-    queryClient.invalidateQueries({ queryKey: [urlPath] });
+    invalidateAcademicData();
     return result;
   };
 
@@ -70,17 +68,15 @@ export const useAcademicTerms = (academicYearId?: string) => {
     currentTerm,
     isLoading,
     isError,
-    error: error as any,
+    error,
     refetch,
 
     create,
     update,
     remove,
-    setCurrent,
 
     isCreating: postMutation.isPending,
     isUpdating: putMutation.isPending,
     isDeleting: deleteMutation.isPending,
-    isSettingCurrent: patchMutation.isPending, 
   };
 };
