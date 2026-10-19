@@ -1,36 +1,38 @@
 import { useState } from "react";
-import { Button, Space, Spin, Empty, message, Form } from "antd";
+import { Button, Spin, Empty, Form } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { TermRow } from "./TermRow";
-import { AcademicTermDrawer } from "./AcademicTermDrawer";
-import { useAcademicTerms, type IAcademicTerm } from "@/hooks/useAcademicTerms";
 import dayjs from "dayjs";
+import type { IAcademicCalendar, IAcademicTerm } from "@carecraft/types";
+import { TermRow } from "./TermRow";
+import {
+  AcademicTermDrawer,
+  type AcademicTermFormValues,
+} from "./AcademicTermDrawer";
+import { useAcademicTerms } from "@/hooks/useAcademicTerms";
+import { normalizeCalendarId } from "@/utils/academic";
+import { toSchoolDate } from "@/utils/schoolDate";
 
 interface TermsPanelProps {
   academicYearId: string;
   academicYearName: string;
+  calendars: IAcademicCalendar[];
 }
 
 export const TermsPanel = ({
   academicYearId,
   academicYearName,
+  calendars,
 }: TermsPanelProps) => {
   const [form] = Form.useForm();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"view" | "edit">("edit");
   const [selectedTerm, setSelectedTerm] = useState<IAcademicTerm | null>(null);
 
-  const {
-    terms,
-    currentTerm,
-    isLoading,
-    create,
-    update,
-    remove,
-    setCurrent,
-    isCreating,
-    isUpdating,
-  } = useAcademicTerms(academicYearId);
+  const { terms, isLoading, create, update, remove, isCreating, isUpdating } =
+    useAcademicTerms(academicYearId);
+
+  const nextSequence =
+    terms.length > 0 ? Math.max(...terms.map((term) => term.sequence || 0)) + 1 : 1;
 
   const openDrawer = (term: IAcademicTerm | null, mode: "view" | "edit") => {
     setSelectedTerm(term);
@@ -38,12 +40,20 @@ export const TermsPanel = ({
 
     if (term && mode === "edit") {
       form.setFieldsValue({
+        calendarId: normalizeCalendarId(term.calendarId) || academicYearId,
         name: term.name,
-        startDate: dayjs(term.startDate),
-        endDate: dayjs(term.endDate),
+        sequence: term.sequence,
+        startDate: dayjs(toSchoolDate(term.startDate)),
+        endDate: dayjs(toSchoolDate(term.endDate)),
       });
     } else {
       form.resetFields();
+      if (mode === "edit") {
+        form.setFieldsValue({
+          calendarId: academicYearId,
+          sequence: nextSequence,
+        });
+      }
     }
     setDrawerOpen(true);
   };
@@ -54,52 +64,32 @@ export const TermsPanel = ({
     form.resetFields();
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: AcademicTermFormValues) => {
+    const payload = {
+      calendarId: values.calendarId,
+      name: values.name,
+      sequence: values.sequence,
+      startDate: values.startDate.format("YYYY-MM-DD"),
+      endDate: values.endDate.format("YYYY-MM-DD"),
+    };
+
     try {
-      // Count existing terms to generate next sequence
-      const nextSequence =
-        terms.length > 0
-          ? Math.max(...terms.map((t) => t.sequence || 0)) + 1
-          : 1;
-
-      const payload = {
-        calendarId: academicYearId, // correct field name
-        name: values.name,
-        sequence: nextSequence, // THIS WAS MISSING → causes 400
-        startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
-        isCurrent: values.isCurrent || false,
-      };
-
       if (selectedTerm) {
         await update(selectedTerm._id, payload);
-        message.success("Term updated successfully");
       } else {
         await create(payload);
-        message.success("Term created successfully");
       }
       closeDrawer();
-    } catch (err: any) {
-      console.error("Term save failed:", err);
-      message.error(err?.response?.data?.message || "Failed to save term");
+    } catch {
+      // The shared useApi error handler surfaces the backend message.
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await remove(id);
-      message.success("Term deleted");
     } catch {
-      message.error("Failed to delete term");
-    }
-  };
-
-  const handleSetCurrent = async (id: string) => {
-    try {
-      await setCurrent(id);
-      message.success("Current term updated");
-    } catch {
-      message.error("Failed to set current term");
+      // The shared useApi error handler surfaces the backend message.
     }
   };
 
@@ -122,10 +112,8 @@ export const TermsPanel = ({
             <TermRow
               key={term._id}
               term={term}
-              isCurrentTerm={currentTerm?._id === term._id}
-              onEdit={(t) => openDrawer(t, "edit")}
+              onEdit={(item) => openDrawer(item, "edit")}
               onDelete={handleDelete}
-              onSetCurrent={handleSetCurrent}
             />
           ))
         )}
@@ -153,6 +141,8 @@ export const TermsPanel = ({
         onSubmit={handleSubmit}
         loading={isCreating || isUpdating}
         academicYear={academicYearName}
+        calendars={calendars}
+        terms={terms}
       />
     </div>
   );
