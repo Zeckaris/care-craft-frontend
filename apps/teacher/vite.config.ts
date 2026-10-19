@@ -44,6 +44,14 @@ export default defineConfig({
             handler: 'NetworkOnly',
           },
           {
+            // Grades writes (marks, conduct, complete) are never cached or
+            // replayed by the service worker — the app-level queue owns offline
+            // writes. Registered before the generic API rule so it always wins.
+            urlPattern: /\/api\/assessment\/scores\/(write|conduct|complete)/,
+            method: 'POST',
+            handler: 'NetworkOnly',
+          },
+          {
             // Branding must always be fetched from the network. Never let the
             // service worker serve a cached palette (registered before the
             // general API rule so it wins).

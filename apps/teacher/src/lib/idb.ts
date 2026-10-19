@@ -10,7 +10,8 @@ import { openDB, type IDBPDatabase } from 'idb';
 export const DB_NAME = 'carecraft-teacher';
 export const QUERY_CACHE_STORE = 'query-cache';
 export const ATTENDANCE_QUEUE_STORE = 'attendance-queue';
-export const DB_VERSION = 2;
+export const GRADES_QUEUE_STORE = 'grades-queue';
+export const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -23,6 +24,9 @@ export function getDb(): Promise<IDBPDatabase> {
         }
         if (!db.objectStoreNames.contains(ATTENDANCE_QUEUE_STORE)) {
           db.createObjectStore(ATTENDANCE_QUEUE_STORE);
+        }
+        if (!db.objectStoreNames.contains(GRADES_QUEUE_STORE)) {
+          db.createObjectStore(GRADES_QUEUE_STORE);
         }
       },
     });

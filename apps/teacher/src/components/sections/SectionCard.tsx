@@ -10,7 +10,15 @@
  *  • Looks great on phone, tablet, and desktop
  */
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, ClipboardCheck, Eye, ArrowUpRight, CloudOff } from 'lucide-react';
+import {
+  Users,
+  BookOpen,
+  ClipboardCheck,
+  ClipboardList,
+  Eye,
+  ArrowUpRight,
+  CloudOff,
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -37,6 +45,10 @@ export function SectionCard({ item, className, pendingSync }: SectionCardProps) 
 
   const handleTakeAttendance = () => {
     navigate(`/app/sections/${section._id}/attendance`);
+  };
+
+  const handleOpenGrades = () => {
+    navigate(`/app/sections/${section._id}/grades`);
   };
 
   return (
@@ -124,6 +136,20 @@ export function SectionCard({ item, className, pendingSync }: SectionCardProps) 
             >
               <ArrowUpRight size={15} />
             </Button>
+
+            {subjects.length > 0 && (
+              <Button
+                id={`open-grades-${section._id}`}
+                variant="ghost"
+                size="sm"
+                className="font-semibold text-[var(--color-text-secondary)] flex items-center gap-1.5 px-2.5"
+                onClick={handleOpenGrades}
+                title="Open class sheets"
+              >
+                <ClipboardList size={15} />
+                <span className="hidden sm:inline">Grades</span>
+              </Button>
+            )}
 
             <Button
               id={`take-attendance-${section._id}`}

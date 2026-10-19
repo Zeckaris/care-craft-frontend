@@ -14,6 +14,7 @@ import { Toaster } from 'sonner';
 import { UserProvider } from '@/context/UserContext';
 import { BrandingProvider } from '@/context/BrandingContext';
 import { AttendanceQueueProvider } from '@/context/AttendanceQueueContext';
+import { GradesQueueProvider } from '@/context/GradesQueueContext';
 import { BRANDING_QUERY_KEY } from '@/lib/query-keys';
 import { idbPersister } from '@/lib/idb-persister';
 import { router } from '@/router';
@@ -50,16 +51,18 @@ export default function App() {
       <UserProvider>
         <BrandingProvider>
           <AttendanceQueueProvider>
-            <RouterProvider router={router} />
-            <Toaster
-              position="top-center"
-              richColors
-              closeButton
-              toastOptions={{
-                duration: 3500,
-                className: 'font-sans text-sm',
-              }}
-            />
+            <GradesQueueProvider>
+              <RouterProvider router={router} />
+              <Toaster
+                position="top-center"
+                richColors
+                closeButton
+                toastOptions={{
+                  duration: 3500,
+                  className: 'font-sans text-sm',
+                }}
+              />
+            </GradesQueueProvider>
           </AttendanceQueueProvider>
         </BrandingProvider>
       </UserProvider>

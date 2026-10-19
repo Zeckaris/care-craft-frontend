@@ -10,6 +10,7 @@ import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
 import { OnlineIndicator } from '@/components/common/OnlineIndicator';
 import { AttendanceAuthBanner } from '@/components/attendance/AttendanceAuthBanner';
+import { GradesAuthBanner } from '@/components/grades/GradesAuthBanner';
 
 /** Map route paths to human-readable page titles. */
 const PAGE_TITLES: Record<string, string> = {
@@ -46,6 +47,7 @@ export function AppShell() {
         >
           <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-5">
             <AttendanceAuthBanner />
+            <GradesAuthBanner />
             <Outlet />
           </div>
         </main>

@@ -18,6 +18,9 @@ import HomePage from '@/pages/home/HomePage';
 import MySchedulePage from '@/pages/schedule/MySchedulePage';
 import SectionDetailPage from '@/pages/sections/SectionDetailPage';
 import AttendancePage from '@/pages/attendance/AttendancePage';
+import GradesSubjectPickerPage from '@/pages/grades/GradesSubjectPickerPage';
+import ClassSheetPage from '@/pages/grades/ClassSheetPage';
+import MarkEntryPage from '@/pages/grades/MarkEntryPage';
 import ProfilePage from '@/pages/profile/ProfilePage';
 import { AppShell } from '@/components/layout/AppShell';
 import { RequireAuth } from '@/components/common/RequireAuth';
@@ -54,6 +57,18 @@ export const router = createBrowserRouter([
       {
         path: 'sections/:sectionId/attendance',
         element: <AttendancePage />,
+      },
+      {
+        path: 'sections/:sectionId/grades',
+        element: <GradesSubjectPickerPage />,
+      },
+      {
+        path: 'sections/:sectionId/grades/:subjectId',
+        element: <ClassSheetPage />,
+      },
+      {
+        path: 'sections/:sectionId/grades/:subjectId/marks/:typeId',
+        element: <MarkEntryPage />,
       },
       {
         path: 'profile',
