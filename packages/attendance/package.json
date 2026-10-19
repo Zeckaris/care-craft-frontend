@@ -11,6 +11,7 @@
     "build": "tsc --noEmit"
   },
   "dependencies": {
+    "@carecraft/offline-queue": "workspace:*",
     "@carecraft/types": "workspace:*"
   },
   "devDependencies": {

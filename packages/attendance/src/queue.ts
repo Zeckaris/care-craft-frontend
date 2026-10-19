@@ -20,7 +20,6 @@ import type {
   AttendanceRosterRow,
   AttendanceStoredRecord,
 } from '@carecraft/types';
-import { SYNC_BACKOFF_BASE_MS, SYNC_BACKOFF_MAX_MS } from './constants';
 import { normalizeNote, recordsEqual } from './records';
 
 export interface AttendanceConflict {
@@ -316,10 +315,4 @@ export function reconcileEntryWithRoster(
   }
 
   return { ...entry, awaiting, outcomes, conflicts, updatedAt: Date.now() };
-}
-
-/** Deterministic exponential backoff for network / 5xx failures. */
-export function backoffDelayMs(attempts: number): number {
-  const safe = Math.max(1, Math.floor(attempts));
-  return Math.min(SYNC_BACKOFF_BASE_MS * 2 ** (safe - 1), SYNC_BACKOFF_MAX_MS);
 }
