@@ -626,3 +626,9 @@ export interface ITeachingAssignment {
 
 export * from './attendance';
 export * from './schedule';
+
+// ---------------------------------------------------------------------------
+// Grades / assessment
+// ---------------------------------------------------------------------------
+
+export * from './grades';
