@@ -10,6 +10,7 @@ import {
   Modal,
   Badge,
   AutoComplete,
+  Alert,
   Button,
   Input,
 } from "antd";
@@ -42,15 +43,17 @@ export const SecuritySection = () => {
 
   const navigate = useNavigate();
 
-  const { users: activeUsers, loading: activeLoading } = useUserSearch(
-    suspendSearch,
-    { suspendedOnly: false },
-  );
+  const {
+    users: activeUsers,
+    loading: activeLoading,
+    error: activeError,
+  } = useUserSearch(suspendSearch, { suspendedOnly: false });
 
-  const { users: suspendedUsers, loading: suspendedLoading } = useUserSearch(
-    unsuspendSearch,
-    { suspendedOnly: true },
-  );
+  const {
+    users: suspendedUsers,
+    loading: suspendedLoading,
+    error: suspendedError,
+  } = useUserSearch(unsuspendSearch, { suspendedOnly: true });
 
   const handleMfaToggle = async (checked: boolean) => {
     setMfaLoading(true);
@@ -128,6 +131,7 @@ export const SecuritySection = () => {
   }
 
   const isMfaEnabled = user?.mfaEnabled || false;
+  const isAdmin = user?.role === "admin";
 
   return (
     <>
@@ -158,89 +162,119 @@ export const SecuritySection = () => {
           </Col>
 
           {/* ================= SUSPENSION ================= */}
-          <Col span={24}>
-            <Title level={5} style={{ marginTop: 32 }}>
-              Account Suspension Management
-            </Title>
+          {isAdmin && (
+            <Col span={24}>
+              <Title level={5} style={{ marginTop: 32 }}>
+                Account Suspension Management
+              </Title>
 
-            {/* -------- Suspend -------- */}
-            <Text strong style={{ display: "block" }}>
-              Suspend an account
-            </Text>
-            <AutoComplete
-              style={{ maxWidth: 560, width: "100%", marginTop: 8 }}
-              options={activeUsers.map(renderOption)}
-              value={suspendSearch}
-              onSearch={setSuspendSearch}
-              onSelect={(id) => {
-                const selected = activeUsers.find((u) => u.id === id);
-                if (selected) {
-                  setSuspendSearch(selected.fullName);
-                  openSuspendModal(selected);
-                }
-              }}
-              onClear={() => {
-                setSuspendSearch("");
-                setSelectedForSuspend(null);
-              }}
-              allowClear
-              placeholder="Search active users..."
-              notFoundContent={
-                activeLoading ? <Spin size="small" /> : "No active users"
-              }
-            />
-
-            {/* -------- Unsuspend -------- */}
-            <Text strong style={{ marginTop: 24, display: "block" }}>
-              Restore (unsuspend) an account
-            </Text>
-            <AutoComplete
-              style={{ maxWidth: 560, width: "100%", marginTop: 8 }}
-              options={suspendedUsers.map(renderOption)}
-              value={unsuspendSearch}
-              onSearch={setUnsuspendSearch}
-              onSelect={(id) => {
-                const selected = suspendedUsers.find((u) => u.id === id);
-                if (selected) {
-                  setSelectedForUnsuspend(selected);
-                  setUnsuspendSearch(selected.fullName);
-                }
-              }}
-              onClear={() => {
-                setUnsuspendSearch("");
-                setSelectedForUnsuspend(null);
-              }}
-              allowClear
-              placeholder="Search suspended users..."
-              notFoundContent={
-                suspendedLoading ? <Spin size="small" /> : "No suspended users"
-              }
-            />
-
-            {selectedForUnsuspend && (
-              <Space
-                style={{
-                  marginTop: 12,
-                  padding: 12,
-                  background: "#f6ffed",
-                  borderRadius: 6,
+              {/* -------- Suspend -------- */}
+              <Text strong style={{ display: "block" }}>
+                Suspend an account
+              </Text>
+              <AutoComplete
+                style={{ maxWidth: 560, width: "100%", marginTop: 8 }}
+                options={activeUsers.map(renderOption)}
+                value={suspendSearch}
+                onSearch={setSuspendSearch}
+                onSelect={(id) => {
+                  const selected = activeUsers.find((u) => u.id === id);
+                  if (selected) {
+                    setSuspendSearch(selected.fullName);
+                    openSuspendModal(selected);
+                  }
                 }}
-              >
-                <Text type="secondary">
-                  Selected: <strong>{selectedForUnsuspend.fullName}</strong> (
-                  {selectedForUnsuspend.role})
-                </Text>
-                <Space>
-                  <Button type="primary" onClick={handleUnsuspend}>
-                    Restore Access
-                  </Button>
-                  <Button onClick={() => setSelectedForUnsuspend(null)}>
-                    Cancel
-                  </Button>
+                onClear={() => {
+                  setSuspendSearch("");
+                  setSelectedForSuspend(null);
+                }}
+                allowClear
+                placeholder="Search active users..."
+                notFoundContent={
+                  activeError ? (
+                    <Text type="danger">Search failed</Text>
+                  ) : activeLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    "No active users found"
+                  )
+                }
+              />
+              {activeError && (
+                <Alert
+                  type="error"
+                  showIcon
+                  message={activeError}
+                  style={{ maxWidth: 560, marginTop: 8 }}
+                />
+              )}
+
+              {/* -------- Unsuspend -------- */}
+              <Text strong style={{ marginTop: 24, display: "block" }}>
+                Restore (unsuspend) an account
+              </Text>
+              <AutoComplete
+                style={{ maxWidth: 560, width: "100%", marginTop: 8 }}
+                options={suspendedUsers.map(renderOption)}
+                value={unsuspendSearch}
+                onSearch={setUnsuspendSearch}
+                onSelect={(id) => {
+                  const selected = suspendedUsers.find((u) => u.id === id);
+                  if (selected) {
+                    setSelectedForUnsuspend(selected);
+                    setUnsuspendSearch(selected.fullName);
+                  }
+                }}
+                onClear={() => {
+                  setUnsuspendSearch("");
+                  setSelectedForUnsuspend(null);
+                }}
+                allowClear
+                placeholder="Search suspended users..."
+                notFoundContent={
+                  suspendedError ? (
+                    <Text type="danger">Search failed</Text>
+                  ) : suspendedLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    "No suspended users found"
+                  )
+                }
+              />
+              {suspendedError && (
+                <Alert
+                  type="error"
+                  showIcon
+                  message={suspendedError}
+                  style={{ maxWidth: 560, marginTop: 8 }}
+                />
+              )}
+
+              {selectedForUnsuspend && (
+                <Space
+                  style={{
+                    marginTop: 12,
+                    padding: 12,
+                    background: "#f6ffed",
+                    borderRadius: 6,
+                  }}
+                >
+                  <Text type="secondary">
+                    Selected: <strong>{selectedForUnsuspend.fullName}</strong> (
+                    {selectedForUnsuspend.role})
+                  </Text>
+                  <Space>
+                    <Button type="primary" onClick={handleUnsuspend}>
+                      Restore Access
+                    </Button>
+                    <Button onClick={() => setSelectedForUnsuspend(null)}>
+                      Cancel
+                    </Button>
+                  </Space>
                 </Space>
-              </Space>
-            )}
-          </Col>
+              )}
+            </Col>
+          )}
           <div style={{ marginTop: 32, textAlign: "center" }}>
             <Button
               type="primary"

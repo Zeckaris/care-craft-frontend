@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { extractApiErrorMessage } from '@carecraft/query-core';
 import { apiClient } from '@/services/api-client';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -31,8 +32,8 @@ export const useUserSearch = (
 
   const enabled = debouncedQuery.length >= minLength;
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['userSearch', debouncedQuery, roleFilter],
+  const { data, isFetching, isError, error } = useQuery({
+    queryKey: ['userSearch', debouncedQuery, roleFilter, suspendedOnly],
     queryFn: async () => {
       if (!enabled) return [];
 
@@ -66,7 +67,7 @@ export const useUserSearch = (
 
   return {
     users: data ?? [],
-    loading: isLoading,
-    error: isError,
+    loading: isFetching,
+    error: isError ? extractApiErrorMessage(error) : null,
   };
 };

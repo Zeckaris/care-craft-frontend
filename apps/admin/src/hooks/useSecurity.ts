@@ -23,6 +23,7 @@ export const useSecurity = () => {
       url: `${basePath}/users/${userId}/suspend`, 
       body: reason ? { suspensionReason: reason } : {} 
     });
+    await queryClient.invalidateQueries({ queryKey: ['userSearch'] });
   };
 
   // Unsuspend a user (admin only)
@@ -31,6 +32,7 @@ export const useSecurity = () => {
       url: `${basePath}/users/${userId}/unsuspend`, 
       body: {} 
     });
+    await queryClient.invalidateQueries({ queryKey: ['userSearch'] });
   };
 
   const isSaving = postMutation.isPending || putMutation.isPending || patchMutation.isPending;
