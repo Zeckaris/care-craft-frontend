@@ -9,8 +9,10 @@ import type { ClassSheetColumn, ClassSheetStudent } from '@carecraft/types';
 import { conductedMaxTotal, orderColumns, stageStateLabel } from '@carecraft/grades';
 import { cn } from '@/lib/utils';
 
+const NUM_COL_PX = 40;
 const NAME_COL_PX = 104;
-const NAME_COL_LEFT_PX = 104;
+const FIRST_NAME_COL_LEFT_PX = 40;
+const LAST_NAME_COL_LEFT_PX = 144;
 
 interface ClassSheetTableProps {
   columns: ClassSheetColumn[];
@@ -37,14 +39,21 @@ export function ClassSheetTable({ columns, students, onSelectStudent }: ClassShe
           <tr className="border-b border-[var(--color-border)] text-left">
             <th
               scope="col"
-              style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: 0 }}
+              style={{ width: NUM_COL_PX, minWidth: NUM_COL_PX, left: 0 }}
+              className="sticky z-20 bg-[var(--color-surface-raised)] px-2 py-2.5 text-center text-xs font-bold text-[var(--color-text-secondary)]"
+            >
+              #
+            </th>
+            <th
+              scope="col"
+              style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: FIRST_NAME_COL_LEFT_PX }}
               className="sticky z-20 bg-[var(--color-surface-raised)] px-3 py-2.5 text-xs font-bold text-[var(--color-text-secondary)]"
             >
               First name
             </th>
             <th
               scope="col"
-              style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: NAME_COL_LEFT_PX }}
+              style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: LAST_NAME_COL_LEFT_PX }}
               className="sticky z-20 border-r border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2.5 text-xs font-bold text-[var(--color-text-secondary)]"
             >
               Last name
@@ -88,14 +97,20 @@ export function ClassSheetTable({ columns, students, onSelectStudent }: ClassShe
         </thead>
 
         <tbody>
-          {students.map((student) => (
+          {students.map((student, index) => (
             <tr
               key={student.studentId}
               className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-surface-raised)]"
             >
+              <td
+                style={{ width: NUM_COL_PX, minWidth: NUM_COL_PX, left: 0 }}
+                className="sticky z-10 bg-[var(--color-surface)] px-2 py-2 text-center font-mono text-xs font-medium tabular-nums text-[var(--color-text-muted)] select-none"
+              >
+                {index + 1}
+              </td>
               <th
                 scope="row"
-                style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: 0 }}
+                style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: FIRST_NAME_COL_LEFT_PX }}
                 className="sticky z-10 bg-[var(--color-surface)] px-3 py-2 text-left text-sm font-medium text-[var(--color-text)]"
               >
                 <button
@@ -108,7 +123,7 @@ export function ClassSheetTable({ columns, students, onSelectStudent }: ClassShe
                 </button>
               </th>
               <th
-                style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: NAME_COL_LEFT_PX }}
+                style={{ width: NAME_COL_PX, minWidth: NAME_COL_PX, left: LAST_NAME_COL_LEFT_PX }}
                 className="sticky z-10 border-r border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-left text-sm font-semibold text-[var(--color-text)]"
               >
                 <span className="block truncate">{student.lastName}</span>

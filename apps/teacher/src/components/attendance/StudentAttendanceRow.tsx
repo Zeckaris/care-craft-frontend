@@ -48,6 +48,7 @@ function resolveImage(path?: string | null): string | null {
 }
 
 interface StudentAttendanceRowProps {
+  rowNumber: number;
   row: AttendanceRosterRow;
   status: AttendanceStatus | null;
   note: string;
@@ -63,6 +64,7 @@ interface StudentAttendanceRowProps {
 }
 
 export function StudentAttendanceRow({
+  rowNumber,
   row,
   status,
   note,
@@ -117,6 +119,12 @@ export function StudentAttendanceRow({
       )}
     >
       <div className="flex items-center gap-3">
+        <span
+          className="w-5 shrink-0 text-center font-mono text-xs font-medium tabular-nums text-[var(--color-text-muted)] select-none"
+          aria-hidden="true"
+        >
+          {rowNumber}
+        </span>
         <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-surface-raised)]">
           {image ? (
             <img src={image} alt="" className="h-full w-full object-cover" loading="lazy" />

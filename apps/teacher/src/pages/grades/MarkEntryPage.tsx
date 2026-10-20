@@ -387,6 +387,12 @@ export default function MarkEntryPage() {
                           : 'border-[var(--color-border)] bg-[var(--color-surface)]',
                       )}
                     >
+                      <span
+                        className="w-5 shrink-0 text-center font-mono text-xs font-medium tabular-nums text-[var(--color-text-muted)] select-none"
+                        aria-hidden="true"
+                      >
+                        {index + 1}
+                      </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-[var(--color-text)]">
                           {student.lastName}, {student.firstName}

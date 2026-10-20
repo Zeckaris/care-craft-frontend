@@ -385,7 +385,7 @@ export default function AttendancePage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-              {roster.map((row) => {
+              {roster.map((row, index) => {
                 const value = draftMap[row.studentId];
                 const tooOld = isRowLocked(row, date, today);
                 const conflicted = conflictedIds.has(row.studentId);
@@ -393,6 +393,7 @@ export default function AttendancePage() {
                 return (
                   <StudentAttendanceRow
                     key={row.studentId}
+                    rowNumber={index + 1}
                     row={row}
                     status={value?.status ?? null}
                     note={normalizeNote(value?.note)}
