@@ -11,12 +11,12 @@ import {
   SafetyOutlined,
   CalendarOutlined,
   ScheduleOutlined,
-  ReconciliationOutlined,
   AppstoreOutlined,
   RadarChartOutlined,
   StrikethroughOutlined,
   BarsOutlined,
   FieldTimeOutlined,
+  CheckSquareOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState, type ReactNode } from "react";
@@ -40,6 +40,11 @@ interface SidebarMenuItemType {
 const menuItems: SidebarMenuItemType[] = [
   { key: "/app/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   { key: "/app/students", icon: <UserOutlined />, label: "Students" },
+  {
+    key: "/app/attendance",
+    icon: <CheckSquareOutlined />,
+    label: "Attendance",
+  },
   {
     key: "/app/enroll",
     icon: <CalendarOutlined />,
@@ -166,26 +171,28 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
   const canSeeItem = (roles?: string[]) =>
     !roles || (!!user && roles.includes(user.role));
 
-  const items = menuItems.filter((item) => canSeeItem(item.roles)).map((item) => {
-    if (item.children) {
+  const items = menuItems
+    .filter((item) => canSeeItem(item.roles))
+    .map((item) => {
+      if (item.children) {
+        return {
+          key: item.key,
+          icon: item.icon,
+          label: item.label,
+          children: item.children
+            .filter((child) => canSeeItem(child.roles))
+            .map((child) => ({
+              key: child.key,
+              label: child.label, // Already has <Link>
+            })),
+        };
+      }
       return {
         key: item.key,
         icon: item.icon,
-        label: item.label,
-        children: item.children
-          .filter((child) => canSeeItem(child.roles))
-          .map((child) => ({
-            key: child.key,
-            label: child.label, // Already has <Link>
-          })),
+        label: <Link to={item.key}>{item.label}</Link>,
       };
-    }
-    return {
-      key: item.key,
-      icon: item.icon,
-      label: <Link to={item.key}>{item.label}</Link>,
-    };
-  });
+    });
 
   return (
     <>

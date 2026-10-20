@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { DashboardPage } from "@/features/admin/pages/DashboardPage";
+import AttendancePage from "@/features/admin/pages/AttendancePage";
 import AdminSignupPage from "@/features/auth/pages/AdminSignupPage";
 import InviteAdminPage from "@/features/auth/pages/InvitationPage";
 import SignInPage from "./features/auth/pages/SignInPage";
@@ -81,6 +82,11 @@ export const router = createBrowserRouter([
         path: "dashboard",
         element: <DashboardPage />,
         handle: { crumb: () => "Dashboard" },
+      },
+      {
+        path: "attendance",
+        element: <AttendancePage />,
+        handle: { crumb: () => "Attendance" },
       },
       {
         path: "school-info",
