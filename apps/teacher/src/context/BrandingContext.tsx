@@ -22,6 +22,8 @@ import {
   getCachedBranding,
   setCachedBranding,
   resolveLogoUrl,
+  DEFAULT_THEME,
+  DEFAULT_FONT,
   type BrandingInfo,
 } from '@carecraft/branding';
 import { useUser } from '@/context/UserContext';
@@ -37,7 +39,7 @@ interface BrandingContextValue {
 const BrandingContext = createContext<BrandingContextValue | undefined>(undefined);
 
 export function BrandingProvider({ children }: { children: ReactNode }) {
-  const { user } = useUser();
+  const { user, sessionKey } = useUser();
   const isAuthenticated = !!user;
 
   // Initialize state from synchronous cache if available
@@ -47,8 +49,8 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
       return {
         name: cached.name || 'CareCraft',
         logo: cached.logo || null,
-        theme: cached.theme || 'palette-1',
-        fontFamily: cached.fontFamily || 'Roboto',
+        theme: cached.theme || DEFAULT_THEME,
+        fontFamily: cached.fontFamily || DEFAULT_FONT,
       };
     }
     return null;
@@ -57,19 +59,20 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
   // Always fetch branding fresh: never persisted, never served stale by the
   // service worker. `staleTime: 0` + `refetchOnMount: 'always'` guarantee a
   // network request on every app load once authenticated.
+  //
+  // NOTE: Custom Cache-Control or Pragma request headers must NOT be sent here
+  // because they trigger CORS preflight checks that backend CORS rejects.
   const {
     data: rawData,
     isLoading,
+    isError,
+    error,
     refetch,
   } = useQuery<{ success: boolean; data: BrandingInfo; message?: string }>({
     queryKey: BRANDING_QUERY_KEY,
     queryFn: () =>
       apiClient
-        .get('/general/school-info/branding', {
-          // Ask the browser and any intermediary to revalidate rather than
-          // serve a cached palette. The backend should also send no-store.
-          headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
-        })
+        .get('/general/school-info/branding')
         .then((r) => r.data),
     enabled: isAuthenticated,
     staleTime: 0,
@@ -86,28 +89,51 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    const onForeground = () => {
-      if (document.visibilityState === 'visible') refresh();
+    const onForegroundOrOnline = () => {
+      if (document.visibilityState === 'visible' || navigator.onLine) refresh();
     };
-    document.addEventListener('visibilitychange', onForeground);
-    window.addEventListener('focus', onForeground);
+    document.addEventListener('visibilitychange', onForegroundOrOnline);
+    window.addEventListener('focus', onForegroundOrOnline);
+    window.addEventListener('online', onForegroundOrOnline);
     return () => {
-      document.removeEventListener('visibilitychange', onForeground);
-      window.removeEventListener('focus', onForeground);
+      document.removeEventListener('visibilitychange', onForegroundOrOnline);
+      window.removeEventListener('focus', onForegroundOrOnline);
+      window.removeEventListener('online', onForegroundOrOnline);
     };
   }, [isAuthenticated, refresh]);
+
+  // Refetch when the user finishes logging in (or switches accounts)
+  useEffect(() => {
+    if (isAuthenticated) {
+      void refetch();
+    }
+  }, [isAuthenticated, sessionKey, refetch]);
+
+  // When the request fails, log a clear console warning while keeping any cached branding applied
+  useEffect(() => {
+    if (isError && error) {
+      const axiosErr = error as { response?: { status?: number; data?: unknown }; message?: string };
+      const statusSuffix = axiosErr.response?.status ? ` (HTTP ${axiosErr.response.status})` : '';
+      console.warn(
+        `[Branding] Failed to fetch school branding from /general/school-info/branding${statusSuffix}:`,
+        error,
+      );
+    }
+  }, [isError, error]);
 
   // When network data arrives, update tokens and cache
   useEffect(() => {
     if (rawData?.success && rawData.data) {
       const serverBranding = rawData.data;
+      const theme = serverBranding.theme || DEFAULT_THEME;
+      const fontFamily = serverBranding.fontFamily || DEFAULT_FONT;
       const resolvedLogo = resolveLogoUrl(serverBranding.logo, ASSETS_BASE);
 
       const resolved: BrandingInfo = {
         name: serverBranding.name || 'CareCraft',
         logo: resolvedLogo,
-        theme: serverBranding.theme,
-        fontFamily: serverBranding.fontFamily,
+        theme,
+        fontFamily,
       };
 
       setBranding(resolved);
@@ -120,7 +146,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
         semanticTokens: true,
       });
 
-      // Update synchronous cache in localStorage
+      // Update synchronous cache in localStorage as the no-flash seed
       setCachedBranding(resolved);
     }
   }, [rawData]);

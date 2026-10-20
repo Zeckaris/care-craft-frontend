@@ -44,9 +44,6 @@ export default function App() {
             String(query.queryKey[0]) !== BRANDING_QUERY_KEY[0],
         },
       }}
-      // Purge any branding persisted by an older build once restore completes,
-      // so a returning user can never hydrate a stale palette.
-      onSuccess={() => queryClient.removeQueries({ queryKey: BRANDING_QUERY_KEY })}
     >
       <UserProvider>
         <BrandingProvider>
