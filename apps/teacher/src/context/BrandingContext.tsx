@@ -26,12 +26,21 @@ import {
   DEFAULT_FONT,
   type BrandingInfo,
 } from '@carecraft/branding';
+import type { SchoolFeatures } from '@carecraft/types';
 import { useUser } from '@/context/UserContext';
 import { apiClient, ASSETS_BASE } from '@/services/api-client';
 import { BRANDING_QUERY_KEY } from '@/lib/query-keys';
 
+const DEFAULT_FEATURES: SchoolFeatures = { attributeEvaluation: false };
+
+function normalizeFeatures(features?: Partial<SchoolFeatures> | null): SchoolFeatures {
+  return { attributeEvaluation: features?.attributeEvaluation === true };
+}
+
 interface BrandingContextValue {
   branding: BrandingInfo | null;
+  features: SchoolFeatures;
+  isLoaded: boolean;
   isLoading: boolean;
   refetch: () => void;
 }
@@ -51,6 +60,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
         logo: cached.logo || null,
         theme: cached.theme || DEFAULT_THEME,
         fontFamily: cached.fontFamily || DEFAULT_FONT,
+        features: normalizeFeatures(cached.features),
       };
     }
     return null;
@@ -134,6 +144,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
         logo: resolvedLogo,
         theme,
         fontFamily,
+        features: normalizeFeatures(serverBranding.features),
       };
 
       setBranding(resolved);
@@ -151,8 +162,14 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
     }
   }, [rawData]);
 
+  const isLoaded = rawData !== undefined || isError;
+  const features =
+    isLoaded && rawData?.success
+      ? normalizeFeatures(rawData.data?.features)
+      : DEFAULT_FEATURES;
+
   return (
-    <BrandingContext.Provider value={{ branding, isLoading, refetch: refresh }}>
+    <BrandingContext.Provider value={{ branding, features, isLoaded, isLoading, refetch: refresh }}>
       {children}
     </BrandingContext.Provider>
   );

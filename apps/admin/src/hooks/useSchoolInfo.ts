@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import type { SchoolFeatures } from '@carecraft/types';
 import { useApi } from '@/hooks/useApi';
 import { ASSETS_BASE } from '@/services/api-client';
 
@@ -33,6 +34,9 @@ export interface ISchoolInfo {
   numberOfPeriods?: number;
   defaultPassingScore?: number;
   gradingSystem?: "Percentage" | "Letter (A-F)" | "Grade Points (4.0)" | "Custom";
+
+  // Optional feature flags
+  features?: SchoolFeatures;
 
   // Metadata
   createdAt?: string;
@@ -163,6 +167,17 @@ export const useSchoolInfo = (enabled = true) => {
     await refetch();
   };
 
+  const updateFeatures = async (features: SchoolFeatures) => {
+    const result = await patch({
+      url: `${basePath}/features`,
+      body: features,
+      invalidateKey: [basePath],
+      toast: false,
+    });
+    await refetch();
+    return result;
+  };
+
   const remove = () => del({ url: basePath });
 
   return {
@@ -174,9 +189,11 @@ export const useSchoolInfo = (enabled = true) => {
     create,
     update,
     updateBranding,
+    updateFeatures,
     remove,
 
     isSaving: postMutation.isPending || putMutation.isPending || patchMutation.isPending,
+    isSavingFeatures: patchMutation.isPending,
     isDeleting: deleteMutation.isPending,
 
     previewLogo,

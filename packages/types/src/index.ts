@@ -205,8 +205,14 @@ export interface ISchoolInfo {
   numberOfPeriods?: number;
   defaultPassingScore?: number;
   gradingSystem?: 'Percentage' | 'Letter (A-F)' | 'Grade Points (4.0)' | 'Custom';
+  features?: SchoolFeatures;
   createdAt?: string;
   updatedAt?: string;
+}
+
+/** Optional school-level feature flags exposed to authenticated apps. */
+export interface SchoolFeatures {
+  attributeEvaluation: boolean;
 }
 
 /**
@@ -217,6 +223,7 @@ export interface BrandingInfo {
   logo?: string | null;
   theme: string;
   fontFamily: string;
+  features?: SchoolFeatures;
 }
 
 // ---------------------------------------------------------------------------

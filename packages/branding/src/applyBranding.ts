@@ -1,3 +1,4 @@
+import type { SchoolFeatures } from '@carecraft/types';
 import type { ApplyBrandingOptions } from './types';
 import { getPalette, normalizeThemeId, DEFAULT_THEME } from './palettes';
 import { FONT_LINKS, FONT_FALLBACK, DEFAULT_FONT } from './fonts';
@@ -10,6 +11,7 @@ export interface CachedBranding {
   logo?: string | null;
   theme?: string;
   fontFamily?: string;
+  features?: SchoolFeatures;
 }
 
 /**
