@@ -6,6 +6,10 @@ import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 import { QuickLinkButton } from "@/components/dashboard/QuickLinkButton";
 import { AttendanceSnapshotCard } from "@/components/dashboard/AttendanceSnapshotCard";
 import { ClassPerformanceCard } from "@/components/dashboard/ClassPerformanceCard";
+import { AttendanceComplianceCard } from "@/components/dashboard/AttendanceComplianceCard";
+import { ChronicAbsenteesCard } from "@/components/dashboard/ChronicAbsenteesCard";
+import { SectionsNeedingSupportCard } from "@/components/dashboard/SectionsNeedingSupportCard";
+import { SubjectsNeedingSupportCard } from "@/components/dashboard/SubjectsNeedingSupportCard";
 import {
   UserOutlined,
   TeamOutlined,
@@ -15,6 +19,9 @@ import {
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useAttendanceSnapshot } from "@/hooks/useAttendanceSnapshot";
 import { useClassPerformance } from "@/hooks/useClassPerformance";
+import { useAttendanceCompliance } from "@/hooks/useAttendanceCompliance";
+import { useChronicAbsentees } from "@/hooks/useChronicAbsentees";
+import { usePerformanceAlerts } from "@/hooks/usePerformanceAlerts";
 import { useUser } from "@/context/UserContext";
 
 export const DashboardPage = () => {
@@ -24,6 +31,9 @@ export const DashboardPage = () => {
   const stats = useDashboardStats({ enabled: !!user });
   const attendance = useAttendanceSnapshot({ enabled: !!user });
   const classPerformance = useClassPerformance({ enabled: !!user });
+  const compliance = useAttendanceCompliance({ enabled: !!user });
+  const absentees = useChronicAbsentees({ enabled: !!user });
+  const performanceAlerts = usePerformanceAlerts({ enabled: !!user });
 
   // Provide safe default values
   const totalStudents = user ? (stats.totalStudents ?? 0) : 0;
@@ -67,7 +77,35 @@ export const DashboardPage = () => {
             />
           </div>
 
-          {/* === Row 2: Attendance + Class performance === */}
+          {/* === Row 2: Actionable Attention Items (2x2 Grid) === */}
+          <div className="dashboard-row row-attention">
+            <AttendanceComplianceCard
+              data={compliance.data}
+              isLoading={compliance.isLoading}
+              isError={compliance.isError}
+              onRetry={compliance.refetch}
+            />
+            <ChronicAbsenteesCard
+              data={absentees.data}
+              isLoading={absentees.isLoading}
+              isError={absentees.isError}
+              onRetry={absentees.refetch}
+            />
+            <SectionsNeedingSupportCard
+              data={performanceAlerts.data}
+              isLoading={performanceAlerts.isLoading}
+              isError={performanceAlerts.isError}
+              onRetry={performanceAlerts.refetch}
+            />
+            <SubjectsNeedingSupportCard
+              data={performanceAlerts.data}
+              isLoading={performanceAlerts.isLoading}
+              isError={performanceAlerts.isError}
+              onRetry={performanceAlerts.refetch}
+            />
+          </div>
+
+          {/* === Row 3: Attendance snapshot + Class performance === */}
           <div className="dashboard-row row-highlights">
             <AttendanceSnapshotCard
               snapshot={attendance.snapshot}
