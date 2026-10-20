@@ -3,7 +3,6 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Legend,
   Tooltip,
 } from "recharts";
 import { Card } from "antd";
@@ -14,8 +13,8 @@ interface GenderDonutProps {
 }
 
 const COLORS = {
-  Male: "#1890ff",
-  Female: "#ff4d4f",
+  Male: "var(--primary)",
+  Female: "var(--accent)",
 };
 
 export const GenderDonut = ({ data, total }: GenderDonutProps) => {
@@ -25,40 +24,52 @@ export const GenderDonut = ({ data, total }: GenderDonutProps) => {
   }));
 
   return (
-    <Card title="Gender Distribution" className="chart-full">
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={displayData}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={100}
-            paddingAngle={5}
-            dataKey="value"
-          >
-            {displayData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[entry.name as keyof typeof COLORS]}
-              />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+    <Card title="Gender Distribution" className="gender-card">
+      <div className="gender-donut">
+        <div className="gender-donut-chart">
+          <ResponsiveContainer width="100%" height={150}>
+            <PieChart>
+              <Pie
+                data={displayData}
+                cx="50%"
+                cy="50%"
+                innerRadius={42}
+                outerRadius={64}
+                paddingAngle={4}
+                dataKey="value"
+              >
+                {displayData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[entry.name as keyof typeof COLORS]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: 16,
-          fontSize: 24,
-          fontWeight: "bold",
-          color: "var(--text-primary)",
-        }}
-      >
-        {total.toLocaleString()} Total
+        <div className="gender-donut-legend">
+          {displayData.map((item) => (
+            <div key={item.name} className="gender-donut-legend-item">
+              <span
+                className="gender-donut-swatch"
+                style={{
+                  background: COLORS[item.name as keyof typeof COLORS],
+                }}
+              />
+              <span className="gender-donut-label">{item.name}</span>
+              <span className="gender-donut-value">
+                {item.value.toLocaleString()}
+              </span>
+            </div>
+          ))}
+          <div className="gender-donut-total">
+            <span>Total</span>
+            <strong>{total.toLocaleString()}</strong>
+          </div>
+        </div>
       </div>
     </Card>
   );

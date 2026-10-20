@@ -7,7 +7,7 @@
 }
 
 .dashboard-header {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   padding: 0 8px;
 }
 
@@ -47,70 +47,100 @@
   background: rgba(0, 0, 0, 0.25);
 }
 
-.dashboard-grid {
-  display: grid;
-  gap: 24px;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: minmax(100px, auto);
+.dashboard-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-@media (min-width: 1200px) {
-  .chart-full {
-    grid-column: span 2;
-  }
+.dashboard-row {
+  display: grid;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.row-metrics,
+.row-highlights {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.row-activity {
+  grid-template-columns: minmax(260px, 1fr) minmax(0, 2fr);
+  align-items: stretch;
+}
+
+.row-trend {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.activity-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.activity-feed-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
 }
 
 .metric-card {
   background: var(--card-bg);
   border-radius: var(--border-radius);
-  padding: 20px;
+  padding: 14px 18px;
   box-shadow: var(--shadow-sm);
-  text-align: center;
+  text-align: left;
   transition: var(--transition);
   border: 1px solid var(--border-color);
 }
 
 .metric-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   background: var(--card-bg-hover);
 }
 
+.metric-card .ant-card-body {
+  padding: 0;
+}
+
+.metric-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.metric-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--primary);
+}
+
 .metric-value {
-  font-size: 32px;
+  flex-shrink: 0;
+  font-size: 24px;
   font-weight: 700;
   color: var(--primary);
-  margin: 8px 0 4px;
+  margin: 0;
   line-height: 1.2;
 }
 
 .metric-title {
+  min-width: 0;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   font-weight: 500;
   opacity: 0.75;
-}
-
-.metric-card .anticon {
-  font-size: 24px;
-  color: var(--primary);
-  margin-bottom: 8px;
-}
-
-.chart-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 280px;
-  border: 1px solid var(--border-color);
-}
-
-.chart-card h3 {
-  margin: 0 0 16px;
-  font-size: var(--font-medium);
-  color: var(--text-dark);
-  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .feed-card {
@@ -118,8 +148,14 @@
   border-radius: var(--border-radius);
   padding: 20px;
   box-shadow: var(--shadow-sm);
-  min-height: 280px;
   border: 1px solid var(--border-color);
+}
+
+.activity-feed-cell .feed-card {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .feed-card h3 {
@@ -158,7 +194,7 @@
 .quick-links {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .quick-link {
@@ -189,16 +225,237 @@
   color: var(--primary);
 }
 
-.chart-full h3 {
-  margin: 0 0 20px;
-  font-size: var(--font-large);
+/* === Attendance snapshot === */
+.snapshot-title,
+.performance-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.3;
+}
+
+.snapshot-subtitle,
+.performance-subtitle {
+  font-size: 12px;
+  font-weight: 400;
   color: var(--text-dark);
+  opacity: 0.6;
+}
+
+.snapshot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.snapshot-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.snapshot-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.snapshot-stat-value {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+}
+
+.snapshot-stat-value--danger {
+  color: var(--danger);
+}
+
+.snapshot-stat-value--warning {
+  color: var(--warning);
+}
+
+.snapshot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.snapshot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--card-bg-hover);
+  border: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-dark);
+}
+
+.snapshot-chip-label {
+  opacity: 0.65;
+}
+
+.snapshot-chip-value {
   font-weight: 600;
 }
 
+.snapshot-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.snapshot-progress-label {
+  font-size: 12px;
+}
+
+.snapshot-progress .ant-progress {
+  margin: 0;
+  line-height: 1;
+}
+
+.snapshot-footnote {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+/* === Class performance === */
+.performance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.performance-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.performance-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--primary);
+}
+
+.performance-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.performance-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.performance-class {
+  display: block;
+  font-size: 14px;
+  color: var(--text-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.performance-average {
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--primary);
+}
+
+.performance-detail {
+  display: block;
+  margin: 2px 0;
+  font-size: 12px;
+}
+
+.performance-info .ant-progress {
+  margin: 0;
+  line-height: 1;
+}
+
+/* === Gender donut === */
+.gender-donut {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.gender-donut-chart {
+  flex: 0 0 150px;
+  width: 150px;
+  height: 150px;
+}
+
+.gender-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 130px;
+  min-width: 120px;
+}
+
+.gender-donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dark);
+}
+
+.gender-donut-swatch {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.gender-donut-label {
+  flex: 1;
+  opacity: 0.7;
+}
+
+.gender-donut-value {
+  font-weight: 600;
+}
+
+.gender-donut-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-dark);
+  opacity: 0.75;
+}
+
+.gender-donut-total strong {
+  font-size: 16px;
+  color: var(--primary);
+  opacity: 1;
+}
+
+
 @media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+  .dashboard-row {
+    grid-template-columns: 1fr !important;
     gap: 16px;
   }
 
@@ -216,40 +473,30 @@
   }
 
   .metric-card {
-    padding: 16px;
+    padding: 14px 16px;
   }
 
   .metric-value {
-    font-size: 36px;
+    font-size: 22px;
   }
 
   .metric-title {
-    font-size: 13px;
+    font-size: 12px;
   }
 
-  .chart-card,
   .feed-card {
     min-height: auto;
     padding: 16px;
   }
 
-  .qlink-feed-container,
-  .chart-full,
-  .full-width {
-    margin-left: -12px !important;
-    margin-right: -12px !important;
-    width: calc(100% + 24px) !important;
-    box-sizing: border-box;
-  }
-
   .quick-link {
-    height: 70px !important;
-    font-size: 15px;
+    height: 48px !important;
+    font-size: 14px;
     padding: 0 12px;
   }
 
   .quick-link .anticon {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .activity-item {
@@ -273,11 +520,6 @@
 
   .activity-avatar {
     margin-left: 0 !important;
-  }
-
-  .chart-full .ant-card-body > div:last-child {
-    font-size: 28px;
-    margin-top: 12px;
   }
 
   /* Grade Trend Chart fixes */
@@ -338,15 +580,21 @@
   grid-column: 1 / -1;
 }
 
-.qlink-feed-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  grid-column: 1 / -1;
-}
-
 @media (max-width: 992px) {
-  .qlink-feed-container {
+  .row-highlights,
+  .row-activity {
     grid-template-columns: 1fr;
+  }
+
+  .activity-feed-cell {
+    position: static;
+  }
+
+  .activity-feed-cell .feed-card {
+    position: static;
+    inset: auto;
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
   }
 }
