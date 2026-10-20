@@ -356,7 +356,30 @@ export default function AttendancePage() {
     }
   };
 
+  const rosterIndexMap = useMemo(
+    () => new Map(roster.map((row, idx) => [row.studentId, idx + 1])),
+    [roster]
+  );
+
   const columns: ColumnsType<AttendanceRosterRow> = [
+    {
+      title: "#",
+      key: "rowNumber",
+      width: 50,
+      align: "center",
+      render: (_, row) => (
+        <span
+          style={{
+            fontFamily: "monospace",
+            fontVariantNumeric: "tabular-nums",
+            color: "var(--text-dark)",
+            opacity: 0.65,
+          }}
+        >
+          {rosterIndexMap.get(row.studentId) ?? "-"}
+        </span>
+      ),
+    },
     {
       title: "Student",
       key: "student",
@@ -605,9 +628,9 @@ export default function AttendancePage() {
                               ? "changed elsewhere"
                               : "rejected"}
                             {stored
-                              ? ` — server value is ${STATUS_LABELS[stored.status]}${storedNote ? ` (${storedNote})` : ""}`
+                              ? ` - server value is ${STATUS_LABELS[stored.status]}${storedNote ? ` (${storedNote})` : ""}`
                               : ""}
-                            {result.reason ? ` — ${result.reason}` : ""}
+                            {result.reason ? ` - ${result.reason}` : ""}
                           </li>
                         );
                       })}

@@ -30,6 +30,7 @@ interface PaginationMeta {
 
 interface UseEnrollmentsParams {
   gradeId?: string;
+  sectionId?: string;
   schoolYear?: string;
   isActive?: boolean;
   pagination?: { page: number; pageSize: number };
@@ -87,6 +88,7 @@ const useCurrentAcademicCalendar = () => {
 
 export const useEnrollments = ({
   gradeId,
+  sectionId,
   schoolYear,
   isActive,
   pagination = { page: 1, pageSize: 10 },
@@ -97,6 +99,7 @@ export const useEnrollments = ({
 
   const params = new URLSearchParams();
   if (gradeId) params.set('gradeId', gradeId);
+  if (sectionId) params.set('sectionId', sectionId);
   if (schoolYear) params.set('schoolYear', schoolYear);
   if (isActive !== undefined) params.set('isActive', String(isActive));
   if (pagination) {
@@ -106,7 +109,7 @@ export const useEnrollments = ({
   if (search) params.set('search', search);
 
   const fetchUrl = `/enrollment?${params.toString()}`;
-  const queryKey = ['/enrollment', { gradeId, schoolYear, isActive, pagination, search }];
+  const queryKey = ['/enrollment', { gradeId, sectionId, schoolYear, isActive, pagination, search }];
 
   const {
     data: raw,

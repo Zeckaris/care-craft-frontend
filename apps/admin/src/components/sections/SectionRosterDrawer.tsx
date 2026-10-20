@@ -115,6 +115,11 @@ function SectionRosterDrawerContent({
     );
   }, [enrollments, searchText]);
 
+  const studentIndexMap = useMemo(
+    () => new Map(enrollments.map((e, idx) => [e._id, idx + 1])),
+    [enrollments]
+  );
+
   const paged = useMemo(
     () => filtered.slice((page - 1) * pageSize, page * pageSize),
     [filtered, page, pageSize]
@@ -341,6 +346,24 @@ function SectionRosterDrawerContent({
           }}
           scroll={{ x: "max-content" }}
           columns={[
+            {
+              title: "#",
+              key: "rowNumber",
+              width: 50,
+              align: "center",
+              render: (_, record) => (
+                <span
+                  style={{
+                    fontFamily: "monospace",
+                    fontVariantNumeric: "tabular-nums",
+                    color: "var(--text-dark)",
+                    opacity: 0.65,
+                  }}
+                >
+                  {studentIndexMap.get(record._id) ?? "-"}
+                </span>
+              ),
+            },
             {
               title: "Student",
               key: "student",

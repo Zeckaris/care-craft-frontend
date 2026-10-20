@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Button,
   message,
@@ -23,6 +23,7 @@ import { EnrollmentDrawer } from "@/components/enroll/EnrollmentDrawer";
 import { BulkEnrollmentDrawer } from "@/components/enroll/BulkEnrollmentDrawer";
 import { useEnrollments, type IEnrollment } from "@/hooks/useEnrollments";
 import { useGrades } from "@/hooks/useGrades";
+import { useSections } from "@/hooks/useSections";
 import { useStudents } from "@/hooks/useStudents";
 import { Avatar, Empty } from "antd";
 import { UserOutlined } from "@ant-design/icons";
@@ -32,6 +33,7 @@ const { Text } = Typography;
 
 export default function EnrollPage() {
   const [gradeId, setGradeId] = useState<string | undefined>(undefined);
+  const [sectionId, setSectionId] = useState<string | undefined>(undefined);
   const [schoolYear, setSchoolYear] = useState<string | undefined>(undefined);
   const [isActive, setIsActive] = useState<boolean | undefined>(true);
   const [searchText, setSearchText] = useState("");
@@ -62,6 +64,7 @@ export default function EnrollPage() {
     isDeleting,
   } = useEnrollments({
     gradeId,
+    sectionId,
     schoolYear,
     isActive,
     pagination,
@@ -69,6 +72,12 @@ export default function EnrollPage() {
   });
 
   const { grades } = useGrades();
+  const { sections } = useSections({
+    gradeId,
+    schoolYear,
+    isActive: true,
+    pageSize: 500,
+  });
   const { students } = useStudents({ pagination: { page: 1, pageSize: 1000 } });
 
   // Drawers
@@ -90,7 +99,11 @@ export default function EnrollPage() {
   // Reset page on filter change
   useEffect(() => {
     setPagination((p) => ({ ...p, page: 1 }));
-  }, [gradeId, schoolYear, isActive, searchText]);
+  }, [gradeId, sectionId, schoolYear, isActive, searchText]);
+
+  useEffect(() => {
+    setSectionId(undefined);
+  }, [gradeId, schoolYear]);
 
   // === Handlers ===
   const openSingleDrawer = (
@@ -213,9 +226,40 @@ export default function EnrollPage() {
     });
   };
 
-  // === Table Columns ===
+  const enrollmentIndexMap = useMemo(
+    () =>
+      new Map(
+        enrollments.map((e, idx) => [
+          e._id,
+          (currentPage - 1) * pageSize + idx + 1,
+        ])
+      ),
+    [enrollments, currentPage, pageSize]
+  );
+
   // === Table Columns ===
   const columns = [
+    ...(sectionId
+      ? [
+          {
+            key: "rowNumber",
+            title: "#",
+            width: 50,
+            render: (enrollment: IEnrollment) => (
+              <span
+                style={{
+                  fontFamily: "monospace",
+                  fontVariantNumeric: "tabular-nums",
+                  color: "var(--text-dark)",
+                  opacity: 0.65,
+                }}
+              >
+                {enrollmentIndexMap.get(enrollment._id) ?? "-"}
+              </span>
+            ),
+          },
+        ]
+      : []),
     {
       key: "student",
       title: "Student",
@@ -365,6 +409,15 @@ export default function EnrollPage() {
           onChange={(v) => setGradeId(v || undefined)}
           placeholder="Grade"
           allowClear
+        />
+        <Select
+          style={{ width: 160 }}
+          options={sections?.map((s) => ({ label: s.name, value: s._id })) ?? []}
+          value={sectionId || ""}
+          onChange={(v) => setSectionId(v || undefined)}
+          placeholder="Section"
+          allowClear
+          disabled={!gradeId && !sections?.length}
         />
         <Input
           placeholder="School Year (e.g. 2024-25)"

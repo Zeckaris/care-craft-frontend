@@ -10,6 +10,7 @@
  * "in progress" and its cells show "_" (not zero); a not-conducted stage also
  * shows "_". A locked stage with no stored mark is a finalized zero.
  */
+import { useMemo } from "react";
 import { Button, Table, Tooltip, type TableColumnsType } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import type {
@@ -91,7 +92,30 @@ export function AssessmentResultsTable({
   const ordered = orderColumns(columns);
   const lockedMax = lockedMaxTotal(columns);
 
+  const studentIndexMap = useMemo(
+    () => new Map(students.map((s, idx) => [s.studentId, idx + 1])),
+    [students]
+  );
+
   const tableColumns: TableColumnsType<ClassSheetStudent> = [
+    {
+      title: "#",
+      key: "rowNumber",
+      fixed: "left",
+      width: 50,
+      align: "center",
+      render: (_value, record) => (
+        <span
+          style={{
+            fontFamily: "monospace",
+            fontVariantNumeric: "tabular-nums",
+            color: MUTED,
+          }}
+        >
+          {studentIndexMap.get(record.studentId) ?? "-"}
+        </span>
+      ),
+    },
     {
       title: "First name",
       dataIndex: "firstName",
