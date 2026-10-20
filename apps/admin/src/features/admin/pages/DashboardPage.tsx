@@ -72,10 +72,14 @@ export const DashboardPage = () => {
             <AttendanceSnapshotCard
               snapshot={attendance.snapshot}
               isLoading={attendance.isLoading}
+              isError={attendance.isError}
+              onRetry={attendance.refetch}
             />
             <ClassPerformanceCard
               performance={classPerformance.performance}
               isLoading={classPerformance.isLoading}
+              isError={classPerformance.isError}
+              onRetry={classPerformance.refetch}
             />
           </div>
 
