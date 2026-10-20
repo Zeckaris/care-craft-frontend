@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { ASSETS_BASE } from '@/services/api-client';
-import { useQueryClient } from '@tanstack/react-query'; 
 
 export interface ISchoolInfo {
   _id?: string;
@@ -10,12 +9,12 @@ export interface ISchoolInfo {
   name: string;
   motto?: string;
   establishedYear?: number;
+  about?: string;
 
   // Contact
   address: string;
   contactEmail: string;
-  contactPhone: string;
-  alternatePhone?: string;
+  telephone: string[];
   website?: string;
 
   // Visual branding
@@ -40,70 +39,110 @@ export interface ISchoolInfo {
   updatedAt?: string;
 }
 
-export const useSchoolInfo = (enabled = true) => { 
+export interface SchoolInfoCreateInput {
+  name: string;
+  address: string;
+  contactEmail: string;
+  telephone: string[];
+  about?: string;
+  logo?: File | null;
+}
+
+export type SchoolInfoUpdateInput = Partial<SchoolInfoCreateInput>;
+
+/** Fields removed from the contract; never send them again. */
+const DEPRECATED_SCHOOL_INFO_FIELDS = new Set([
+  'contactPhone',
+  'alternatePhone',
+]);
+
+/**
+ * Appends one school-info field to a multipart body.
+ *
+ * Telephone numbers are sent as repeated `telephone[]` parts; empty entries
+ * are skipped so an empty array omits the field entirely (the backend then
+ * keeps the stored value on update).
+ */
+const appendSchoolInfoField = (
+  formData: FormData,
+  key: string,
+  value: unknown,
+) => {
+  if (value === undefined || value === null) return;
+  if (DEPRECATED_SCHOOL_INFO_FIELDS.has(key)) return;
+
+  if (key === 'telephone') {
+    if (!Array.isArray(value)) return;
+    value.forEach((entry) => {
+      if (typeof entry !== 'string') return;
+      const trimmed = entry.trim();
+      if (trimmed) formData.append('telephone[]', trimmed);
+    });
+    return;
+  }
+
+  if (value instanceof File) {
+    formData.append(key, value);
+    return;
+  }
+
+  formData.append(key, String(value));
+};
+
+const buildSchoolInfoFormData = (data: object) => {
+  const formData = new FormData();
+  Object.entries(data as Record<string, unknown>).forEach(([key, value]) => {
+    appendSchoolInfoField(formData, key, value);
+  });
+  return formData;
+};
+
+export const useSchoolInfo = (enabled = true) => {
   const { get, post, put, patch, del, postMutation, putMutation, patchMutation, deleteMutation } = useApi();
-  const queryClient = useQueryClient(); 
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const basePath = '/general/school-info';
 
- 
-  const { data: rawData, isLoading, refetch } = get(basePath, { enabled });  
+  const { data: rawData, isLoading, refetch } = get(basePath, { enabled });
 
- const schoolInfo: ISchoolInfo | null = rawData?.success
-  ? {
-      ...rawData.data,
-      logo: rawData.data.logo
-        ? rawData.data.logo.startsWith("http")
-          ? rawData.data.logo 
-          : `${ASSETS_BASE}${rawData.data.logo}`  
-        : null,
-    }
-  : null;
+  const schoolInfo: ISchoolInfo | null = rawData?.success
+    ? {
+        ...rawData.data,
+        telephone: Array.isArray(rawData.data.telephone)
+          ? rawData.data.telephone
+          : [],
+        about: rawData.data.about ?? undefined,
+        logo: rawData.data.logo
+          ? rawData.data.logo.startsWith("http")
+            ? rawData.data.logo
+            : `${ASSETS_BASE}${rawData.data.logo}`
+          : null,
+      }
+    : null;
 
   const serverError = rawData && !rawData.success ? rawData.message : null;
 
-  const handleLogoChange = (file: File) => {
+  const handleLogoChange = useCallback((file: File) => {
     setLogoFile(file);
     const reader = new FileReader();
     reader.onload = () => setPreviewLogo(reader.result as string);
     reader.readAsDataURL(file);
-  };
+  }, []);
 
-  const resetLogo = () => {
+  const resetLogo = useCallback(() => {
     setLogoFile(null);
     setPreviewLogo(null);
-  };
+  }, []);
 
   // Full create (initial setup)
-  const create = async (data: Omit<ISchoolInfo, 'logo'> & { logo?: File | null }) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (value instanceof File) {
-          formData.append(key, value);
-        } else {
-          formData.append(key, String(value));
-        }
-      }
-    });
-    return post({ url: basePath, body: formData });
+  const create = async (data: SchoolInfoCreateInput) => {
+    return post({ url: basePath, body: buildSchoolInfoFormData(data) });
   };
 
-  // Full update (used for name, contact, logo changes)
-  const update = async (data: Partial<Omit<ISchoolInfo, 'logo'>> & { logo?: File | null }) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (value instanceof File) {
-          formData.append(key, value);
-        } else {
-          formData.append(key, String(value));
-        }
-      }
-    });
-    return put({ url: basePath, body: formData });
+  // Full update (used for name, contact, about, logo changes)
+  const update = async (data: SchoolInfoUpdateInput) => {
+    return put({ url: basePath, body: buildSchoolInfoFormData(data) });
   };
 
   // Partial update for branding only
