@@ -70,6 +70,11 @@ export interface MutationVars {
    * Example: `invalidateKey: false`         → skip automatic invalidation.
    */
   invalidateKey?: QueryKey | false;
+  /**
+   * Set to `false` to suppress the shared success/error toast for this call.
+   * The caller is then responsible for showing its own feedback.
+   */
+  toast?: boolean;
 }
 
 /** Outcome of a fan-out batch of mutations (e.g. bulk delete). */
@@ -256,7 +261,9 @@ export function makeUseApi(
 
         onSuccess: (res: any, variables: TVariables, context: any) => {
           // Toast
-          globalOnSuccess((res as any)?.message || 'Success!');
+          if (variables.toast !== false) {
+            globalOnSuccess((res as any)?.message || 'Success!');
+          }
 
           // Invalidation
           if (variables.invalidateKey !== false) {
@@ -278,7 +285,9 @@ export function makeUseApi(
         },
 
         onError: (error: any, variables: TVariables, context: any) => {
-          globalOnError(extractApiErrorMessage(error));
+          if (variables.toast !== false) {
+            globalOnError(extractApiErrorMessage(error));
+          }
           (customOnError as any)?.(error, variables, context);
         },
       });

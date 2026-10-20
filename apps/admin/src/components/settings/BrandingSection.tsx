@@ -24,7 +24,7 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { useSchoolInfo } from "@/hooks/useSchoolInfo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import {
   PALETTES,
@@ -39,43 +39,50 @@ const { Search } = Input;
 
 export const BrandingSection = () => {
   const { schoolInfo, isLoading, updateBranding, isSaving } = useSchoolInfo();
-  const { fontFamily, setFontFamily } = useTheme(); // <-- Use theme context for font
+  const { previewBranding, commitBranding } = useTheme();
 
-  // Initialize state once based on schoolInfo
-  const [selectedTheme, setSelectedTheme] = useState<string>(
-    schoolInfo?.theme || "palette-1"
-  );
-  const [selectedFont, setSelectedFontState] = useState<string>(
-    schoolInfo?.fontFamily || fontFamily || "Roboto"
-  );
+  const savedTheme = schoolInfo?.theme || DEFAULT_THEME;
+  const savedFont = schoolInfo?.fontFamily || DEFAULT_FONT;
 
-  // Only set state if schoolInfo was not loaded initially
+  const [selectedTheme, setSelectedTheme] = useState<string>(savedTheme);
+  const [selectedFont, setSelectedFont] = useState<string>(savedFont);
+  const savedRef = useRef({ theme: savedTheme, fontFamily: savedFont });
+
+  // Adopt the saved branding whenever the server value loads or changes.
+  // Preview selections do not touch `schoolInfo`, so they are not overwritten
+  // by unrelated renders or background refetches that return the same values.
   useEffect(() => {
-    if (schoolInfo) {
-      setSelectedTheme((prev) => prev || schoolInfo.theme || "palette-1");
-      setSelectedFontState(
-        (prev) => prev || schoolInfo.fontFamily || fontFamily || "Roboto"
-      );
-      setFontFamily(schoolInfo.fontFamily || fontFamily || "Roboto"); // <-- sync context on load
-    }
-  }, [schoolInfo, fontFamily, setFontFamily]);
+    savedRef.current = { theme: savedTheme, fontFamily: savedFont };
+    setSelectedTheme(savedTheme);
+    setSelectedFont(savedFont);
+  }, [savedTheme, savedFont]);
 
-  const hasChanges =
-    selectedTheme !== (schoolInfo?.theme || "palette-1") ||
-    selectedFont !== (schoolInfo?.fontFamily || "Roboto");
+  // Leaving the section without saving must not leave the preview applied.
+  useEffect(() => {
+    return () => {
+      previewBranding(savedRef.current);
+    };
+  }, [previewBranding]);
+
+  const hasChanges = selectedTheme !== savedTheme || selectedFont !== savedFont;
 
   const handleSave = async () => {
+    const selection = { theme: selectedTheme, fontFamily: selectedFont };
+
     try {
-      await updateBranding({
-        theme: selectedTheme,
-        fontFamily: selectedFont,
-      });
-      message.success("Branding updated successfully!");
+      await updateBranding(selection);
+      commitBranding(selection);
+      savedRef.current = selection;
+      message.success("Branding saved successfully.");
     } catch (err) {
       const backendMessage = (
         err as { response?: { data?: { message?: string } } }
       )?.response?.data?.message;
-      message.error(backendMessage || "Failed to update branding. Please try again.");
+      message.error(
+        backendMessage
+          ? `Could not save branding: ${backendMessage}`
+          : "Could not save branding. Please try again."
+      );
     }
   };
 
@@ -229,7 +236,13 @@ export const BrandingSection = () => {
               <Col key={pal.id} xs={24} sm={12} md={8} lg={6}>
                 <div
                   className={`palette-preview ${pal.id}`}
-                  onClick={() => setSelectedTheme(pal.id)}
+                  onClick={() => {
+                    setSelectedTheme(pal.id);
+                    previewBranding({
+                      theme: pal.id,
+                      fontFamily: selectedFont,
+                    });
+                  }}
                   style={{
                     cursor: "pointer",
                     borderRadius: 16,
@@ -326,8 +339,11 @@ export const BrandingSection = () => {
           <Select
             value={selectedFont}
             onChange={(val) => {
-              setSelectedFontState(val); // local preview
-              setFontFamily(val); // update context & live app
+              setSelectedFont(val);
+              previewBranding({
+                theme: selectedTheme,
+                fontFamily: val,
+              });
             }}
             style={{ width: "100%" }}
             size="large"
