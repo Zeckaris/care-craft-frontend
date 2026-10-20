@@ -289,7 +289,7 @@ export interface IAttributeItem {
     description?: string;
     minScore: number;
     maxScore: number;
-  };
+  } | null;
   score: number;
   comment?: string;
 }
@@ -316,7 +316,7 @@ export interface IAttributeEvaluation {
     lastName: string;
     email: string;
     role: string;
-  };
+  } | null;
   attributes: IAttributeItem[];
   totalScore: number;
   remark?: string;

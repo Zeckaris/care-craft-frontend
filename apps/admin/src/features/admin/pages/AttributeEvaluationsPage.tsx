@@ -63,7 +63,7 @@ export default function AttributeEvaluationsPage() {
       form.setFieldsValue({
         studentId: evaluation.studentId?._id,
         studentEnrollmentId: evaluation.studentEnrollmentId?._id,
-        teacherId: evaluation.teacherId._id,
+        teacherId: evaluation.teacherId?._id,
         remark: evaluation.remark || "",
       });
     } else if (mode === "create" && extraData) {
@@ -83,16 +83,30 @@ export default function AttributeEvaluationsPage() {
 
   const handleView = (record: IAttributeEvaluation) =>
     openDrawer(record, "view");
-  const handleEdit = (record: IAttributeEvaluation) =>
+  const handleEdit = (record: IAttributeEvaluation) => {
+    const studentId = record.studentId?._id;
+    const enrollmentId = record.studentEnrollmentId?._id;
+    const teacherId = record.teacherId?._id;
+
+    if (!studentId || !enrollmentId || !teacherId) {
+      message.warning(
+        "Cannot edit evaluation: missing student, enrollment, or teacher data."
+      );
+      return;
+    }
+
     openDrawer(record, "edit");
+  };
 
   const handleNewEvaluation = (record: IAttributeEvaluation) => {
     const studentId = record.studentId?._id;
     const enrollmentId = record.studentEnrollmentId?._id;
-    const teacherId = record.teacherId._id;
+    const teacherId = record.teacherId?._id;
 
-    if (!studentId || !enrollmentId) {
-      message.warning("Cannot create evaluation: missing student data.");
+    if (!studentId || !enrollmentId || !teacherId) {
+      message.warning(
+        "Cannot create evaluation: missing student, enrollment, or teacher data."
+      );
       return;
     }
 
@@ -177,7 +191,9 @@ export default function AttributeEvaluationsPage() {
       title: "Student",
       render: (record: IAttributeEvaluation) => (
         <Text strong>
-          {record.studentId?.firstName} {record.studentId?.lastName}
+          {record.studentId
+            ? `${record.studentId.firstName} ${record.studentId.lastName}`
+            : "Deleted student"}
         </Text>
       ),
     },
@@ -198,7 +214,9 @@ export default function AttributeEvaluationsPage() {
       key: "teacher",
       title: "Teacher",
       render: (record: IAttributeEvaluation) =>
-        `${record.teacherId.firstName} ${record.teacherId.lastName}`,
+        record.teacherId
+          ? `${record.teacherId.firstName} ${record.teacherId.lastName}`
+          : "Deleted teacher",
     },
     {
       key: "date",
