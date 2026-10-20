@@ -6,6 +6,7 @@
  */
 import { useUser } from '@/context/UserContext';
 import { SyncStatusButton } from '@/components/common/SyncStatusButton';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 interface AppHeaderProps {
   title: string;
@@ -29,13 +30,12 @@ export function AppHeader({ title }: AppHeaderProps) {
         <div className="flex items-center gap-3 shrink-0">
           <SyncStatusButton />
 
-          {/* Notification bell slot reserved for future task */}
+          {/* Notification bell slot */}
           <div
             id="header-notifications-slot"
-            className="flex items-center justify-center p-1.5 rounded-full text-[var(--color-header-muted)] hover:text-[var(--color-header-fg)] transition-colors"
-            aria-label="Notifications"
+            className="flex items-center justify-center"
           >
-            {/* Slot placeholder for upcoming notification bell */}
+            <NotificationBell />
           </div>
 
           {user && (
