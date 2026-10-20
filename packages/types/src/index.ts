@@ -448,6 +448,8 @@ export interface IBroadcastMessage {
   updatedAt: string;
 }
 
+export type NotificationPriority = 'urgent' | 'normal' | 'low';
+
 export interface INotification {
   _id: string;
   userId: string;
@@ -455,8 +457,15 @@ export interface INotification {
   title?: string;
   message: string;
   isRead: boolean;
+  priority?: NotificationPriority;
   broadcastId?: string;
   createdAt: string;
+}
+
+export interface INotificationPagination {
+  total: number;
+  page: number;
+  limit: number;
 }
 
 // ---------------------------------------------------------------------------
