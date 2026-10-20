@@ -7,6 +7,7 @@
  *    ├── /app/home          Sections list (Home)
  *    ├── /app/schedule      My published timetable
  *    ├── /app/sections/:id  Section placeholder
+ *    ├── /app/attributes    Homeroom student attributes (feature-gated)
  *    └── /app/profile       Profile & logout
  *  • /                      Redirects to /app/home
  *  • *                      Catch-all redirects to /app/home
@@ -21,9 +22,13 @@ import AttendancePage from '@/pages/attendance/AttendancePage';
 import GradesSubjectPickerPage from '@/pages/grades/GradesSubjectPickerPage';
 import ClassSheetPage from '@/pages/grades/ClassSheetPage';
 import MarkEntryPage from '@/pages/grades/MarkEntryPage';
+import AttributeSectionsPage from '@/pages/attributes/AttributeSectionsPage';
+import AttributeRosterPage from '@/pages/attributes/AttributeRosterPage';
+import AttributeEvaluationPage from '@/pages/attributes/AttributeEvaluationPage';
 import ProfilePage from '@/pages/profile/ProfilePage';
 import { AppShell } from '@/components/layout/AppShell';
 import { RequireAuth } from '@/components/common/RequireAuth';
+import { RequireFeature } from '@/components/common/RequireFeature';
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +74,30 @@ export const router = createBrowserRouter([
       {
         path: 'sections/:sectionId/grades/:subjectId/marks/:typeId',
         element: <MarkEntryPage />,
+      },
+      {
+        path: 'attributes',
+        element: (
+          <RequireFeature feature="attributeEvaluation">
+            <AttributeSectionsPage />
+          </RequireFeature>
+        ),
+      },
+      {
+        path: 'attributes/:sectionId',
+        element: (
+          <RequireFeature feature="attributeEvaluation">
+            <AttributeRosterPage />
+          </RequireFeature>
+        ),
+      },
+      {
+        path: 'attributes/:sectionId/:studentId',
+        element: (
+          <RequireFeature feature="attributeEvaluation">
+            <AttributeEvaluationPage />
+          </RequireFeature>
+        ),
       },
       {
         path: 'profile',

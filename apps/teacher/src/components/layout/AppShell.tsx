@@ -14,9 +14,10 @@ import { GradesAuthBanner } from '@/components/grades/GradesAuthBanner';
 
 /** Map route paths to human-readable page titles. */
 const PAGE_TITLES: Record<string, string> = {
-  '/app/home':     'Teacher Dashboard',
-  '/app/schedule': 'My Schedule',
-  '/app/profile':  'Teacher Profile',
+  '/app/home':       'Teacher Dashboard',
+  '/app/schedule':   'My Schedule',
+  '/app/attributes': 'Student Attributes',
+  '/app/profile':    'Teacher Profile',
 };
 
 function usePageTitle(): string {

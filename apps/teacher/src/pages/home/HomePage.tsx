@@ -8,7 +8,17 @@
  *  • Fully responsive grid: comfortable on phones, tablets, and wide monitors
  */
 import { type ReactNode } from 'react';
-import { BookOpen, RefreshCw, Calendar, Users, Award, LayoutGrid } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  BookOpen,
+  RefreshCw,
+  Calendar,
+  Users,
+  Award,
+  LayoutGrid,
+  ChevronRight,
+  Sparkles,
+} from 'lucide-react';
 import { SectionCard } from '@/components/sections/SectionCard';
 import { SectionCardSkeleton } from '@/components/sections/SectionCardSkeleton';
 import { Button } from '@/components/ui/Button';
@@ -16,6 +26,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { useMySections } from '@/hooks/useMySections';
 import { usePrefetchHomeroomRosters } from '@/hooks/useAttendanceRoster';
 import { useAttendanceQueue } from '@/context/AttendanceQueueContext';
+import { useBranding } from '@/context/BrandingContext';
 import { useUser } from '@/context/UserContext';
 import { cn } from '@/lib/utils';
 
@@ -52,7 +63,9 @@ function SummaryStat({
 }
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const { user } = useUser();
+  const { features, isLoaded: brandingLoaded } = useBranding();
   const { sections, isLoading, error, refetch } = useMySections();
   const { entries } = useAttendanceQueue();
 
@@ -75,6 +88,8 @@ export default function HomePage() {
   // Calculate day summary metrics
   const totalStudents = sections.reduce((acc, curr) => acc + (curr.studentCount || 0), 0);
   const homeroomCount = sections.filter((s) => s.isHomeroom).length;
+  const showAttributeCard =
+    brandingLoaded && features.attributeEvaluation && homeroomCount > 0;
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -138,6 +153,30 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+      {showAttributeCard && (
+        <button
+          type="button"
+          onClick={() => navigate('/app/attributes')}
+          className="group flex w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 text-left shadow-[var(--shadow-card)] transition-all duration-200 hover:border-[var(--color-primary)] hover:shadow-md sm:p-6"
+        >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary-light)] text-[var(--color-primary)]">
+            <Sparkles size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-bold text-[var(--color-text)] transition-colors group-hover:text-[var(--color-primary)] sm:text-lg">
+              Student attributes
+            </h2>
+            <p className="mt-0.5 text-xs text-[var(--color-text-secondary)] sm:text-sm">
+              Record attribute evaluations for your homeroom students.
+            </p>
+          </div>
+          <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--color-primary)]">
+            Open
+            <ChevronRight size={16} />
+          </span>
+        </button>
+      )}
 
       {/* ── Classes overview ── */}
       <div>
