@@ -132,7 +132,7 @@ export default function AttributeEvaluationPage() {
 
   const student = enrollment?.studentId;
   const studentDisplayName = student
-    ? [student.lastName, student.firstName].filter(Boolean).join(', ')
+    ? [student.firstName, student.lastName].filter(Boolean).join(' ')
     : '';
 
   const scoredCount = categories.filter(

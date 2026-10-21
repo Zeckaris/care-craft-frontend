@@ -24,7 +24,7 @@ function studentName(enrollment: ISectionRosterEnrollment): string {
 
 function studentDisplayName(enrollment: ISectionRosterEnrollment): string {
   const student = enrollment.studentId;
-  return [student.lastName, student.firstName].filter(Boolean).join(', ');
+  return [student.firstName, student.lastName].filter(Boolean).join(' ');
 }
 
 function initials(enrollment: ISectionRosterEnrollment): string {
