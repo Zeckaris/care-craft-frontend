@@ -20,7 +20,6 @@ import {
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState, type ReactNode } from "react";
-import { MdPlaylistAddCheck } from "react-icons/md";
 import { RiMedal2Line } from "react-icons/ri";
 import { EyeOutlined } from "@ant-design/icons";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -106,11 +105,6 @@ const menuItems: SidebarMenuItemType[] = [
     key: "/app/attribute-evaluations",
     icon: <StrikethroughOutlined />,
     label: "Attribute Evaluation",
-  },
-  {
-    key: "/app/action-plans",
-    icon: <MdPlaylistAddCheck style={{ fontSize: 18 }} />,
-    label: "Action Plans",
   },
   {
     key: "/app/badges",

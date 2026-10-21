@@ -356,39 +356,6 @@ export interface IObservation {
 }
 
 // ---------------------------------------------------------------------------
-// Action Plans
-// ---------------------------------------------------------------------------
-
-export interface IActionPlan {
-  _id: string;
-  studentId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-  };
-  teacherId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  };
-  issue: string;
-  goal: string;
-  actionSteps: {
-    _id?: string;
-    step: string;
-    completed: boolean;
-    responsibleParty: 'teacher' | 'parent' | 'either';
-  }[];
-  progressRating?: number;
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  __v?: number;
-}
-
-// ---------------------------------------------------------------------------
 // Badges
 // ---------------------------------------------------------------------------
 

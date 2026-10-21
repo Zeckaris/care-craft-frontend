@@ -20,7 +20,6 @@ import AcademicCalendarPage from "./features/admin/pages/AcademicCalendarPage";
 import GradeSubjectAssessmentsPage from "./features/admin/pages/GradeSubjectAssessmentsPage";
 import AttributeCategoriesPage from "./features/admin/pages/AttributeCategoriesPage";
 import AttributeEvaluationsPage from "./features/admin/pages/AttributeEvaluationsPage";
-import ActionPlansPage from "@/features/admin/pages/ActionPlansPage";
 import { Typography } from "antd";
 import BadgeCriteriaPage from "./features/admin/pages/badge/BadgeCriteriaPage";
 import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
@@ -198,11 +197,6 @@ export const router = createBrowserRouter([
         path: "attribute-evaluations",
         element: <AttributeEvaluationsPage />,
         handle: { crumb: () => "Attribute Evaluation" },
-      },
-      {
-        path: "action-plans",
-        element: <ActionPlansPage />,
-        handle: { crumb: () => "Action Plans" },
       },
       {
         path: "badges",
