@@ -16,7 +16,9 @@ import { GradesAuthBanner } from '@/components/grades/GradesAuthBanner';
 const PAGE_TITLES: Record<string, string> = {
   '/app/home':       'Teacher Dashboard',
   '/app/schedule':   'My Schedule',
+  '/app/sections':   'Section',
   '/app/attributes': 'Student Attributes',
+  '/app/observations': 'Observations',
   '/app/profile':    'Teacher Profile',
 };
 

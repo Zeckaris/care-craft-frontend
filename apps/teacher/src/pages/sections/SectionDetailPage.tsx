@@ -1,11 +1,11 @@
 /**
- * SectionDetailPage — placeholder for a section's detail view.
+ * SectionDetailPage: entry point for a section's tools.
  *
  * This page is navigated to when a teacher taps a section card.
- * Attendance, roster, and grading features will be built here in future tasks.
+ * It links to the student roster, attendance, and grades.
  */
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ClipboardCheck, ClipboardList, Eye, Construction } from 'lucide-react';
+import { ArrowLeft, ClipboardCheck, ClipboardList, Eye, Users } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useMySections } from '@/hooks/useMySections';
 
@@ -32,18 +32,29 @@ export default function SectionDetailPage() {
       </Button>
 
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-warning-light)] mb-4">
-          <Construction size={28} className="text-[var(--color-warning)]" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-primary-light)] mb-4">
+          <Users size={28} className="text-[var(--color-primary)]" />
         </div>
-        <h2 className="text-base font-bold text-[var(--color-text)] mb-2">Coming soon</h2>
+        <h2 className="text-base font-bold text-[var(--color-text)] mb-2">Section tools</h2>
         <p className="text-sm text-[var(--color-text-secondary)] max-w-xs">
-          The roster view will be built in a later task. Attendance and grades are ready now.
+          Open the roster, take attendance, or manage grades for this section.
         </p>
 
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
           <Button
-            id={`section-detail-attendance-${sectionId}`}
+            id={`section-detail-roster-${sectionId}`}
             variant="default"
+            size="sm"
+            className="font-semibold"
+            onClick={() => navigate(`/app/sections/${sectionId}/roster`)}
+          >
+            <Users size={15} />
+            Student Roster
+          </Button>
+
+          <Button
+            id={`section-detail-attendance-${sectionId}`}
+            variant="secondary"
             size="sm"
             className="font-semibold"
             onClick={() => navigate(`/app/sections/${sectionId}/attendance`)}

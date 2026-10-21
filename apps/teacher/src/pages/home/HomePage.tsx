@@ -17,6 +17,7 @@ import {
   Award,
   LayoutGrid,
   ChevronRight,
+  MessageSquare,
   Sparkles,
 } from 'lucide-react';
 import { SectionCard } from '@/components/sections/SectionCard';
@@ -90,6 +91,8 @@ export default function HomePage() {
   const homeroomCount = sections.filter((s) => s.isHomeroom).length;
   const showAttributeCard =
     brandingLoaded && features.attributeEvaluation && homeroomCount > 0;
+  const showObservationCard =
+    brandingLoaded && features.observations && sections.length > 0;
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -169,6 +172,30 @@ export default function HomePage() {
             </h2>
             <p className="mt-0.5 text-xs text-[var(--color-text-secondary)] sm:text-sm">
               Record attribute evaluations for your homeroom students.
+            </p>
+          </div>
+          <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--color-primary)]">
+            Open
+            <ChevronRight size={16} />
+          </span>
+        </button>
+      )}
+
+      {showObservationCard && (
+        <button
+          type="button"
+          onClick={() => navigate('/app/observations')}
+          className="group flex w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 text-left shadow-[var(--shadow-card)] transition-all duration-200 hover:border-[var(--color-primary)] hover:shadow-md sm:p-6"
+        >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-info-light)] text-[var(--color-info)]">
+            <MessageSquare size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-bold text-[var(--color-text)] transition-colors group-hover:text-[var(--color-primary)] sm:text-lg">
+              Student observations
+            </h2>
+            <p className="mt-0.5 text-xs text-[var(--color-text-secondary)] sm:text-sm">
+              Share a quick note with a student's parent.
             </p>
           </div>
           <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--color-primary)]">
