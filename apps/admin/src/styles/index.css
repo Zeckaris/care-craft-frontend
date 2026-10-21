@@ -1,3 +1,111 @@
 @import "./variables.css";
 @import "./layout.css";
 @import "./dashboard.css";
+
+/* === READ-ONLY (VIEW) FORM VALUES ===
+   Applied via the `cc-readonly-form` class on view-mode <Form>s.
+   Keeps the muted, non-editable look while making the value text fully
+   readable and clearly distinct from edit-mode placeholder text. */
+.cc-readonly-form .ant-input[disabled],
+.cc-readonly-form .ant-input-disabled,
+.cc-readonly-form textarea.ant-input[disabled],
+.cc-readonly-form .ant-input-number-disabled input,
+.cc-readonly-form .ant-picker-input > input[disabled],
+.cc-readonly-form .ant-input-affix-wrapper-disabled .ant-input,
+.cc-readonly-form .ant-select-disabled .ant-select-selection-item {
+  color: var(--palette-text, #1f2937) !important;
+  -webkit-text-fill-color: var(--palette-text, #1f2937) !important;
+  opacity: 1 !important;
+}
+
+.cc-readonly-form .ant-input[disabled],
+.cc-readonly-form .ant-input-disabled,
+.cc-readonly-form textarea.ant-input[disabled],
+.cc-readonly-form .ant-input-number-disabled,
+.cc-readonly-form .ant-picker-disabled,
+.cc-readonly-form .ant-input-affix-wrapper-disabled,
+.cc-readonly-form .ant-select-disabled .ant-select-selector {
+  background: var(--palette-card-bg-hover, #f0f0f0) !important;
+  border-color: var(--border-color, #e1e4e8) !important;
+}
+
+.cc-readonly-form .ant-input[disabled]::placeholder,
+.cc-readonly-form textarea.ant-input[disabled]::placeholder,
+.cc-readonly-form .ant-picker-input > input[disabled]::placeholder {
+  color: var(--palette-text, #1f2937) !important;
+  -webkit-text-fill-color: var(--palette-text, #1f2937) !important;
+  opacity: 0.6 !important;
+}
+
+.cc-readonly-form .ant-select-disabled .ant-select-arrow,
+.cc-readonly-form .ant-picker-disabled .ant-picker-suffix {
+  color: var(--palette-text, #1f2937) !important;
+  opacity: 0.45 !important;
+}
+
+/* === READ-ONLY (VIEW) RADIOS, CHECKBOXES & SWITCHES ===
+   Ant Design renders disabled controls with low-contrast marks (the checked
+   radio dot uses `colorTextDisabled`, ~25% black), so a selected option can
+   read as "empty". Keep the non-editable look but make the state obvious. */
+.cc-readonly-form .ant-radio-wrapper-disabled .ant-radio-inner,
+.cc-readonly-form .ant-radio-disabled .ant-radio-inner,
+.cc-readonly-form .ant-checkbox-wrapper-disabled .ant-checkbox-inner,
+.cc-readonly-form .ant-checkbox-disabled .ant-checkbox-inner {
+  background-color: var(--palette-card-bg-hover, #f0f0f0) !important;
+  border-color: var(--border-color, #e1e4e8) !important;
+}
+
+.cc-readonly-form
+  .ant-radio-wrapper-disabled.ant-radio-wrapper-checked
+  .ant-radio-inner,
+.cc-readonly-form .ant-radio-disabled.ant-radio-checked .ant-radio-inner,
+.cc-readonly-form
+  .ant-checkbox-wrapper-disabled.ant-checkbox-wrapper-checked
+  .ant-checkbox-inner,
+.cc-readonly-form
+  .ant-checkbox-disabled.ant-checkbox-checked
+  .ant-checkbox-inner {
+  background-color: var(--palette-primary, #1677ff) !important;
+  border-color: var(--palette-primary, #1677ff) !important;
+}
+
+.cc-readonly-form
+  .ant-radio-wrapper-disabled.ant-radio-wrapper-checked
+  .ant-radio-inner::after,
+.cc-readonly-form
+  .ant-radio-disabled.ant-radio-checked
+  .ant-radio-inner::after {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  transform: scale(0.5) !important;
+}
+
+.cc-readonly-form
+  .ant-checkbox-disabled.ant-checkbox-checked
+  .ant-checkbox-inner::after {
+  border-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.cc-readonly-form .ant-radio-wrapper-disabled .ant-radio-label,
+.cc-readonly-form .ant-radio-disabled + span,
+.cc-readonly-form .ant-checkbox-wrapper-disabled .ant-checkbox-label,
+.cc-readonly-form .ant-checkbox-disabled + span {
+  color: var(--palette-text, #1f2937) !important;
+  -webkit-text-fill-color: var(--palette-text, #1f2937) !important;
+  opacity: 1 !important;
+}
+
+.cc-readonly-form .ant-switch.ant-switch-disabled {
+  opacity: 1 !important;
+}
+
+.cc-readonly-form .ant-switch-disabled.ant-switch-checked {
+  background: var(--palette-primary, #1677ff) !important;
+}
+
+.cc-readonly-form
+  .ant-switch-disabled.ant-switch-checked
+  .ant-switch-handle::before {
+  background: #ffffff !important;
+}
