@@ -10,7 +10,6 @@ import {
   Tag,
   Typography,
   List,
-  Divider,
   Alert,
 } from "antd";
 import {
@@ -21,6 +20,7 @@ import {
 import type { FormInstance } from "antd";
 import { useState, useEffect } from "react";
 import type { IBadgeDefinition } from "@/hooks/useBadgeDefinitions";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -144,9 +144,10 @@ export const BadgeDefinitionDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           name: definition?.name || "",
-          description: definition?.description || "",
+          description: definition?.description || (isView ? "-" : ""),
           level: definition?.level || 1,
           criteria: definition?.criteria.map((c) => c._id) || [],
         }}
@@ -219,7 +220,7 @@ export const BadgeDefinitionDrawer = ({
         {/* Criteria Selection */}
         <Form.Item
           name="criteria"
-          label="Criteria (optional — add later if needed)"
+          label="Criteria (optional - add later if needed)"
         >
           {isView ? (
             <List
@@ -232,7 +233,7 @@ export const BadgeDefinitionDrawer = ({
                     <Text strong>
                       {item.type.replace(/([A-Z])/g, " $1").trim()}
                     </Text>
-                    <Text type="secondary">{item.description || "—"}</Text>
+                    <Text type="secondary">{item.description || "-"}</Text>
                     {(item.minScore ||
                       item.minProgress ||
                       item.minObservations) && (
@@ -285,15 +286,10 @@ export const BadgeDefinitionDrawer = ({
 
         {/* Created By (view only) */}
         {isView && definition?.createdBy && (
-          <>
-            <Divider />
-            <Space>
-              <Text type="secondary">Created by:</Text>
-              <Text strong>
-                {definition.createdBy.firstName} {definition.createdBy.lastName}
-              </Text>
-            </Space>
-          </>
+          <ReadOnlyField
+            label="Created By"
+            value={`${definition.createdBy.firstName} ${definition.createdBy.lastName}`}
+          />
         )}
       </Form>
     </Drawer>

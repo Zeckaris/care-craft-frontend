@@ -104,6 +104,7 @@ export const ActionPlanDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           studentId: plan?.studentId._id,
           teacherId: plan?.teacherId._id,

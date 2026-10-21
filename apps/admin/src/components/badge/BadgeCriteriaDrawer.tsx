@@ -7,11 +7,12 @@ import {
   Select,
   Tag,
   Typography,
-  Divider,
 } from "antd";
 import type { FormInstance } from "antd";
 import type { IBadgeCriteria } from "@/hooks/useBadgeCriteria";
 import type { IBadgeDefinition } from "@/hooks/useBadgeDefinitions";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -218,10 +219,11 @@ export const BadgeCriteriaDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           badgeDefinitionId: criteria?.badgeDefinitionId || undefined,
           type: criteria?.type || undefined,
-          description: criteria?.description || "",
+          description: criteria?.description || (isView ? "-" : ""),
           attributeCategoryId: criteria?.attributeCategoryId || null,
           minScore: criteria?.minScore || null,
           actionPlanId: criteria?.actionPlanId || null,
@@ -300,13 +302,10 @@ export const BadgeCriteriaDrawer = ({
         )}
 
         {isView && criteria && (
-          <>
-            <Divider />
-            <Space direction="vertical">
-              <Text type="secondary">Created on:</Text>
-              <Text>{new Date(criteria.createdAt).toLocaleDateString()}</Text>
-            </Space>
-          </>
+          <ReadOnlyField
+            label="Created On"
+            value={formatDateTime(criteria.createdAt)}
+          />
         )}
       </Form>
     </Drawer>

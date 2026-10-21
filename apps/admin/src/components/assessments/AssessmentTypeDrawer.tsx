@@ -10,10 +10,12 @@ import {
 } from "antd";
 import { SafetyOutlined, UserOutlined } from "@ant-design/icons";
 import type { FormInstance } from "antd";
-import dayjs from "dayjs";
+import { useEffect } from "react";
 import type { IAssessmentType } from "@/hooks/useAssessmentTypes";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
 
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 interface AssessmentTypeDrawerProps {
   open: boolean;
@@ -37,8 +39,15 @@ export const AssessmentTypeDrawer = ({
   const isView = mode === "view";
   const isEdit = mode === "edit";
 
-  const formatDate = (dateStr?: string) =>
-    dateStr ? dayjs(dateStr).format("MMMM D, YYYY") : "—";
+  useEffect(() => {
+    if (open && type) {
+      form.setFieldsValue({
+        name: type.name,
+        weight: type.weight,
+        description: type.description || "",
+      });
+    }
+  }, [open, type, isView, form]);
 
   return (
     <Drawer
@@ -74,6 +83,7 @@ export const AssessmentTypeDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           name: type?.name || "",
           weight: type?.weight ?? undefined,
@@ -132,13 +142,15 @@ export const AssessmentTypeDrawer = ({
               </Tag>
             </Form.Item>
 
-            <Form.Item label="Created">
-              <Text>{formatDate(type?.createdAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Created"
+              value={formatDateTime(type?.createdAt)}
+            />
 
-            <Form.Item label="Last Updated">
-              <Text>{formatDate(type?.updatedAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Last Updated"
+              value={formatDateTime(type?.updatedAt)}
+            />
           </>
         )}
       </Form>

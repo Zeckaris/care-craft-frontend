@@ -62,22 +62,18 @@ export const StudentDrawer = ({
       setProfileFile(null);
 
       if (student) {
-        if (isEdit) {
-          form.setFieldsValue({
-            firstName: student.firstName,
-            middleName: student.middleName || "",
-            lastName: student.lastName,
-            gender: student.gender,
-            dateOfBirth: student.dateOfBirth
-              ? dayjs(student.dateOfBirth)
-              : null,
-          });
-        }
+        form.setFieldsValue({
+          firstName: student.firstName,
+          middleName: student.middleName || (isView ? "-" : ""),
+          lastName: student.lastName,
+          gender: student.gender,
+          dateOfBirth: student.dateOfBirth ? dayjs(student.dateOfBirth) : null,
+        });
       } else {
         setPreviewUrl(null);
       }
     }
-  }, [open, student, isEdit, form]);
+  }, [open, student, isView, form]);
 
   const uploadProps: UploadProps = {
     onRemove: () => {
@@ -176,7 +172,12 @@ export const StudentDrawer = ({
         )
       }
     >
-      <Form form={form} layout="vertical" disabled={isView}>
+      <Form
+        form={form}
+        layout="vertical"
+        disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
+      >
         {/* Profile Image */}
         <Form.Item label="Profile Image">
           <Space direction="vertical" align="center" style={{ width: "100%" }}>
@@ -248,7 +249,7 @@ export const StudentDrawer = ({
             <DatePicker
               style={{ width: "100%" }}
               format="MMMM D, YYYY"
-              placeholder="Select date"
+              placeholder={isView ? "-" : "Select date"}
             />
           </Form.Item>
         </Space>
@@ -259,7 +260,7 @@ export const StudentDrawer = ({
             value={
               student?.admissionDate
                 ? dayjs(student.admissionDate).format("MMMM D, YYYY")
-                : "—"
+                : "-"
             }
             disabled
           />
