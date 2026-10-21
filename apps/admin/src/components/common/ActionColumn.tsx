@@ -1,3 +1,4 @@
+import type { KeyboardEvent, MouseEvent } from "react";
 import { Space, Tooltip, Dropdown, Menu } from "antd";
 import {
   EyeOutlined,
@@ -14,7 +15,9 @@ interface ExtraAction<T> {
   danger?: boolean;
 }
 
-interface ActionColumnProps<T extends Record<string, any>> {
+interface ActionColumnProps<
+  T extends { _id?: string | number; id?: string | number },
+> {
   record: T;
   onView?: (record: T) => void;
   onEdit?: (record: T) => void;
@@ -22,7 +25,9 @@ interface ActionColumnProps<T extends Record<string, any>> {
   extraActions?: ExtraAction<T>[];
 }
 
-export function ActionColumn<T extends Record<string, any>>({
+export function ActionColumn<
+  T extends { _id?: string | number; id?: string | number },
+>({
   record,
   onView,
   onEdit,
@@ -30,8 +35,8 @@ export function ActionColumn<T extends Record<string, any>>({
   extraActions,
 }: ActionColumnProps<T>) {
   const getKey = (): Key => {
-    if ("_id" in record && record._id != null) return record._id as Key;
-    if ("id" in record && record.id != null) return record.id as Key;
+    if (record._id != null) return record._id;
+    if (record.id != null) return record.id;
     console.warn("ActionColumn: No _id or id found", record);
     return Math.random().toString();
   };
@@ -110,7 +115,7 @@ export function ActionColumn<T extends Record<string, any>>({
     key: action.key,
     label: action.label,
     danger: action.danger,
-    onClick: (e: any) => {
+    onClick: (e: { domEvent: MouseEvent | KeyboardEvent }) => {
       e.domEvent.stopPropagation();
       action.onClick(record); // ← now it calls your function exactly once
     },
