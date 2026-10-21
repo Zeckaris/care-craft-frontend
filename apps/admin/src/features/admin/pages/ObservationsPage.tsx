@@ -1,35 +1,56 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Button,
-  Input,
+  DatePicker,
+  Dropdown,
+  Empty,
+  Modal,
   Select,
   Space,
-  Typography,
-  Alert,
-  Empty,
-  message,
-  Modal,
   Tag,
-  DatePicker,
+  Typography,
+  message,
 } from "antd";
-import { SearchOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EyeOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import { extractApiErrorMessage } from "@carecraft/query-core";
+import type { IObservation } from "@carecraft/types";
 import { DataTable } from "@/components/common/DataTable";
-import { useObservations, type IObservation } from "@/hooks/useObservations";
+import { ObservationDetailDrawer } from "@/components/observations/ObservationDetailDrawer";
+import { useObservations } from "@/hooks/useObservations";
 import { useStudents } from "@/hooks/useStudents";
 import { useTeachers } from "@/hooks/useTeachers";
-import { useAttributeCategories } from "@/hooks/useAttributeCategories";
+import { useSubjects } from "@/hooks/useSubjects";
+import { useTerms } from "@/hooks/useAssessmentResults";
 import dayjs from "dayjs";
-import type { Key } from "antd/es/table/interface";
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
+function formatObservationDate(value: string | null | undefined): string {
+  if (!value) return "-";
+  return dayjs(value.slice(0, 10)).format("MMM D, YYYY");
+}
+
 export default function ObservationsPage() {
   const [studentId, setStudentId] = useState<string | undefined>(undefined);
   const [teacherId, setTeacherId] = useState<string | undefined>(undefined);
-  const [category, setCategory] = useState<string | undefined>(undefined);
+  const [subjectId, setSubjectId] = useState<string | undefined>(undefined);
+  const [schoolYear, setSchoolYear] = useState<string | undefined>(undefined);
+  const [term, setTerm] = useState<string | undefined>(undefined);
+  const [from, setFrom] = useState<string | undefined>(undefined);
+  const [to, setTo] = useState<string | undefined>(undefined);
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
-  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [selectedObservation, setSelectedObservation] =
+    useState<IObservation | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingStudentId, setDeletingStudentId] = useState<string | null>(
+    null,
+  );
 
   const {
     observations,
@@ -39,56 +60,153 @@ export default function ObservationsPage() {
     isLoading,
     isError,
     fetchError,
-    refetch,
     remove,
-    isDeleting,
+    bulkRemoveByStudent,
   } = useObservations({
     studentId,
     teacherId,
-    category,
+    subjectId,
+    schoolYear,
+    term,
+    from,
+    to,
     pagination,
   });
 
-  // Load options for filters
-  const { students = [] } = useStudents();
-  const { teachers = [] } = useTeachers();
-  const { categories = [] } = useAttributeCategories();
+  // Load complete option lists for filters.
+  const { students = [], isLoading: studentsLoading } = useStudents({
+    pagination: { page: 1, pageSize: 1000 },
+  });
+  const { teachers = [], isLoading: teachersLoading } = useTeachers({
+    page: 1,
+    pageSize: 1000,
+  });
+  const { subjects = [], isLoading: subjectsLoading } = useSubjects();
+  const { data: terms = [], isLoading: termsLoading } = useTerms();
 
   // Reset pagination when filters change
   useEffect(() => {
     setPagination((p) => ({ ...p, page: 1 }));
-  }, [studentId, teacherId, category]);
+  }, [studentId, teacherId, subjectId, schoolYear, term, from, to]);
 
-  // Filter options
-  const studentOptions = students.map((s: any) => ({
-    value: s._id,
-    label: `${s.firstName} ${s.lastName}`,
+  // Clear a term that no longer belongs to the selected school year.
+  useEffect(() => {
+    if (!term || !schoolYear) return;
+    const selectedTerm = terms.find((item) => item._id === term);
+    if (
+      selectedTerm &&
+      selectedTerm.calendarId?.academicYear !== schoolYear
+    ) {
+      setTerm(undefined);
+    }
+  }, [term, schoolYear, terms]);
+
+  const studentOptions = students.map((student) => ({
+    value: student._id,
+    label: `${student.firstName} ${student.lastName}`,
   }));
 
-  const teacherOptions = teachers.map((t: any) => ({
-    value: t._id,
-    label: `${t.firstName} ${t.lastName}`,
+  const teacherOptions = teachers.map((teacher) => ({
+    value: teacher._id,
+    label: `${teacher.firstName} ${teacher.lastName}`,
   }));
 
-  const categoryOptions = categories.map((c: any) => ({
-    value: c._id,
-    label: c.name,
+  const subjectOptions = subjects.map((subject) => ({
+    value: subject._id,
+    label: subject.name,
   }));
 
-  // Score color logic
-  const getScoreTag = (score: number, minScore: number, maxScore: number) => {
-    const ratio = (score - minScore) / (maxScore - minScore);
-    let color = "default";
-    if (ratio >= 0.8) color = "success";
-    else if (ratio >= 0.6) color = "processing";
-    else if (ratio >= 0.4) color = "warning";
-    else color = "error";
+  const yearOptions = useMemo(() => {
+    const years = new Set<string>();
+    terms.forEach((item) => {
+      const year = item.calendarId?.academicYear;
+      if (year) years.add(year);
+    });
+    return Array.from(years)
+      .sort((a, b) => b.localeCompare(a))
+      .map((value) => ({ value, label: value }));
+  }, [terms]);
 
-    return (
-      <Tag color={color}>
-        {score} / {maxScore}
-      </Tag>
-    );
+  const termOptions = useMemo(
+    () =>
+      terms
+        .filter(
+          (item) =>
+            !schoolYear || item.calendarId?.academicYear === schoolYear,
+        )
+        .sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0))
+        .map((item) => ({
+          value: item._id,
+          label: schoolYear
+            ? item.name
+            : `${item.name} (${item.calendarId?.academicYear ?? ""})`,
+        })),
+    [terms, schoolYear],
+  );
+
+  const termNameById = useMemo(
+    () => new Map(terms.map((item) => [item._id, item.name])),
+    [terms],
+  );
+
+  const getTermName = (termId: string | null | undefined): string => {
+    if (!termId) return "-";
+    return termNameById.get(termId) ?? "Unknown term";
+  };
+
+  const handleDelete = (record: IObservation) => {
+    const studentName = record.studentId
+      ? `${record.studentId.firstName} ${record.studentId.lastName}`
+      : "this student";
+
+    Modal.confirm({
+      title: "Delete Observation",
+      content: `Are you sure you want to permanently delete the observation for ${studentName}?`,
+      okText: "Delete",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setDeletingId(record._id);
+        try {
+          await remove(record._id);
+          message.success("Observation deleted successfully");
+          setSelectedObservation((current) =>
+            current?._id === record._id ? null : current,
+          );
+        } catch {
+          // Error handled by useApi
+        } finally {
+          setDeletingId(null);
+        }
+      },
+    });
+  };
+
+  const handleDeleteAllForStudent = (record: IObservation) => {
+    const student = record.studentId;
+    if (!student) return;
+
+    const studentName = `${student.firstName} ${student.lastName}`;
+
+    Modal.confirm({
+      title: "Delete all observations for this student",
+      content: `This permanently deletes every observation for ${studentName}. This action cannot be undone.`,
+      okText: "Delete all",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setDeletingStudentId(student._id);
+        try {
+          await bulkRemoveByStudent(student._id);
+          message.success(`All observations for ${studentName} deleted`);
+          setSelectedObservation((current) =>
+            current?.studentId?._id === student._id ? null : current,
+          );
+        } catch {
+          // Error handled by useApi
+        } finally {
+          setDeletingStudentId(null);
+        }
+      },
+    });
   };
 
   const columns = [
@@ -118,34 +236,29 @@ export default function ObservationsPage() {
         ),
     },
     {
-      title: "Category",
-      key: "category",
+      title: "Subject",
+      key: "subject",
       render: (record: IObservation) =>
-        record.category ? (
-          record.category.name
+        record.subjectId ? (
+          <Tag>{record.subjectId.name}</Tag>
         ) : (
-          <Text type="secondary">Unknown Category</Text>
+          <Text type="secondary">No subject</Text>
         ),
-    },
-    {
-      title: "Score",
-      key: "score",
-      render: (record: IObservation) => {
-        if (!record.category) {
-          return <Tag color="default">N/A</Tag>;
-        }
-        return getScoreTag(
-          record.score,
-          record.category.minScore,
-          record.category.maxScore
-        );
-      },
     },
     {
       title: "Date",
       key: "date",
-      render: (record: IObservation) =>
-        dayjs(record.date).format("MMM D, YYYY"),
+      render: (record: IObservation) => formatObservationDate(record.date),
+    },
+    {
+      title: "School Year",
+      key: "schoolYear",
+      render: (record: IObservation) => record.schoolYear || "-",
+    },
+    {
+      title: "Term",
+      key: "term",
+      render: (record: IObservation) => getTermName(record.term),
     },
     {
       title: "Description",
@@ -157,35 +270,52 @@ export default function ObservationsPage() {
       title: "Actions",
       key: "actions",
       render: (record: IObservation) => (
-        <Button
-          danger
-          icon={<DeleteOutlined />}
-          size="small"
-          onClick={() => handleDelete(record._id)}
-          loading={isDeleting}
-        >
-          Delete
-        </Button>
+        <Space size="small">
+          <Button
+            type="text"
+            size="small"
+            icon={<EyeOutlined />}
+            aria-label="View observation details"
+            onClick={() => setSelectedObservation(record)}
+          />
+          <Button
+            type="text"
+            danger
+            size="small"
+            icon={<DeleteOutlined />}
+            aria-label="Delete observation"
+            loading={deletingId === record._id}
+            onClick={() => handleDelete(record)}
+          />
+          <Dropdown
+            trigger={["click"]}
+            menu={{
+              items: [
+                {
+                  key: "delete-all",
+                  label: "Delete all for this student",
+                  danger: true,
+                  disabled: !record.studentId,
+                  onClick: () => handleDeleteAllForStudent(record),
+                },
+              ],
+            }}
+          >
+            <Button
+              type="text"
+              size="small"
+              icon={<MoreOutlined />}
+              aria-label="More observation actions"
+              loading={
+                Boolean(record.studentId) &&
+                deletingStudentId === record.studentId?._id
+              }
+            />
+          </Dropdown>
+        </Space>
       ),
     },
   ];
-
-  const handleDelete = (id: string) => {
-    Modal.confirm({
-      title: "Delete Observation",
-      content: "Are you sure you want to permanently delete this observation?",
-      okText: "Delete",
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await remove(id);
-          message.success("Observation deleted successfully");
-        } catch {
-          // Error handled by useApi
-        }
-      },
-    });
-  };
 
   return (
     <div style={{ padding: "24px", background: "#fff", borderRadius: 8 }}>
@@ -206,6 +336,7 @@ export default function ObservationsPage() {
             showSearch
             optionFilterProp="label"
             options={studentOptions}
+            loading={studentsLoading}
             onChange={(value) => setStudentId(value || undefined)}
             value={studentId}
           />
@@ -216,33 +347,75 @@ export default function ObservationsPage() {
             showSearch
             optionFilterProp="label"
             options={teacherOptions}
+            loading={teachersLoading}
             onChange={(value) => setTeacherId(value || undefined)}
             value={teacherId}
           />
           <Select
             style={{ width: 240 }}
-            placeholder="Filter by Category"
+            placeholder="Filter by Subject"
             allowClear
-            options={categoryOptions}
-            onChange={(value) => setCategory(value || undefined)}
-            value={category}
+            showSearch
+            optionFilterProp="label"
+            options={subjectOptions}
+            loading={subjectsLoading}
+            onChange={(value) => setSubjectId(value || undefined)}
+            value={subjectId}
+          />
+          <Select
+            style={{ width: 180 }}
+            placeholder="Filter by School Year"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={yearOptions}
+            loading={termsLoading}
+            onChange={(value) => setSchoolYear(value || undefined)}
+            value={schoolYear}
+          />
+          <Select
+            style={{ width: 220 }}
+            placeholder="Filter by Term"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={termOptions}
+            loading={termsLoading}
+            onChange={(value) => setTerm(value || undefined)}
+            value={term}
+          />
+          <RangePicker
+            placeholder={["From date", "To date"]}
+            value={
+              from && to
+                ? [dayjs(from), dayjs(to)]
+                : null
+            }
+            onChange={(dates, dateStrings) => {
+              if (!dates || !dates[0] || !dates[1]) {
+                setFrom(undefined);
+                setTo(undefined);
+                return;
+              }
+              setFrom(dateStrings[0]);
+              setTo(dateStrings[1]);
+            }}
+            format="YYYY-MM-DD"
           />
         </Space>
 
-        {/* Error Alert */}
-        {isError && fetchError && (
+        {isError ? (
           <Alert
             type="error"
             message="Failed to load observations"
-            description={fetchError?.message || "Please try again"}
+            description={
+              fetchError
+                ? extractApiErrorMessage(fetchError)
+                : "Please try again"
+            }
             showIcon
-            closable
-            onClose={() => refetch()}
           />
-        )}
-
-        {/* Table or Empty */}
-        {observations.length === 0 && !isLoading ? (
+        ) : !isLoading && observations.length === 0 ? (
           <Empty description="No observations recorded yet" />
         ) : (
           <DataTable
@@ -261,6 +434,13 @@ export default function ObservationsPage() {
             }}
           />
         )}
+
+        <ObservationDetailDrawer
+          open={Boolean(selectedObservation)}
+          observation={selectedObservation}
+          termName={getTermName(selectedObservation?.term)}
+          onClose={() => setSelectedObservation(null)}
+        />
       </Space>
     </div>
   );

@@ -136,18 +136,32 @@ export default function BadgeCriteriaPage() {
     try {
       const values = await form.validateFields();
 
-      // Convert numeric fields to actual numbers (AntD sends them as strings)
-      const transformedValues = {
-        ...values,
-        minScore:
-          values.minScore !== undefined ? Number(values.minScore) : null,
-        minProgress:
-          values.minProgress !== undefined ? Number(values.minProgress) : null,
-        minObservations:
-          values.minObservations !== undefined
-            ? Number(values.minObservations)
-            : null,
+      const type = values.type as IBadgeCriteria["type"];
+      const transformedValues: Omit<IBadgeCriteria, "_id" | "createdAt"> = {
+        badgeDefinitionId: values.badgeDefinitionId,
+        type,
+        description: values.description || undefined,
       };
+
+      switch (type) {
+        case "scoreThreshold":
+          transformedValues.attributeCategoryId = values.attributeCategoryId;
+          transformedValues.minScore = Number(values.minScore);
+          break;
+        case "actionPlanProgress":
+          transformedValues.actionPlanId = values.actionPlanId;
+          transformedValues.minProgress = Number(values.minProgress);
+          break;
+        case "observationCount":
+          transformedValues.minObservations = Number(values.minObservations);
+          break;
+        case "attributeEvaluationAverage":
+          transformedValues.minScore = Number(values.minScore);
+          transformedValues.scope = values.scope;
+          break;
+        case "custom":
+          break;
+      }
 
       if (drawerMode === "create") {
         await create(transformedValues);
@@ -157,8 +171,8 @@ export default function BadgeCriteriaPage() {
         message.success("Criteria updated successfully");
       }
       closeDrawer();
-    } catch (error: any) {
-      // Validation or API error — already handled by useApi or form
+    } catch {
+      // Validation or API errors are handled by the form and useApi.
     }
   };
 

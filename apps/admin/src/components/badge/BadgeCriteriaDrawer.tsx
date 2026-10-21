@@ -10,11 +10,10 @@ import {
   Divider,
 } from "antd";
 import type { FormInstance } from "antd";
-import { useEffect } from "react";
 import type { IBadgeCriteria } from "@/hooks/useBadgeCriteria";
 import type { IBadgeDefinition } from "@/hooks/useBadgeDefinitions";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 interface BadgeCriteriaDrawerProps {
@@ -53,23 +52,8 @@ export const BadgeCriteriaDrawer = ({
 }: BadgeCriteriaDrawerProps) => {
   const isView = mode === "view";
   const isCreate = mode === "create";
-  const isEdit = mode === "edit";
 
   const selectedType = Form.useWatch("type", form);
-
-  // Reset conditional fields when type changes
-  useEffect(() => {
-    if (!isView) {
-      form.setFieldsValue({
-        attributeCategoryId: null,
-        minScore: null,
-        actionPlanId: null,
-        minProgress: null,
-        minObservations: null,
-        scope: null,
-      });
-    }
-  }, [selectedType, form, isView]);
 
   const badgeOptions = badgeDefinitions.map((bd) => ({
     value: bd._id,
@@ -176,28 +160,13 @@ export const BadgeCriteriaDrawer = ({
 
       case "observationCount":
         return (
-          <>
-            <Form.Item
-              name="attributeCategoryId"
-              label="Attribute Category"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Select
-                placeholder="Select attribute category"
-                options={attributeCategoryOptions}
-                showSearch
-                optionFilterProp="label"
-                allowClear
-              />
-            </Form.Item>
-            <Form.Item
-              name="minObservations"
-              label="Minimum Observations"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Input type="number" min={1} />
-            </Form.Item>
-          </>
+          <Form.Item
+            name="minObservations"
+            label="Minimum Observations"
+            rules={[{ required: true, message: "Required" }]}
+          >
+            <Input type="number" min={1} />
+          </Form.Item>
         );
 
       case "custom":
