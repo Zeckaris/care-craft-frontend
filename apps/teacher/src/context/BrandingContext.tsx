@@ -31,10 +31,16 @@ import { useUser } from '@/context/UserContext';
 import { apiClient, ASSETS_BASE } from '@/services/api-client';
 import { BRANDING_QUERY_KEY } from '@/lib/query-keys';
 
-const DEFAULT_FEATURES: SchoolFeatures = { attributeEvaluation: false };
+const DEFAULT_FEATURES: SchoolFeatures = {
+  attributeEvaluation: false,
+  observations: false,
+};
 
 function normalizeFeatures(features?: Partial<SchoolFeatures> | null): SchoolFeatures {
-  return { attributeEvaluation: features?.attributeEvaluation === true };
+  return {
+    attributeEvaluation: features?.attributeEvaluation === true,
+    observations: features?.observations === true,
+  };
 }
 
 interface BrandingContextValue {

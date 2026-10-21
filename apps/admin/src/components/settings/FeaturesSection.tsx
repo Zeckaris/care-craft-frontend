@@ -5,30 +5,44 @@ import { useSchoolInfo } from "@/hooks/useSchoolInfo";
 
 const { Text } = Typography;
 
+type FeatureKey = "attributeEvaluation" | "observations";
+
 export const FeaturesSection = () => {
   const { schoolInfo, isLoading, updateFeatures, isSavingFeatures } =
     useSchoolInfo();
-  const savedEnabled = schoolInfo?.features?.attributeEvaluation ?? false;
-  const [optimisticEnabled, setOptimisticEnabled] = useState<boolean | null>(
-    null,
-  );
+
+  const savedEnabled: Record<FeatureKey, boolean> = {
+    attributeEvaluation: schoolInfo?.features?.attributeEvaluation ?? false,
+    observations: schoolInfo?.features?.observations ?? false,
+  };
+
+  const [optimistic, setOptimistic] = useState<
+    Partial<Record<FeatureKey, boolean>>
+  >({});
 
   useEffect(() => {
-    setOptimisticEnabled(null);
-  }, [savedEnabled]);
+    setOptimistic({});
+  }, [savedEnabled.attributeEvaluation, savedEnabled.observations]);
 
-  const enabled = optimisticEnabled ?? savedEnabled;
+  const isEnabled = (key: FeatureKey) =>
+    optimistic[key] ?? savedEnabled[key];
 
-  const handleToggle = async (checked: boolean) => {
-    setOptimisticEnabled(checked);
+  const handleToggle = async (
+    key: FeatureKey,
+    label: string,
+    checked: boolean,
+  ) => {
+    setOptimistic((current) => ({ ...current, [key]: checked }));
 
     try {
-      await updateFeatures({ attributeEvaluation: checked });
-      message.success(
-        `Student attribute evaluations ${checked ? "enabled" : "disabled"}.`,
-      );
+      await updateFeatures({ [key]: checked });
+      message.success(`${label} ${checked ? "enabled" : "disabled"}.`);
     } catch (err) {
-      setOptimisticEnabled(null);
+      setOptimistic((current) => {
+        const next = { ...current };
+        delete next[key];
+        return next;
+      });
       const backendMessage = (
         err as { response?: { data?: { message?: string } } }
       )?.response?.data?.message;
@@ -59,20 +73,46 @@ export const FeaturesSection = () => {
       }
       style={{ marginBottom: 32 }}
     >
-      <Space direction="vertical" size={8}>
-        <Space size="middle">
-          <Switch
-            checked={enabled}
-            loading={isSavingFeatures}
-            onChange={handleToggle}
-            aria-label="Enable student attribute evaluations"
-          />
-          <Text strong>Enable student attribute evaluations</Text>
+      <Space direction="vertical" size={16}>
+        <Space direction="vertical" size={8}>
+          <Space size="middle">
+            <Switch
+              checked={isEnabled("attributeEvaluation")}
+              loading={isSavingFeatures}
+              onChange={(checked) =>
+                handleToggle(
+                  "attributeEvaluation",
+                  "Student attribute evaluations",
+                  checked,
+                )
+              }
+              aria-label="Enable student attribute evaluations"
+            />
+            <Text strong>Enable student attribute evaluations</Text>
+          </Space>
+          <Text type="secondary">
+            Homeroom teachers will see student attribute evaluations on their
+            home page only when enabled. Admins can turn this off at any time.
+          </Text>
         </Space>
-        <Text type="secondary">
-          Homeroom teachers will see student attribute evaluations on their home
-          page only when enabled. Admins can turn this off at any time.
-        </Text>
+
+        <Space direction="vertical" size={8}>
+          <Space size="middle">
+            <Switch
+              checked={isEnabled("observations")}
+              loading={isSavingFeatures}
+              onChange={(checked) =>
+                handleToggle("observations", "Student observations", checked)
+              }
+              aria-label="Enable student observations"
+            />
+            <Text strong>Enable student observations</Text>
+          </Space>
+          <Text type="secondary">
+            Teachers will see student observations in the teacher app only when
+            enabled. Admins can turn this off at any time.
+          </Text>
+        </Space>
       </Space>
     </Card>
   );

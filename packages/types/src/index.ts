@@ -213,6 +213,7 @@ export interface ISchoolInfo {
 /** Optional school-level feature flags exposed to authenticated apps. */
 export interface SchoolFeatures {
   attributeEvaluation: boolean;
+  observations: boolean;
 }
 
 /**
@@ -336,22 +337,22 @@ export interface IObservation {
     _id: string;
     firstName: string;
     lastName: string;
-  };
+  } | null;
   teacherId: {
     _id: string;
     firstName: string;
     lastName: string;
-  };
-  category: {
+  } | null;
+  subjectId: {
     _id: string;
     name: string;
-    minScore: number;
-    maxScore: number;
-  };
-  score: number;
+  } | null;
   description: string;
   date: string;
+  schoolYear: string;
+  term: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -391,6 +392,51 @@ export interface IActionPlan {
 // Badges
 // ---------------------------------------------------------------------------
 
+export interface IBadgeCriterionBase {
+  _id: string;
+  description?: string;
+}
+
+export interface IObservationCountBadgeCriterion extends IBadgeCriterionBase {
+  type: 'observationCount';
+  minObservations?: number | null;
+}
+
+export interface IScoreThresholdBadgeCriterion extends IBadgeCriterionBase {
+  type: 'scoreThreshold';
+  attributeCategoryId?: string | null;
+  minScore?: number | null;
+}
+
+export interface IActionPlanProgressBadgeCriterion extends IBadgeCriterionBase {
+  type: 'actionPlanProgress';
+  actionPlanId?: string | null;
+  minProgress?: number | null;
+}
+
+export interface IAttributeEvaluationAverageBadgeCriterion
+  extends IBadgeCriterionBase {
+  type: 'attributeEvaluationAverage';
+  minScore?: number | null;
+  scope?: 'yearly' | 'allTime' | null;
+}
+
+export interface ICustomBadgeCriterion extends IBadgeCriterionBase {
+  type: 'custom';
+}
+
+export type IBadgeCriterion =
+  | IObservationCountBadgeCriterion
+  | IScoreThresholdBadgeCriterion
+  | IActionPlanProgressBadgeCriterion
+  | IAttributeEvaluationAverageBadgeCriterion
+  | ICustomBadgeCriterion;
+
+export type IBadgeCriteria = IBadgeCriterion & {
+  badgeDefinitionId: string;
+  createdAt: string;
+};
+
 export interface IBadgeDefinition {
   _id: string;
   name: string;
@@ -404,31 +450,7 @@ export interface IBadgeDefinition {
     email: string;
     role: string;
   };
-  criteria: {
-    _id: string;
-    type: string;
-    attributeCategoryId?: string | null;
-    minScore?: number | null;
-    actionPlanId?: string | null;
-    minProgress?: number | null;
-    minObservations?: number | null;
-    scope?: string | null;
-    description?: string;
-  }[];
-  createdAt: string;
-}
-
-export interface IBadgeCriteria {
-  _id: string;
-  badgeDefinitionId: string;
-  type: 'scoreThreshold' | 'actionPlanProgress' | 'observationCount' | 'custom' | 'attributeEvaluationAverage';
-  attributeCategoryId?: string | null;
-  minScore?: number | null;
-  actionPlanId?: string | null;
-  minProgress?: number | null;
-  minObservations?: number | null;
-  scope?: 'yearly' | 'allTime' | null;
-  description?: string;
+  criteria: IBadgeCriterion[];
   createdAt: string;
 }
 

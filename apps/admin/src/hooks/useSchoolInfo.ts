@@ -167,7 +167,7 @@ export const useSchoolInfo = (enabled = true) => {
     await refetch();
   };
 
-  const updateFeatures = async (features: SchoolFeatures) => {
+  const updateFeatures = async (features: Partial<SchoolFeatures>) => {
     const result = await patch({
       url: `${basePath}/features`,
       body: features,
