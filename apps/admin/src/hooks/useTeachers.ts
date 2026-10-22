@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useApi } from '@/hooks/useApi';
 import type { IUser } from '@/components/users/UserEditDrawer';
@@ -22,16 +21,14 @@ export const useTeachers = ({
   const queryClient = useQueryClient();
   const { get, put, del, putMutation, deleteMutation } = useApi();
 
-  const [currentPage, setCurrentPage] = useState(page);
-
   const params = new URLSearchParams();
-  params.set('page', String(currentPage));
+  params.set('page', String(page));
   params.set('limit', String(pageSize));
   // The admin teacher directory must show suspended teachers so they can be unsuspended.
   params.set('includeSuspended', 'true');
 
   const fetchUrl = `/adminUser/teachers?${params.toString()}`;
-  const queryKey = ['/adminUser/teachers', { page: currentPage, pageSize, includeSuspended: true }];
+  const queryKey = ['/adminUser/teachers', { page, pageSize, includeSuspended: true }];
 
   const {
     data: raw,
@@ -71,7 +68,6 @@ export const useTeachers = ({
     total: paginationMeta.total,
     currentPage: paginationMeta.page,
     pageSize: paginationMeta.limit,
-    setPage: setCurrentPage,
 
     isLoading,
     isError,
