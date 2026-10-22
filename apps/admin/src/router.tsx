@@ -22,6 +22,7 @@ import AttributeCategoriesPage from "./features/admin/pages/AttributeCategoriesP
 import AttributeEvaluationsPage from "./features/admin/pages/AttributeEvaluationsPage";
 import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
 import BadgeAwardsPage from "./features/admin/pages/badge/BadgeAwardsPage";
+import GiftsPage from "./features/admin/pages/badge/GiftsPage";
 import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
@@ -213,6 +214,11 @@ export const router = createBrowserRouter([
             path: "awards",
             element: <BadgeAwardsPage />,
             handle: { crumb: () => "Awards" },
+          },
+          {
+            path: "gifts",
+            element: <GiftsPage />,
+            handle: { crumb: () => "Gifts" },
           },
         ],
       },

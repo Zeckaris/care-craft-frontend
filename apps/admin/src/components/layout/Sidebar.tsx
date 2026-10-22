@@ -119,6 +119,10 @@ const menuItems: SidebarMenuItemType[] = [
         key: "/app/badges/awards",
         label: <Link to="/app/badges/awards">Awards</Link>,
       },
+      {
+        key: "/app/badges/gifts",
+        label: <Link to="/app/badges/gifts">Gifts</Link>,
+      },
     ],
   },
   {
