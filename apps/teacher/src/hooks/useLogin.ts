@@ -23,7 +23,7 @@ export const useLogin = () => {
     setError(null);
     try {
       const body = mfaCode ? { email, password, mfaCode } : { email, password };
-      const res = await post({ url: '/auth/signin', body });
+      const res = await post({ url: '/auth/signin', body, toast: false });
 
       // MFA step 1 — backend returns success:true but error.mfaRequired:true
       if (res.success && res.error?.mfaRequired) {
@@ -38,7 +38,6 @@ export const useLogin = () => {
         if (role !== 'teacher') {
           const msg = `Access denied. This app is for teachers only. Your role is "${role}".`;
           setError(msg);
-          toast.error(msg);
           return null;
         }
 
@@ -66,7 +65,6 @@ export const useLogin = () => {
       // Suspended account
       if (axiosErr?.response?.status === 403 && backendMsg) {
         setError(backendMsg);
-        toast.error(backendMsg);
         return null;
       }
 

@@ -18,7 +18,7 @@ export const useLogout = () => {
 
   const logout = async () => {
     try {
-      await post({ url: '/auth/signout' });
+      await post({ url: '/auth/signout', toast: false });
     } catch {
       console.warn('Backend logout failed, proceeding locally');
     } finally {

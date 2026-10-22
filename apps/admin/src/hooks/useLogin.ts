@@ -20,7 +20,7 @@ export const useLogin = () => {
     setError(null);
     try {
       const body = mfaCode ? { email, password, mfaCode } : { email, password };
-      const res = await post({ url: '/auth/signin', body });
+      const res = await post({ url: '/auth/signin', body, toast: false });
 
       if (res.success && res.error?.mfaRequired) {
         message.info('A verification code has been sent to your email.');

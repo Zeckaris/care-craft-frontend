@@ -45,7 +45,7 @@ import { capitalizeFirstLetter, clearUser } from '@carecraft/utils';
 // is not coupled to a specific Axios instance.
 type UseApiFn = () => {
   get: (url: string, options?: Record<string, unknown>) => any;
-  post: (vars: { url: string; body?: unknown }) => Promise<any>;
+  post: (vars: { url: string; body?: unknown; toast?: boolean }) => Promise<any>;
 };
 
 // ---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ export function makeUseLogin(useApi: UseApiFn, callbacks: LoginCallbacks = {}) {
       setError(null);
       try {
         const body = mfaCode ? { email, password, mfaCode } : { email, password };
-        const res = await post({ url: '/auth/signin', body });
+        const res = await post({ url: '/auth/signin', body, toast: false });
 
         if (res.success && res.error?.mfaRequired) {
           onMfaRequired?.('A verification code has been sent to your email.');
@@ -194,7 +194,7 @@ export function makeUseLogout(useApi: UseApiFn, callbacks: LogoutCallbacks = {})
 
     const logout = async () => {
       try {
-        await post({ url: '/auth/signout' });
+        await post({ url: '/auth/signout', toast: false });
       } catch {
         console.warn('Backend logout failed, proceeding locally');
       } finally {
