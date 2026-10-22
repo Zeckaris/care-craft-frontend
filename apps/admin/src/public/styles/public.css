@@ -338,7 +338,7 @@ section {
 }
 
 /* ==========================================================================
-   SLIDER (SCREENSHOT CAROUSEL)
+   SLIDER (ROTATING SCREENSHOT WHEEL)
    ========================================================================== */
 .landing-slider {
   background: var(--bg-light) !important;
@@ -346,43 +346,246 @@ section {
   padding: 100px 40px !important;
 }
 
-.carousel-container {
+.wheel-gallery {
+  --wheel-card-width: min(48%, 620px);
+  --wheel-frame-height: clamp(250px, 34vw, 430px);
+  --wheel-side-shift: calc(var(--wheel-card-width) * 0.86);
+  position: relative;
   max-width: 1100px;
   margin: 0 auto;
   border-radius: 24px;
-  padding: 24px;
-  background: #ffffff;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-light);
+  outline: none;
 }
 
-.carousel-slide {
-  border-radius: 16px;
-  overflow: hidden;
+.wheel-gallery:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 6px;
+}
+
+.wheel-stage {
   position: relative;
-  background: #000;
+  height: calc(var(--wheel-frame-height) + 28px);
+  overflow: hidden;
+  perspective: 1600px;
 }
 
-.landing-slider img {
-  width: 100%;
-  display: block;
-  transition: transform 6s ease;
+.wheel-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--wheel-card-width);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transform-origin: center center;
+  transition:
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    filter 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform, opacity;
 }
 
-.carousel-slide:hover img {
-  transform: scale(1.05);
-}
-
-.slick-dots li button {
-  background: var(--primary) !important;
-  opacity: 0.3;
-}
-
-.slick-dots li.slick-active button {
-  background: var(--primary) !important;
+.wheel-card[data-offset="0"] {
+  z-index: 3;
   opacity: 1;
-  width: 24px;
-  border-radius: 4px;
+  filter: none;
+  cursor: default;
+  transform: translate(-50%, -50%) translateX(0) scale(1) rotateY(0deg);
+}
+
+.wheel-card[data-offset="-1"] {
+  z-index: 2;
+  opacity: 0.66;
+  filter: saturate(0.88) brightness(0.92);
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--wheel-side-shift) * -1)) scale(0.8) rotateY(7deg);
+}
+
+.wheel-card[data-offset="1"] {
+  z-index: 2;
+  opacity: 0.66;
+  filter: saturate(0.88) brightness(0.92);
+  transform: translate(-50%, -50%) translateX(var(--wheel-side-shift))
+    scale(0.8) rotateY(-7deg);
+}
+
+.wheel-card[data-offset="-2"] {
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--wheel-side-shift) * -2)) scale(0.64) rotateY(12deg);
+}
+
+.wheel-card[data-offset="2"] {
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--wheel-side-shift) * 2)) scale(0.64) rotateY(-12deg);
+}
+
+.wheel-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--wheel-frame-height);
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid var(--border-light);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.9),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #f7f4f8 0%, #ece7ef 100%);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.wheel-card[data-offset="0"] .wheel-frame {
+  box-shadow: var(--shadow-hover);
+}
+
+.wheel-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 12px;
+  user-select: none;
+}
+
+.wheel-card:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 6px;
+  border-radius: 22px;
+}
+
+.wheel-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid rgba(124, 36, 75, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--primary);
+  font-size: 20px;
+  cursor: pointer;
+  transform: translateY(-50%);
+  box-shadow: var(--shadow-md);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.wheel-nav:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.wheel-nav--prev {
+  left: 12px;
+}
+
+.wheel-nav--next {
+  right: 12px;
+}
+
+.wheel-nav:focus-visible,
+.wheel-dot:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 3px;
+}
+
+.wheel-caption {
+  min-height: 28px;
+  margin-top: 18px;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.wheel-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.wheel-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  opacity: 0.28;
+  cursor: pointer;
+  transition:
+    width var(--transition-normal),
+    opacity var(--transition-normal),
+    background var(--transition-normal);
+}
+
+.wheel-dot[data-active] {
+  width: 26px;
+  opacity: 1;
+}
+
+.wheel-dot:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .wheel-gallery {
+    --wheel-card-width: min(84%, 440px);
+    --wheel-frame-height: clamp(260px, 62vw, 440px);
+  }
+
+  .wheel-nav {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+  }
+
+  .wheel-nav--prev {
+    left: 4px;
+  }
+
+  .wheel-nav--next {
+    right: 4px;
+  }
+
+  .wheel-frame {
+    padding: 10px;
+    border-radius: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wheel-card,
+  .wheel-dot,
+  .wheel-nav {
+    transition: none;
+  }
 }
 
 /* ==========================================================================
@@ -767,13 +970,6 @@ section {
   }
 }
 
-/* ==========================================================================
-   CAROUSEL ARROWS
-   ========================================================================== */
-.ant-carousel .slick-prev::before,
-.ant-carousel .slick-next::before {
-  color: #7c244b !important; /* Your --primary color */
-}
 /* ==========================================================================
    TWO-COLUMN FAQ LAYOUT
    ========================================================================== */
@@ -1184,9 +1380,4 @@ section {
   .hero-subtitle {
     font-size: 18px !important;
   }
-}
-
-.ant-carousel .slick-prev::before,
-.ant-carousel .slick-next::before {
-  color: #7c244b !important; /* Your --primary color */
 }

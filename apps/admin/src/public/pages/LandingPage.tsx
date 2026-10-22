@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from "react";
+import type { FocusEvent, KeyboardEvent, TouchEvent } from "react";
 import { Helmet } from "@dr.pogodin/react-helmet";
-import { Button, Typography, Row, Col, Carousel, Space, Collapse } from "antd";
+import { Button, Typography, Row, Col, Space, Collapse } from "antd";
 import { Link } from "react-router-dom";
 import {
   CheckCircleOutlined,
@@ -8,10 +10,277 @@ import {
   BulbOutlined,
   TeamOutlined,
   HeartOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from "@ant-design/icons";
 import "@/public/styles/public.css";
 
 const { Title, Paragraph } = Typography;
+
+type GalleryItem = {
+  src: string;
+  alt: string;
+  caption?: string;
+};
+
+const LANDING_GALLERY_ITEMS: GalleryItem[] = [
+  {
+    src: "/images/landing_page_image_1.webp",
+    alt: "Admin dashboard showing student and teacher totals, attendance status, and sections that need support",
+  },
+  {
+    src: "/images/landing_page_image_2.webp",
+    alt: "Student badge awards page listing students, badges, terms, gifts, and award dates",
+  },
+  {
+    src: "/images/landing_page_image_3.webp",
+    alt: "Teacher dashboard showing assigned sections, homeroom roles, total students, and class cards",
+  },
+  {
+    src: "/images/landing_page_image_4.webp",
+    alt: "Mobile teacher page for awarding a badge, with the student summary and badges awarded this term",
+  },
+  {
+    src: "/images/landing_page_image_5.webp",
+    alt: "Mobile teacher schedule showing the Thursday timetable, lesson times, and a school day finished notice",
+  },
+  {
+    src: "/images/landing_page_image_6.webp",
+    alt: "Mobile teacher dashboard showing assigned sections, student observations, and class cards",
+  },
+  {
+    src: "/images/landing_page_image_7.webp",
+    alt: "Enrollment management page listing students, grades, school year, status, and enrollment dates",
+  },
+  {
+    src: "/images/landing_page_image_8.webp",
+    alt: "Branding settings page with a live preview of the admin interface and color theme options",
+  },
+];
+
+const AUTOPLAY_DELAY = 4500;
+const SWIPE_THRESHOLD = 48;
+const GALLERY_WINDOW = 2;
+
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
+function ScreenshotWheel() {
+  const items = LANDING_GALLERY_ITEMS;
+  const itemCount = items.length;
+  const [position, setPosition] = useState(itemCount);
+  const [hoverPaused, setHoverPaused] = useState(false);
+  const [focusPaused, setFocusPaused] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const suppressClickUntil = useRef(0);
+
+  const centerIndex = ((position % itemCount) + itemCount) % itemCount;
+  const centerItem = items[centerIndex];
+  const paused = hoverPaused || focusPaused;
+
+  const goBy = (delta: number) => {
+    setPosition((current) => current + delta);
+  };
+
+  const goToIndex = (targetIndex: number) => {
+    let delta = targetIndex - centerIndex;
+
+    if (delta > itemCount / 2) delta -= itemCount;
+    if (delta < -itemCount / 2) delta += itemCount;
+
+    if (delta !== 0) goBy(delta);
+  };
+
+  useEffect(() => {
+    if (paused || prefersReducedMotion) return;
+
+    const timer = window.setTimeout(() => {
+      setPosition((current) => current + 1);
+    }, AUTOPLAY_DELAY);
+
+    return () => window.clearTimeout(timer);
+  }, [paused, position, prefersReducedMotion]);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goBy(-1);
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goBy(1);
+    }
+  };
+
+  const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
+    const target = event.target;
+
+    if (target instanceof HTMLElement && target.matches(":focus-visible")) {
+      setFocusPaused(true);
+    }
+  };
+
+  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
+    const nextFocus = event.relatedTarget;
+
+    if (
+      !(nextFocus instanceof Node) ||
+      !event.currentTarget.contains(nextFocus)
+    ) {
+      setFocusPaused(false);
+    }
+  };
+
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+
+    if (touch) {
+      touchStart.current = { x: touch.clientX, y: touch.clientY };
+    }
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const start = touchStart.current;
+    touchStart.current = null;
+
+    if (!start) return;
+
+    const touch = event.changedTouches[0];
+
+    if (!touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+
+    if (
+      Math.abs(deltaX) < SWIPE_THRESHOLD ||
+      Math.abs(deltaX) <= Math.abs(deltaY)
+    ) {
+      return;
+    }
+
+    suppressClickUntil.current = Date.now() + 500;
+    goBy(deltaX < 0 ? 1 : -1);
+  };
+
+  const virtualPositions = Array.from(
+    { length: GALLERY_WINDOW * 2 + 1 },
+    (_, index) => position - GALLERY_WINDOW + index,
+  );
+
+  return (
+    <div
+      className="wheel-gallery"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="CareCraft product screenshots"
+      tabIndex={0}
+      onMouseEnter={() => setHoverPaused(true)}
+      onMouseLeave={() => setHoverPaused(false)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="wheel-stage">
+        {virtualPositions.map((virtualPosition) => {
+          const offset = virtualPosition - position;
+          const item =
+            items[((virtualPosition % itemCount) + itemCount) % itemCount];
+          const isCenter = offset === 0;
+          const isHidden = Math.abs(offset) > 1;
+
+          return (
+            <button
+              key={virtualPosition}
+              type="button"
+              className="wheel-card"
+              data-offset={offset}
+              tabIndex={isCenter || isHidden ? -1 : 0}
+              aria-hidden={isHidden || undefined}
+              aria-label={
+                isCenter
+                  ? `Current screenshot: ${item.alt}`
+                  : `Show screenshot: ${item.alt}`
+              }
+              onClick={() => {
+                if (
+                  Date.now() >= suppressClickUntil.current &&
+                  Math.abs(offset) === 1
+                ) {
+                  goBy(offset);
+                }
+              }}
+            >
+              <span className="wheel-frame">
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  loading={isHidden ? "lazy" : "eager"}
+                  decoding="async"
+                  draggable={false}
+                />
+              </span>
+            </button>
+          );
+        })}
+
+        <button
+          type="button"
+          className="wheel-nav wheel-nav--prev"
+          aria-label="Previous screenshot"
+          onClick={() => goBy(-1)}
+        >
+          <LeftOutlined aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="wheel-nav wheel-nav--next"
+          aria-label="Next screenshot"
+          onClick={() => goBy(1)}
+        >
+          <RightOutlined aria-hidden="true" />
+        </button>
+      </div>
+
+      <div className="wheel-caption" aria-live="polite">
+        {centerItem.caption ?? ""}
+      </div>
+
+      <div className="wheel-dots" role="group" aria-label="Choose screenshot">
+        {items.map((item, index) => (
+          <button
+            key={item.src}
+            type="button"
+            className="wheel-dot"
+            data-active={index === centerIndex || undefined}
+            aria-label={`Show screenshot ${index + 1} of ${itemCount}: ${item.alt}`}
+            aria-current={index === centerIndex ? "true" : undefined}
+            onClick={() => goToIndex(index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   return (
@@ -84,28 +353,7 @@ export default function LandingPage() {
             See CareCraft in Action
           </Title>
 
-          <div className="carousel-container">
-            <Carousel
-              autoplay
-              speed={800}
-              autoplaySpeed={4000}
-              dots={true}
-              arrows={true}
-            >
-              <div className="carousel-slide">
-                <img src="/images/sc1.png" alt="Dashboard" />
-              </div>
-              <div className="carousel-slide">
-                <img src="/images/sc2.png" alt="Badges" />
-              </div>
-              <div className="carousel-slide">
-                <img src="/images/sc3.png" alt="Assessment" />
-              </div>
-              <div className="carousel-slide">
-                <img src="/images/sc5.png" alt="Attributes" />
-              </div>
-            </Carousel>
-          </div>
+          <ScreenshotWheel />
         </div>
       </section>
 
