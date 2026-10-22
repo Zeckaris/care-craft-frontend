@@ -27,6 +27,9 @@ import MarkEntryPage from '@/pages/grades/MarkEntryPage';
 import AttributeSectionsPage from '@/pages/attributes/AttributeSectionsPage';
 import AttributeRosterPage from '@/pages/attributes/AttributeRosterPage';
 import AttributeEvaluationPage from '@/pages/attributes/AttributeEvaluationPage';
+import BadgeSectionsPage from '@/pages/badges/BadgeSectionsPage';
+import BadgeRosterPage from '@/pages/badges/BadgeRosterPage';
+import BadgeStudentPage from '@/pages/badges/BadgeStudentPage';
 import ObservationsPage from '@/pages/observations/ObservationsPage';
 import ProfilePage from '@/pages/profile/ProfilePage';
 import { AppShell } from '@/components/layout/AppShell';
@@ -105,6 +108,18 @@ export const router = createBrowserRouter([
             <AttributeEvaluationPage />
           </RequireFeature>
         ),
+      },
+      {
+        path: 'badges',
+        element: <BadgeSectionsPage />,
+      },
+      {
+        path: 'badges/:sectionId',
+        element: <BadgeRosterPage />,
+      },
+      {
+        path: 'badges/:sectionId/:studentId',
+        element: <BadgeStudentPage />,
       },
       {
         path: 'observations',

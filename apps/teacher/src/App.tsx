@@ -41,7 +41,8 @@ export default function App() {
         // fallback. Anything else risks serving a stale palette.
         dehydrateOptions: {
           shouldDehydrateQuery: (query) =>
-            String(query.queryKey[0]) !== BRANDING_QUERY_KEY[0],
+            String(query.queryKey[0]) !== BRANDING_QUERY_KEY[0] &&
+            query.meta?.persist !== false,
         },
       }}
     >
