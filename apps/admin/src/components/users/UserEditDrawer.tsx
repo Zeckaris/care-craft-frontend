@@ -1,9 +1,9 @@
-import { Drawer, Form, Input, Button, Space, Typography, Avatar } from "antd";
+import { Drawer, Form, Input, Button, Space, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import type { FormInstance } from "antd";
-import dayjs from "dayjs";
-
-const { Text } = Typography;
+import { useEffect } from "react";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
 
 export interface IUser {
   _id: string;
@@ -38,8 +38,16 @@ export const UserEditDrawer = ({
   const isView = mode === "view";
   const isEdit = mode === "edit";
 
-  const formatDate = (dateStr?: string) =>
-    dateStr ? dayjs(dateStr).format("MMMM D, YYYY") : "—";
+  useEffect(() => {
+    if (open && user) {
+      form.setFieldsValue({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber || (isView ? "-" : ""),
+      });
+    }
+  }, [open, user, isView, form]);
 
   return (
     <Drawer
@@ -76,6 +84,7 @@ export const UserEditDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           firstName: user?.firstName || "",
           lastName: user?.lastName || "",
@@ -121,17 +130,20 @@ export const UserEditDrawer = ({
         {/* Read-only Info (View Mode Only) */}
         {isView && (
           <>
-            <Form.Item label="Created">
-              <Text>{formatDate(user?.createdAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Created"
+              value={formatDateTime(user?.createdAt)}
+            />
 
-            <Form.Item label="Last Login">
-              <Text>{formatDate(user?.lastLogin)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Last Login"
+              value={formatDateTime(user?.lastLogin)}
+            />
 
-            <Form.Item label="Last Updated">
-              <Text>{formatDate(user?.updatedAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Last Updated"
+              value={formatDateTime(user?.updatedAt)}
+            />
           </>
         )}
       </Form>

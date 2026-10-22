@@ -24,10 +24,10 @@ export default function FeaturesPage() {
   return (
     <>
       <Helmet>
-        <title>CareCraft Features - Parent Teacher Collaboration Tools</title>
+        <title>CareCraft Features | Complete School Management System</title>
         <meta
           name="description"
-          content="Discover CareCraft's powerful features for schools, teachers, and parents. From student tracking to collaborative action plans."
+          content="Explore CareCraft's tools for school administrators, teachers and parents: enrollment, sections, timetables, attendance, results, observations and badges."
         />
       </Helmet>
 
@@ -53,7 +53,7 @@ export default function FeaturesPage() {
               Tools for School Administrators
             </Title>
             <Paragraph className="section-subtitle">
-              Manage operations, maintain absolute safety, and align resources to support classrooms.
+              Set up your school, run the timetable and keep an eye on every classroom.
             </Paragraph>
 
             <Row gutter={[32, 32]}>
@@ -62,16 +62,16 @@ export default function FeaturesPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
                     <SettingOutlined style={{ fontSize: "28px", color: "#7c244b" }} />
                     <Title level={4} style={{ fontSize: "22px", fontWeight: 700, margin: 0 }}>
-                      Streamlined Setup and Management
+                      Setup and Enrollment
                     </Title>
                   </div>
                   <List
                     itemLayout="horizontal"
                     dataSource={[
-                      "Easily assign teachers to students and classes for personalized support",
-                      "Create and organize subjects with custom assessments to track progress",
-                      "Securely onboard teachers and connect parents to their children",
-                      "Centralize all assignments and student data for quick access",
+                      "Set up the academic calendar, grades, subjects and assessments",
+                      "Enroll students one by one or import them from Excel",
+                      "Generate sections automatically, then adjust sizes and move students between sections",
+                      "Invite teachers, coordinators and parents with secure invitation codes",
                     ]}
                     renderItem={(item) => (
                       <div className="feature-list-item">
@@ -88,17 +88,17 @@ export default function FeaturesPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
                     <SettingOutlined style={{ fontSize: "28px", color: "#7c244b" }} />
                     <Title level={4} style={{ fontSize: "22px", fontWeight: 700, margin: 0 }}>
-                      Customization and Control
+                      Teaching, Insight and Control
                     </Title>
                   </div>
                   <List
                     itemLayout="horizontal"
                     dataSource={[
-                      "Personalize your school’s look with custom colors and fonts",
-                      "Enhance security with multi-factor authentication and session management",
-                      "Send important announcements to teachers, parents, or everyone",
-                      "Generate and export reports for insights and compliance",
-                      "Safely manage data with controlled reset options",
+                      "Assign homeroom and subject teachers, then generate and publish the school-wide timetable",
+                      "Watch attendance, results and the classes that need support on a live dashboard",
+                      "Review results by section and subject",
+                      "Send announcements to teachers, admins, coordinators, parents or students",
+                      "Apply your color palette and fonts, add email verification at sign-in, and switch features such as observations on or off",
                     ]}
                     renderItem={(item) => (
                       <div className="feature-list-item">
@@ -118,7 +118,7 @@ export default function FeaturesPage() {
               Tools for Teachers
             </Title>
             <Paragraph className="section-subtitle">
-              Simplify student tracking, focus on holistic development, and communicate directly with families.
+              Take attendance, enter marks and record student growth from your phone, even when the network is unreliable.
             </Paragraph>
 
             <Row gutter={[24, 24]}>
@@ -133,10 +133,10 @@ export default function FeaturesPage() {
                   <List
                     itemLayout="horizontal"
                     dataSource={[
-                      "Record daily insights on academics, skills, and well-being",
-                      "Enter grades and assessment results effortlessly",
-                      "Highlight areas for improvement with notes",
-                      "Create customizable reports to share progress over time",
+                      "Enter marks out of each assessment's weight, even without a connection",
+                      "Complete and lock a stage once the marks are final",
+                      "Record observations about a student's progress and behavior",
+                      "Evaluate the character and soft-skill attributes your school defines",
                     ]}
                     renderItem={(item) => (
                       <div className="feature-list-item">
@@ -153,16 +153,16 @@ export default function FeaturesPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
                     <LineChartOutlined style={{ fontSize: "24px", color: "#2081c3" }} />
                     <Title level={4} style={{ fontSize: "20px", fontWeight: 700, margin: 0 }}>
-                      Collaborate on Action Plans
+                      Work Without a Reliable Connection
                     </Title>
                   </div>
                   <List
                     itemLayout="horizontal"
                     dataSource={[
-                      "Build shared plans to address student needs",
-                      "Track and update progress together",
-                      "Save effective plans as templates for future use",
-                      "Add notes and ratings to monitor improvements",
+                      "Install CareCraft on your phone like an app",
+                      "Take attendance offline and let it sync when the network returns",
+                      "Enter marks offline and sync them later",
+                      "Check your published timetable offline, with the current period highlighted",
                     ]}
                     renderItem={(item) => (
                       <div className="feature-list-item">
@@ -179,15 +179,15 @@ export default function FeaturesPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
                     <LineChartOutlined style={{ fontSize: "24px", color: "#2081c3" }} />
                     <Title level={4} style={{ fontSize: "20px", fontWeight: 700, margin: 0 }}>
-                      Engage with Parents
+                      Recognize and Stay Focused
                     </Title>
                   </div>
                   <List
                     itemLayout="horizontal"
                     dataSource={[
-                      "Chat directly in a secure space per student",
-                      "Award badges to celebrate achievements",
-                      "Reuse proven strategies from shared templates",
+                      "Award badges to celebrate achievements, as a homeroom teacher",
+                      "Work only with the sections and subjects assigned to you",
+                      "Get in-app notifications that you can read and clear in one tap",
                     ]}
                     renderItem={(item) => (
                       <div className="feature-list-item">
@@ -224,6 +224,7 @@ export default function FeaturesPage() {
                     dataSource={[
                       "Switch views between multiple children easily",
                       "See at-a-glance summaries and progress trends",
+                      "Get notified when your child is absent or late",
                       "Get alerts for important updates or concerns",
                       "Review badges and achievements with your child",
                     ]}
@@ -248,11 +249,10 @@ export default function FeaturesPage() {
                   <List
                     itemLayout="horizontal"
                     dataSource={[
+                      "View your child's results",
+                      "Get insights from your child's teacher in each subject",
                       "Respond to teacher notes and suggestions",
-                      "Contribute to action plans from home",
-                      "Update and track plan steps together",
                       "Communicate securely with teachers",
-                      "Rate and refine strategies for better results",
                     ]}
                     renderItem={(item) => (
                       <div className="feature-list-item">
@@ -272,25 +272,25 @@ export default function FeaturesPage() {
               System Overview
             </Title>
             <Paragraph className="section-subtitle">
-              Learn about the robust security and modern engineering that powers CareCraft's parent-teacher network.
+              See how CareCraft fits together, from school setup to daily classroom work.
             </Paragraph>
 
             <Collapse accordion bordered={false} className="faq-collapse">
               <Collapse.Panel header="How It All Works Together" key="1">
                 <Paragraph style={{ fontSize: "16px", lineHeight: "1.8", color: "var(--text-main)", margin: 0 }}>
-                  Seamless flow from school setup to daily tracking, collaborative planning, progress monitoring, and insightful reporting.
+                  The school sets up its calendar, grades and subjects, enrolls students, builds sections and generates the timetable. Teachers then run each day from their phones, taking attendance and entering marks, while admins follow live insights.
                 </Paragraph>
               </Collapse.Panel>
               
               <Collapse.Panel header="Technology Behind CareCraft" key="2">
                 <Paragraph style={{ fontSize: "16px", lineHeight: "1.8", color: "var(--text-main)", margin: 0 }}>
-                  Built with modern tools: Node/Express for the backend, React for the frontend, TypeScript for reliability, MongoDB for data storage. We use Ant Design (AntD) for the admin interface to provide powerful, customizable components for school administrators. Chakra UI powers the user-friendly interfaces for parents, teachers, and students, ensuring a responsive and accessible experience. Additionally, Redis is used for efficient job management, such as storing notifications and sending them intelligently: processing urgent ones immediately while handling non-urgent ones when the server is less busy to optimize performance.
+                  CareCraft is a modern web application. The admin interface is built with React, TypeScript and Ant Design, and the teacher app is an installable, phone-friendly app built with React, TypeScript and Tailwind. A Node and Express backend with MongoDB stores the data, and a background job queue handles notifications.
                 </Paragraph>
               </Collapse.Panel>
 
               <Collapse.Panel header="Key Components" key="3">
                 <Paragraph style={{ fontSize: "16px", lineHeight: "1.8", color: "var(--text-main)", margin: 0 }}>
-                  Includes classes, subjects, teacher profiles, student observations, action plans, reports, badges, parent accounts, secure chats, and more – all designed for simplicity and security.
+                  Includes academic calendars, grades and sections, subjects and assessments, teacher assignments, timetables, attendance, results, observations, attribute evaluations, badges and notifications, all designed for simplicity and security.
                 </Paragraph>
               </Collapse.Panel>
             </Collapse>

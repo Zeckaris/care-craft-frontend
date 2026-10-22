@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Button, Input, Modal, message, Typography } from "antd";
+import { Button, Input, Modal, Typography } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { AttributeCategoryDrawer } from "@/components/attributeCategories/AttributeCategoryDrawer";
 import {
   useAttributeCategories,
@@ -90,11 +91,8 @@ export default function AttributeCategoriesPage() {
     if (!deleteConfirm.id) return;
     try {
       await remove(deleteConfirm.id);
-      message.success("Attribute category deleted");
-    } catch (err: any) {
-      message.error(
-        err?.response?.data?.message || "Failed to delete category"
-      );
+    } catch {
+      // error toast is shown globally
     } finally {
       setDeleteConfirm({ open: false });
     }
@@ -112,12 +110,8 @@ export default function AttributeCategoriesPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} categories deleted`);
-        } catch {
-          message.error("Failed to delete some categories");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "category");
       },
     });
   };
@@ -128,16 +122,12 @@ export default function AttributeCategoriesPage() {
 
       if (selectedCategory) {
         await update(selectedCategory._id, values);
-        message.success("Category updated successfully");
       } else {
         await create(values);
-        message.success("Category created successfully");
       }
       closeDrawer();
     } catch (err: any) {
       if (err?.errorFields) return; // Form validation error
-      const msg = err?.response?.data?.message || "Operation failed";
-      message.error(msg);
     }
   };
 
@@ -164,7 +154,7 @@ export default function AttributeCategoriesPage() {
       title: "Score Range",
       render: (cat: IAttributeCategory) => (
         <Text strong>
-          {cat.minScore} – {cat.maxScore}
+          {cat.minScore} to {cat.maxScore}
         </Text>
       ),
       width: 120,

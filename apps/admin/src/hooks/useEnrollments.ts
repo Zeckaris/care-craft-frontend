@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 import { useApi } from '@/hooks/useApi';
 import type { IAcademicCalendar } from './useAcademicCalendars';
 
@@ -29,6 +30,7 @@ interface PaginationMeta {
 
 interface UseEnrollmentsParams {
   gradeId?: string;
+  sectionId?: string;
   schoolYear?: string;
   isActive?: boolean;
   pagination?: { page: number; pageSize: number };
@@ -68,7 +70,7 @@ const useCurrentAcademicCalendar = () => {
     (!newRegEnd || today <= newRegEnd);
 
   const registrationWindowText = currentCalendar
-    ? `${regStart ? regStart.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} — ${
+    ? `${regStart ? regStart.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} to ${
         newRegEnd ? newRegEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'
       }`
     : 'No active calendar set';
@@ -86,6 +88,7 @@ const useCurrentAcademicCalendar = () => {
 
 export const useEnrollments = ({
   gradeId,
+  sectionId,
   schoolYear,
   isActive,
   pagination = { page: 1, pageSize: 10 },
@@ -96,6 +99,7 @@ export const useEnrollments = ({
 
   const params = new URLSearchParams();
   if (gradeId) params.set('gradeId', gradeId);
+  if (sectionId) params.set('sectionId', sectionId);
   if (schoolYear) params.set('schoolYear', schoolYear);
   if (isActive !== undefined) params.set('isActive', String(isActive));
   if (pagination) {
@@ -105,7 +109,7 @@ export const useEnrollments = ({
   if (search) params.set('search', search);
 
   const fetchUrl = `/enrollment?${params.toString()}`;
-  const queryKey = ['/enrollment', { gradeId, schoolYear, isActive, pagination, search }];
+  const queryKey = ['/enrollment', { gradeId, sectionId, schoolYear, isActive, pagination, search }];
 
   const {
     data: raw,
@@ -139,7 +143,7 @@ export const useEnrollments = ({
   };
 
   const bulkCreate = async (data: { studentIds: string[]; gradeId: string }) => {
-    const result = await post({ url: '/enrollment/bulk', body: data });
+    const result = await post({ url: '/enrollment/bulk', body: data, toast: false });
     queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
     return result;
   };
@@ -162,10 +166,14 @@ export const useEnrollments = ({
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `/enrollment/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
+        return result;
+      }),
+    );
 
   return {
     // Data

@@ -1,18 +1,15 @@
-import { Avatar, Typography } from "antd";
+import { Avatar, Tag, Typography } from "antd";
 import { formatDistanceToNow } from "date-fns";
+import type { DashboardRecentActivity } from "@/hooks/useDashboardStats";
 
 const { Text } = Typography;
 
-export interface Activity {
-  id: string;
-  message: string;
-  timestamp: Date;
-  actionInitial: string;
+interface ActivityFeedProps {
+  activities: DashboardRecentActivity[];
 }
 
-interface ActivityFeedProps {
-  activities: Activity[];
-}
+const roleLabel = (role: DashboardRecentActivity["actorRole"]) =>
+  role === "admin" ? "Admin" : "Coordinator";
 
 export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
   if (activities.length === 0) {
@@ -54,53 +51,90 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
       </Text>
 
       <div className="activity-list">
-        {activities.map((item) => (
-          <div key={item.id} className="activity-item">
-            <Avatar
-              size={28}
-              className="activity-avatar"
-              style={{
-                background: "var(--primary)",
-                fontWeight: "bold",
-                fontSize: 13,
-                flexShrink: 0,
-                color: "white !important",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
-              }}
-            >
-              {item.actionInitial}
-            </Avatar>
+        {activities.map((item) => {
+          const createdAt = new Date(item.createdAt);
+          const initial =
+            item.actorName.trim().charAt(0).toUpperCase() || "?";
 
-            <Text
-              strong
-              style={{
-                fontSize: 13,
-                color: "var(--text-dark)",
-                marginLeft: 10,
-                flex: 1,
-                minWidth: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.message}
-            </Text>
+          return (
+            <div key={item.id} className="activity-item">
+              <Avatar
+                size={28}
+                className="activity-avatar"
+                style={{
+                  background: "var(--primary)",
+                  fontWeight: "bold",
+                  fontSize: 13,
+                  flexShrink: 0,
+                  color: "var(--white)",
+                }}
+              >
+                {initial}
+              </Avatar>
 
-            <Text
-              type="secondary"
-              style={{
-                fontSize: 11,
-                color: "var(--primary)",
-                opacity: 0.9,
-                marginLeft: 8,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {formatDistanceToNow(item.timestamp, { addSuffix: true })}
-            </Text>
-          </div>
-        ))}
+              <div
+                style={{
+                  marginLeft: 10,
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Text
+                    strong
+                    style={{ fontSize: 13, color: "var(--text-dark)" }}
+                  >
+                    {item.actorName}
+                  </Text>
+                  <Tag
+                    style={{
+                      marginInlineEnd: 0,
+                      fontSize: 10,
+                      lineHeight: "16px",
+                      paddingInline: 6,
+                    }}
+                  >
+                    {roleLabel(item.actorRole)}
+                  </Tag>
+                </div>
+                <Text
+                  style={{
+                    display: "block",
+                    fontSize: 12,
+                    color: "var(--text-dark)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.message}
+                </Text>
+              </div>
+
+              <Text
+                type="secondary"
+                style={{
+                  fontSize: 11,
+                  color: "var(--primary)",
+                  opacity: 0.9,
+                  marginLeft: 8,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {Number.isNaN(createdAt.getTime())
+                  ? ""
+                  : formatDistanceToNow(createdAt, { addSuffix: true })}
+              </Text>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

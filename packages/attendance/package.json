@@ -1,0 +1,20 @@
+{
+  "name": "@carecraft/attendance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@carecraft/offline-queue": "workspace:*",
+    "@carecraft/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

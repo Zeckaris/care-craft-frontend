@@ -12,7 +12,7 @@ export default function AboutPage() {
         <title>About Amanuel & CareCraft</title>
         <meta
           name="description"
-          content="Meet Amanuel, the developer behind CareCraft a platform built to nurture every aspect of a child's growth in Ethiopian schools."
+          content="Meet Amanuel, the developer behind CareCraft, a complete school management system built to nurture every aspect of a child's growth in Ethiopian schools."
         />
       </Helmet>
 
@@ -75,7 +75,7 @@ export default function AboutPage() {
                   maxWidth: "800px",
                 }}
               >
-                Hi, I'm Amanuel, a full-stack developer and AI enthusiast from Addis Ababa, Ethiopia.
+                Hi, I'm Amanuel, a software engineer and agentic AI developer from Addis Ababa, Ethiopia.
               </Paragraph>
             </Col>
           </Row>
@@ -103,7 +103,7 @@ export default function AboutPage() {
                 margin: 0,
               }}
             >
-              This idea has been in my mind for a long time. I kept noticing that most school management platforms are built mainly to automate traditional tasks: registrations, announcements, attaching assignments, sending notices, basically replacing manual paperwork with digital versions.
+              This idea has been in my mind for a long time. I kept noticing that most school management platforms are built mainly to automate traditional tasks: registrations, announcements, attaching assignments, sending notices, basically replacing manual paperwork with digital versions and stopping there.
             </Paragraph>
 
             <Paragraph
@@ -114,18 +114,7 @@ export default function AboutPage() {
                 margin: 0,
               }}
             >
-              But I believe technology in education should do much more. It should primarily focus on nurturing students, helping them grow not just in academics, but in every aspect of life. That's why I created CareCraft: a platform that tracks and supports children's social skills, soft skills, confidence, emotional well-being, and more, things that matter just as much as grades.
-            </Paragraph>
-
-            <Paragraph
-              style={{
-                fontSize: "18px",
-                lineHeight: "1.8",
-                color: "var(--text-main)",
-                margin: 0,
-              }}
-            >
-              In our Ethiopian culture, respect and consciousness are deeply rooted values and I truly value that. At the same time, I’ve seen how these beautiful qualities can sometimes make children more timid, less confident in speaking up, or slower to develop certain social skills compared to some other environments. That observation became one of my strongest motivations: to help nurture these skills from early childhood, gently and genuinely, so every child can grow with balance and strength.
+              But I believe technology in education should do much more. It should primarily focus on nurturing students, helping them grow not just in academics, but in every aspect of life. That's why I created CareCraft: a complete school management system that also tracks and supports children's social skills, soft skills, confidence, emotional well-being, and more, things that matter just as much as grades.
             </Paragraph>
 
             <div

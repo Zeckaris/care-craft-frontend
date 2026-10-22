@@ -43,12 +43,10 @@ export default function SignInPage() {
 
     if (result && result.mfaRequired) {
       setShowMfaInput(true);
-      message.info("A verification code has been sent to your email.");
       return;
     }
 
     if (result) {
-      message.success("Login successful!");
       setTimeout(() => {
         window.location.href = "/app/dashboard";
       }, 1000);

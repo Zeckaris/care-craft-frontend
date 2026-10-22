@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Button,
-  message,
   Form,
   Modal,
   Select,
@@ -12,10 +11,12 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { StudentDrawer } from "@/components/students/StudentDrawer";
 import { ImportStudentsButton } from "@/components/students/ImportStudentsButton";
 import { useStudents, type IStudent } from "@/hooks/useStudents";
 import { useGrades } from "@/hooks/useGrades";
+import { useDebounce } from "@/hooks/useDebounce";
 import dayjs from "dayjs";
 import { Avatar, Empty } from "antd";
 import { UserOutlined } from "@ant-design/icons";
@@ -27,6 +28,7 @@ const { Text } = Typography;
 export default function StudentsPage() {
   const [gradeId, setGradeId] = useState<string | undefined>(undefined);
   const [searchText, setSearchText] = useState("");
+  const debouncedSearch = useDebounce(searchText.trim(), 300);
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -35,8 +37,6 @@ export default function StudentsPage() {
   const {
     students,
     total,
-    currentPage,
-    pageSize,
     isLoading,
     isError,
     fetchError,
@@ -51,7 +51,7 @@ export default function StudentsPage() {
   } = useStudents({
     gradeId,
     pagination,
-    search: searchText,
+    search: debouncedSearch,
   });
 
   const { grades } = useGrades();
@@ -69,7 +69,7 @@ export default function StudentsPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setPagination((p) => ({ ...p, page: 1 }));
-  }, [gradeId, searchText]);
+  }, [gradeId, debouncedSearch]);
 
   const openDrawer = (student: IStudent | null, mode: "view" | "edit") => {
     setSelectedStudent(student);
@@ -95,9 +95,8 @@ export default function StudentsPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Student deleted");
     } catch {
-      message.error("Failed to delete");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -112,12 +111,8 @@ export default function StudentsPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} students deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "student");
       },
     });
   };
@@ -126,22 +121,13 @@ export default function StudentsPage() {
     try {
       if (selectedStudent) {
         await update(selectedStudent._id, formData);
-        message.success("Student updated successfully");
       } else {
         await create(formData);
-        message.success("Student created successfully");
       }
       closeDrawer();
-    } catch (err) {
-      message.error("Failed to save student");
+    } catch {
+      // error toast is shown globally
     }
-  };
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination({
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
   };
 
   const columns = [
@@ -196,7 +182,7 @@ export default function StudentsPage() {
       render: (student: IStudent) =>
         student.dateOfBirth
           ? dayjs(student.dateOfBirth).format("MMM D, YYYY")
-          : "—",
+          : "-",
     },
     // ... rest of columns remain unchanged
     {
@@ -227,7 +213,7 @@ export default function StudentsPage() {
       render: (student: IStudent) =>
         student.admissionDate
           ? dayjs(student.admissionDate).format("MMM D, YYYY")
-          : "—",
+          : "-",
     },
   ];
 
@@ -322,8 +308,8 @@ export default function StudentsPage() {
           onDelete={handleDelete}
           onBulkDelete={handleBulkDelete}
           pagination={{
-            current: currentPage,
-            pageSize: pageSize,
+            current: pagination.page,
+            pageSize: pagination.pageSize,
             total: total,
             showSizeChanger: true,
             showQuickJumper: true,

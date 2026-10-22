@@ -1,8 +1,5 @@
-export const getUser = () => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
-};
-
-export const clearUser = () => {
-  localStorage.removeItem('user');
-};
+/**
+ * Re-exports from @carecraft/utils for backwards compatibility.
+ * Admin code can keep importing from '@/utils/auth'.
+ */
+export { getUser, clearUser } from '@carecraft/utils';

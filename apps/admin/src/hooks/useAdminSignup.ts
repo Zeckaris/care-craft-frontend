@@ -15,7 +15,7 @@ export const useAdminSignup = () => {
   const signup = async (data: any) => {
     setIsSignupSuccess(false);
 
-    const res = await post({ url: '/auth/signup', body: data });
+    const res = await post({ url: '/auth/signup', body: data, toast: false });
 
     if (res.success) {
       const { _id, firstName, role, email } = res.data.user;
@@ -37,7 +37,7 @@ export const useAdminSignup = () => {
       setIsSignupSuccess(true);
     }
 
-    // Errors are already handled in useApi / displayed via message/alert
+    // Errors are surfaced by the page-level alert.
   };
 
   return {

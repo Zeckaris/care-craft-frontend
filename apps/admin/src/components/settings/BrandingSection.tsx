@@ -24,157 +24,65 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { useSchoolInfo } from "@/hooks/useSchoolInfo";
-import { useState, useEffect } from "react";
-import { PALETTES, useTheme } from "@/context/ThemeContext";
+import { useState, useEffect, useRef } from "react";
+import { useTheme } from "@/context/ThemeContext";
+import {
+  PALETTES,
+  FONT_OPTIONS,
+  PALETTE_COLORS,
+  DEFAULT_THEME,
+  DEFAULT_FONT,
+} from "@carecraft/branding";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
 
-const FONT_OPTIONS = [
-  { value: "Roboto", label: "Roboto" },
-  { value: "Open Sans", label: "Open Sans" },
-  { value: "Ubuntu", label: "Ubuntu" },
-  { value: "Lato", label: "Lato" },
-  { value: "Montserrat", label: "Montserrat" },
-  { value: "Inter", label: "Inter" },
-  { value: "Nunito", label: "Nunito" },
-  { value: "Source Sans Pro", label: "Source Sans Pro" },
-  { value: "Mountains of Christmas", label: "Mountains of Christmas" },
-];
-
-// Map palette id to CSS variables to use in live preview
-const PALETTE_COLORS: Record<
-  string,
-  {
-    headerBg: string;
-    sidebarBg: string;
-    contentBg: string;
-    success: string;
-    danger: string;
-  }
-> = {
-  "palette-1": {
-    headerBg: "#1f4d36",
-    sidebarBg: "#2d6a4f",
-    contentBg: "#f8faf9",
-    success: "#22c55e",
-    danger: "#ef4444",
-  },
-  "palette-2": {
-    headerBg: "#047857",
-    sidebarBg: "#059669",
-    contentBg: "#f0fdf4",
-    success: "#22c55e",
-    danger: "#ef4444",
-  },
-  "palette-3": {
-    headerBg: "#881337",
-    sidebarBg: "#be123c",
-    contentBg: "#fff1f2",
-    success: "#10b981",
-    danger: "#b91c1c",
-  },
-  "palette-4": {
-    headerBg: "#0c4a6e",
-    sidebarBg: "#164e63",
-    contentBg: "#ecfeff",
-    success: "#059669",
-    danger: "#dc2626",
-  },
-  "palette-5": {
-    headerBg: "#5b21b6",
-    sidebarBg: "#6d28d9",
-    contentBg: "#faf5ff",
-    success: "#10b981",
-    danger: "#c026d3",
-  },
-  "palette-6": {
-    headerBg: "#0284c7",
-    sidebarBg: "#0369a1",
-    contentBg: "#f0f9ff",
-    success: "#22c55e",
-    danger: "#ef4444",
-  },
-  "palette-7": {
-    headerBg: "#0c2340",
-    sidebarBg: "#001233",
-    contentBg: "#f0f7ff",
-    success: "#059669",
-    danger: "#dc2626",
-  },
-  "palette-8": {
-    headerBg: "#861f2d",
-    sidebarBg: "#991b1b",
-    contentBg: "#fef2f2",
-    success: "#16a34a",
-    danger: "#b91c1c",
-  },
-  "palette-9": {
-    headerBg: "#264e36",
-    sidebarBg: "#1e3a2a",
-    contentBg: "#f4f9f4",
-    success: "#22c55e",
-    danger: "#dc2626",
-  },
-  "palette-10": {
-    headerBg: "#581c87",
-    sidebarBg: "#4c1d95",
-    contentBg: "#f4f1fb",
-    success: "#059669",
-    danger: "#e11d48",
-  },
-  "palette-11": {
-    headerBg: "#9b2c2c",
-    sidebarBg: "#7f1d1d",
-    contentBg: "#f8f5f5",
-    success: "#16a34a",
-    danger: "#b91c1c",
-  },
-  "palette-12": {
-    headerBg: "#3730a3",
-    sidebarBg: "#4338ca",
-    contentBg: "#eef2ff",
-    success: "#059669",
-    danger: "#dc2626",
-  },
-};
-
 export const BrandingSection = () => {
   const { schoolInfo, isLoading, updateBranding, isSaving } = useSchoolInfo();
-  const { fontFamily, setFontFamily } = useTheme(); // <-- Use theme context for font
+  const { previewBranding, commitBranding } = useTheme();
 
-  // Initialize state once based on schoolInfo
-  const [selectedTheme, setSelectedTheme] = useState<string>(
-    schoolInfo?.theme || "palette-1"
-  );
-  const [selectedFont, setSelectedFontState] = useState<string>(
-    schoolInfo?.fontFamily || fontFamily || "Roboto"
-  );
+  const savedTheme = schoolInfo?.theme || DEFAULT_THEME;
+  const savedFont = schoolInfo?.fontFamily || DEFAULT_FONT;
 
-  // Only set state if schoolInfo was not loaded initially
+  const [selectedTheme, setSelectedTheme] = useState<string>(savedTheme);
+  const [selectedFont, setSelectedFont] = useState<string>(savedFont);
+  const savedRef = useRef({ theme: savedTheme, fontFamily: savedFont });
+
+  // Adopt the saved branding whenever the server value loads or changes.
+  // Preview selections do not touch `schoolInfo`, so they are not overwritten
+  // by unrelated renders or background refetches that return the same values.
   useEffect(() => {
-    if (schoolInfo) {
-      setSelectedTheme((prev) => prev || schoolInfo.theme || "palette-1");
-      setSelectedFontState(
-        (prev) => prev || schoolInfo.fontFamily || fontFamily || "Roboto"
-      );
-      setFontFamily(schoolInfo.fontFamily || fontFamily || "Roboto"); // <-- sync context on load
-    }
-  }, [schoolInfo, fontFamily, setFontFamily]);
+    savedRef.current = { theme: savedTheme, fontFamily: savedFont };
+    setSelectedTheme(savedTheme);
+    setSelectedFont(savedFont);
+  }, [savedTheme, savedFont]);
 
-  const hasChanges =
-    selectedTheme !== (schoolInfo?.theme || "palette-1") ||
-    selectedFont !== (schoolInfo?.fontFamily || "Roboto");
+  // Leaving the section without saving must not leave the preview applied.
+  useEffect(() => {
+    return () => {
+      previewBranding(savedRef.current);
+    };
+  }, [previewBranding]);
+
+  const hasChanges = selectedTheme !== savedTheme || selectedFont !== savedFont;
 
   const handleSave = async () => {
+    const selection = { theme: selectedTheme, fontFamily: selectedFont };
+
     try {
-      await updateBranding({
-        theme: selectedTheme,
-        fontFamily: selectedFont,
-      });
-      message.success("Branding updated successfully!");
+      await updateBranding(selection);
+      commitBranding(selection);
+      savedRef.current = selection;
+      message.success("Branding saved successfully.");
     } catch (err) {
-      message.error("Failed to update branding");
+      const backendMessage = (
+        err as { response?: { data?: { message?: string } } }
+      )?.response?.data?.message;
+      message.error(
+        backendMessage
+          ? `Could not save branding: ${backendMessage}`
+          : "Could not save branding. Please try again."
+      );
     }
   };
 
@@ -204,6 +112,7 @@ export const BrandingSection = () => {
             type="primary"
             onClick={handleSave}
             loading={isSaving}
+            disabled={isSaving}
             style={{ background: "red", borderColor: "red" }}
           >
             Save Changes
@@ -327,7 +236,13 @@ export const BrandingSection = () => {
               <Col key={pal.id} xs={24} sm={12} md={8} lg={6}>
                 <div
                   className={`palette-preview ${pal.id}`}
-                  onClick={() => setSelectedTheme(pal.id)}
+                  onClick={() => {
+                    setSelectedTheme(pal.id);
+                    previewBranding({
+                      theme: pal.id,
+                      fontFamily: selectedFont,
+                    });
+                  }}
                   style={{
                     cursor: "pointer",
                     borderRadius: 16,
@@ -424,8 +339,11 @@ export const BrandingSection = () => {
           <Select
             value={selectedFont}
             onChange={(val) => {
-              setSelectedFontState(val); // local preview
-              setFontFamily(val); // update context & live app
+              setSelectedFont(val);
+              previewBranding({
+                theme: selectedTheme,
+                fontFamily: val,
+              });
             }}
             style={{ width: "100%" }}
             size="large"

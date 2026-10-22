@@ -10,6 +10,7 @@ import {
 } from "antd";
 import { UploadOutlined, FileExcelOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { extractApiErrorMessage } from "@carecraft/query-core";
 import type { RcFile } from "antd/es/upload/interface";
 import { useStudents } from "@/hooks/useStudents";
 import dayjs from "dayjs";
@@ -90,7 +91,8 @@ export const ImportStudentsButton = ({
       setPreviewData([]);
       setCurrentFile(null);
     } catch (err: any) {
-      message.error(err.message || "Import failed");
+      const errorMessage = extractApiErrorMessage({ response: err?.response });
+      message.error(errorMessage === "Request Failed" ? "Import failed" : errorMessage);
     }
   };
 

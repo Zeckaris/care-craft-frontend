@@ -1,0 +1,22 @@
+{
+  "name": "@carecraft/grades",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@carecraft/offline-queue": "workspace:*",
+    "@carecraft/types": "workspace:*",
+    "@tanstack/react-query": "^5.90.6",
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

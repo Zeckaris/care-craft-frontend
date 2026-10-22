@@ -1,19 +1,16 @@
-import axios from "axios";
+/**
+ * Admin API client.
+ *
+ * Creates a singleton Axios instance using the shared `@carecraft/api-client`
+ * factory, passing in the Vite env variables for this app.
+ *
+ * Other apps will create their own instance with their own env vars.
+ */
+import { createApiClient } from '@carecraft/api-client';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const ASSETS_BASE = import.meta.env.VITE_ASSETS_BASE;
-
-export const apiClient = axios.create({
-  baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true,
+const { apiClient, ASSETS_BASE } = createApiClient({
+  baseURL: import.meta.env.VITE_API_BASE_URL as string,
+  assetsBase: import.meta.env.VITE_ASSETS_BASE as string,
 });
 
-apiClient.interceptors.request.use((config: any) => {
-  if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
-  } else {
-    config.headers["Content-Type"] = "application/json";
-  }
-  return config;
-});
+export { apiClient, ASSETS_BASE };

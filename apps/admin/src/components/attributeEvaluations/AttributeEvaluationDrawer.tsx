@@ -54,6 +54,7 @@ export function AttributeEvaluationDrawer({
 
     if (evaluation && mode !== "create") {
       const attrs = evaluation.attributes.reduce((acc: any, item: any) => {
+        if (!item.attributeId) return acc;
         acc[`score_${item.attributeId._id}`] = item.score;
         acc[`comment_${item.attributeId._id}`] = item.comment || "";
         return acc;
@@ -62,7 +63,7 @@ export function AttributeEvaluationDrawer({
       form.setFieldsValue({
         studentId: evaluation.studentId?._id,
         studentEnrollmentId: evaluation.studentEnrollmentId?._id,
-        teacherId: evaluation.teacherId._id,
+        teacherId: evaluation.teacherId?._id,
         remark: evaluation.remark || "",
         ...attrs,
       });
@@ -189,7 +190,9 @@ export function AttributeEvaluationDrawer({
               {evaluation.studentEnrollmentId?.schoolYear || "-"}
             </Descriptions.Item>
             <Descriptions.Item label="Teacher" span={2}>
-              {evaluation.teacherId.firstName} {evaluation.teacherId.lastName}
+              {evaluation.teacherId
+                ? `${evaluation.teacherId.firstName} ${evaluation.teacherId.lastName}`
+                : "Deleted teacher"}
             </Descriptions.Item>
             <Descriptions.Item label="Evaluation Date">
               {formatDate(evaluation.createdAt)}
@@ -203,28 +206,38 @@ export function AttributeEvaluationDrawer({
 
           <Divider>Attribute Scores</Divider>
 
-          {evaluation.attributes.map((item) => (
-            <div key={item.attributeId._id} style={{ marginBottom: 16 }}>
-              <Space direction="vertical" style={{ width: "100%" }}>
-                <div>
-                  <Text strong>{item.attributeId.name}</Text>
-                  {item.attributeId.description && (
-                    <Text type="secondary" style={{ marginLeft: 8 }}>
-                      ({item.attributeId.description})
+          {evaluation.attributes.map((item, index) => {
+            const attribute = item.attributeId;
+
+            return (
+              <div
+                key={attribute?._id ?? `deleted-category-${index}`}
+                style={{ marginBottom: 16 }}
+              >
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <div>
+                    <Text strong>
+                      {attribute?.name ?? "Deleted category"}
                     </Text>
-                  )}
-                </div>
-                <Space>
-                  <Tag color="green">
-                    Score: {item.score} / {item.attributeId.maxScore}
-                  </Tag>
-                  {item.comment && (
-                    <Text type="secondary">“{item.comment}”</Text>
-                  )}
+                    {attribute?.description && (
+                      <Text type="secondary" style={{ marginLeft: 8 }}>
+                        ({attribute.description})
+                      </Text>
+                    )}
+                  </div>
+                  <Space>
+                    <Tag color="green">
+                      Score: {item.score}
+                      {attribute ? ` / ${attribute.maxScore}` : ""}
+                    </Tag>
+                    {item.comment && (
+                      <Text type="secondary">“{item.comment}”</Text>
+                    )}
+                  </Space>
                 </Space>
-              </Space>
-            </div>
-          ))}
+              </div>
+            );
+          })}
 
           {evaluation.remark && (
             <>

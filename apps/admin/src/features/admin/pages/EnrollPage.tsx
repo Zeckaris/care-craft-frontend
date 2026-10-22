@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Button,
   message,
@@ -18,10 +18,12 @@ import {
   UserAddOutlined,
 } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EnrollmentDrawer } from "@/components/enroll/EnrollmentDrawer";
 import { BulkEnrollmentDrawer } from "@/components/enroll/BulkEnrollmentDrawer";
 import { useEnrollments, type IEnrollment } from "@/hooks/useEnrollments";
 import { useGrades } from "@/hooks/useGrades";
+import { useSections } from "@/hooks/useSections";
 import { useStudents } from "@/hooks/useStudents";
 import { Avatar, Empty } from "antd";
 import { UserOutlined } from "@ant-design/icons";
@@ -31,6 +33,7 @@ const { Text } = Typography;
 
 export default function EnrollPage() {
   const [gradeId, setGradeId] = useState<string | undefined>(undefined);
+  const [sectionId, setSectionId] = useState<string | undefined>(undefined);
   const [schoolYear, setSchoolYear] = useState<string | undefined>(undefined);
   const [isActive, setIsActive] = useState<boolean | undefined>(true);
   const [searchText, setSearchText] = useState("");
@@ -61,6 +64,7 @@ export default function EnrollPage() {
     isDeleting,
   } = useEnrollments({
     gradeId,
+    sectionId,
     schoolYear,
     isActive,
     pagination,
@@ -68,6 +72,12 @@ export default function EnrollPage() {
   });
 
   const { grades } = useGrades();
+  const { sections } = useSections({
+    gradeId,
+    schoolYear,
+    isActive: true,
+    pageSize: 500,
+  });
   const { students } = useStudents({ pagination: { page: 1, pageSize: 1000 } });
 
   // Drawers
@@ -89,7 +99,11 @@ export default function EnrollPage() {
   // Reset page on filter change
   useEffect(() => {
     setPagination((p) => ({ ...p, page: 1 }));
-  }, [gradeId, schoolYear, isActive, searchText]);
+  }, [gradeId, sectionId, schoolYear, isActive, searchText]);
+
+  useEffect(() => {
+    setSectionId(undefined);
+  }, [gradeId, schoolYear]);
 
   // === Handlers ===
   const openSingleDrawer = (
@@ -137,9 +151,8 @@ export default function EnrollPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Enrollment deleted");
     } catch {
-      message.error("Failed to delete");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -154,12 +167,8 @@ export default function EnrollPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} enrollments deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "enrollment");
       },
     });
   };
@@ -169,7 +178,6 @@ export default function EnrollPage() {
       const values = await form.validateFields();
       if (selectedEnrollment) {
         await update(selectedEnrollment._id, values);
-        message.success("Enrollment updated");
       } else {
         const { studentId, gradeId } = values;
         if (!studentId) {
@@ -177,7 +185,6 @@ export default function EnrollPage() {
           return;
         }
         await create({ studentId, gradeId });
-        message.success("Student enrolled successfully");
       }
       closeSingleDrawer();
     } catch (err) {
@@ -191,11 +198,12 @@ export default function EnrollPage() {
       message.success("Students enrolled successfully");
       closeBulkDrawer();
     } catch (err: any) {
-      const errors = err.response?.data?.errors;
+      const data = err.response?.data;
+      const errors = data?.errors;
       if (errors?.length) {
         errors.slice(0, 5).forEach((e: string) => message.error(e));
       } else {
-        message.error("Failed to enroll students");
+        message.error(data?.message || "Failed to enroll students");
       }
     }
   };
@@ -203,9 +211,8 @@ export default function EnrollPage() {
   const handleToggleActive = async (id: string) => {
     try {
       await toggleActive(id);
-      message.success("Status updated");
     } catch {
-      message.error("Failed to update status");
+      // error toast is shown globally
     }
   };
 
@@ -216,9 +223,40 @@ export default function EnrollPage() {
     });
   };
 
-  // === Table Columns ===
+  const enrollmentIndexMap = useMemo(
+    () =>
+      new Map(
+        enrollments.map((e, idx) => [
+          e._id,
+          (currentPage - 1) * pageSize + idx + 1,
+        ])
+      ),
+    [enrollments, currentPage, pageSize]
+  );
+
   // === Table Columns ===
   const columns = [
+    ...(sectionId
+      ? [
+          {
+            key: "rowNumber",
+            title: "#",
+            width: 50,
+            render: (enrollment: IEnrollment) => (
+              <span
+                style={{
+                  fontFamily: "monospace",
+                  fontVariantNumeric: "tabular-nums",
+                  color: "var(--text-dark)",
+                  opacity: 0.65,
+                }}
+              >
+                {enrollmentIndexMap.get(enrollment._id) ?? "-"}
+              </span>
+            ),
+          },
+        ]
+      : []),
     {
       key: "student",
       title: "Student",
@@ -255,7 +293,7 @@ export default function EnrollPage() {
             strong
             style={{ color: grade ? "var(--primary)" : "var(--text-disabled)" }}
           >
-            {grade ? grade.level : "—"}
+            {grade ? grade.level : "-"}
           </Text>
         );
       },
@@ -265,7 +303,7 @@ export default function EnrollPage() {
       title: "School Year",
       render: (enrollment: IEnrollment) => {
         const year = enrollment.schoolYear;
-        if (!year) return <Text type="secondary">—</Text>;
+        if (!year) return <Text type="secondary">-</Text>;
         return <Text strong>{year}</Text>;
       },
     },
@@ -288,7 +326,7 @@ export default function EnrollPage() {
               day: "numeric",
               year: "numeric",
             })
-          : "—",
+          : "-",
     },
     {
       key: "toggle",
@@ -368,6 +406,15 @@ export default function EnrollPage() {
           onChange={(v) => setGradeId(v || undefined)}
           placeholder="Grade"
           allowClear
+        />
+        <Select
+          style={{ width: 160 }}
+          options={sections?.map((s) => ({ label: s.name, value: s._id })) ?? []}
+          value={sectionId || ""}
+          onChange={(v) => setSectionId(v || undefined)}
+          placeholder="Section"
+          allowClear
+          disabled={!gradeId && !sections?.length}
         />
         <Input
           placeholder="School Year (e.g. 2024-25)"

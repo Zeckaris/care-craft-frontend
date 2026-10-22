@@ -43,6 +43,7 @@ export default function InviteAdminPage() {
       const res = await post({
         url: "/adminstrator/send-invite",
         body: values,
+        toast: false,
       });
 
       if (!res) {

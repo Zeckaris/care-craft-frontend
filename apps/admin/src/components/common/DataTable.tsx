@@ -1,12 +1,10 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { Table, Button, Skeleton, Popconfirm } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { ActionColumn } from "./ActionColumn";
 
 interface DataType {
   _id: string | number;
-  [key: string]: any;
 }
 
 export interface Column<T extends DataType> {
@@ -31,6 +29,7 @@ interface DataTableProps<T extends DataType> {
   rowKey?: keyof T | ((record: T) => React.Key);
   searchPlaceholder?: string;
   emptyText?: string;
+  onRowClick?: (record: T) => void;
   onView?: (record: T) => void;
   onEdit?: (record: T) => void;
   onDelete?: (key: React.Key) => void;
@@ -44,8 +43,8 @@ export function DataTable<T extends DataType>({
   columns,
   loading = false,
   rowKey = "_id" as keyof T,
-  searchPlaceholder = "Search...",
   emptyText = "No data found",
+  onRowClick,
   onView,
   onEdit,
   onDelete,
@@ -54,26 +53,13 @@ export function DataTable<T extends DataType>({
   extraRowActions,
 }: DataTableProps<T>) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [searchText, setSearchText] = useState("");
-
-  const filteredData = pagination
-    ? data
-    : useMemo(() => {
-        if (!searchText) return data;
-        const term = searchText.toLowerCase();
-        return data.filter((record) =>
-          Object.values(record).some((v) =>
-            v?.toString().toLowerCase().includes(term)
-          )
-        );
-      }, [data, searchText]);
 
   const getRowKey = (record: T): React.Key => {
     if (typeof rowKey === "function") {
       return rowKey(record);
     }
     const key = record[rowKey];
-    if (key != null) return key;
+    if (key != null) return key as React.Key;
     console.warn("DataTable: Missing _id, using fallback", record);
     return Math.random();
   };
@@ -92,28 +78,36 @@ export function DataTable<T extends DataType>({
     key: String(col.key),
     width: col.width,
     sorter: col.sorter,
-    render: (_: any, record: T) =>
-      col.render ? col.render(record) : record[col.key as keyof T] ?? "-",
+    render: (_value: unknown, record: T) =>
+      col.render
+        ? col.render(record)
+        : ((record[col.key as keyof T] ?? "-") as React.ReactNode),
   }));
 
-  const antdColumns: ColumnsType<T> = [
-    ...userColumns,
-    {
-      title: "Actions",
-      key: "actions",
-      fixed: "right" as const,
-      width: 120,
-      render: (_: any, record: T) => (
-        <ActionColumn
-          record={record}
-          onView={onView}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          extraActions={extraRowActions?.(record)}
-        />
-      ),
-    },
-  ];
+  const hasRowActions = Boolean(
+    onView || onEdit || onDelete || extraRowActions
+  );
+
+  const antdColumns: ColumnsType<T> = hasRowActions
+    ? [
+        ...userColumns,
+        {
+          title: "Actions",
+          key: "actions",
+          fixed: "right" as const,
+          width: 120,
+          render: (_value: unknown, record: T) => (
+            <ActionColumn
+              record={record}
+              onView={onView}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              extraActions={extraRowActions?.(record)}
+            />
+          ),
+        },
+      ]
+    : userColumns;
 
   return (
     <div>
@@ -150,9 +144,9 @@ export function DataTable<T extends DataType>({
       ) : (
         <Table<T>
           columns={antdColumns}
-          dataSource={filteredData}
+          dataSource={data}
           rowKey={getRowKey}
-          rowSelection={rowSelection}
+          rowSelection={onBulkDelete ? rowSelection : undefined}
           pagination={
             pagination === false
               ? false
@@ -164,6 +158,10 @@ export function DataTable<T extends DataType>({
           }
           scroll={{ x: "max-content" }}
           locale={{ emptyText }}
+          onRow={(record) => ({
+            onClick: onRowClick ? () => onRowClick(record) : undefined,
+            style: onRowClick ? { cursor: "pointer" } : undefined,
+          })}
         />
       )}
     </div>

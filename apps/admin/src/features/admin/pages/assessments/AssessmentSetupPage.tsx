@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EmptyState } from "@/components/common/EmptyState";
 import { AssessmentSetupDrawer } from "@/components/assessments/AssessmentSetupDrawer";
 import {
@@ -146,12 +147,8 @@ export default function AssessmentSetupPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} assessment setups deleted`);
-        } catch {
-          message.error("Some items could not be deleted");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "assessment setup");
       },
     });
   };
@@ -162,10 +159,8 @@ export default function AssessmentSetupPage() {
 
       if (selectedSetup) {
         await update(selectedSetup._id, values);
-        message.success("Assessment setup updated");
       } else {
         await create(values);
-        message.success("Assessment setup created");
       }
       closeDrawer();
     } catch (err) {
@@ -198,7 +193,7 @@ export default function AssessmentSetupPage() {
             ))}
           </Space>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
@@ -214,7 +209,7 @@ export default function AssessmentSetupPage() {
       key: "createdAt",
       title: "Created",
       render: (setup: IAssessmentSetup) =>
-        setup.createdAt ? dayjs(setup.createdAt).format("MMM D, YYYY") : "—",
+        setup.createdAt ? dayjs(setup.createdAt).format("MMM D, YYYY") : "-",
     },
   ];
 

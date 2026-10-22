@@ -18,6 +18,7 @@ import type { IStudent } from "@/hooks/useStudents";
 import { useState, useEffect } from "react";
 import type { UploadProps } from "antd";
 import { ASSETS_BASE } from "@/services/api-client";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
 
 const { Text } = Typography;
 
@@ -62,22 +63,18 @@ export const StudentDrawer = ({
       setProfileFile(null);
 
       if (student) {
-        if (isEdit) {
-          form.setFieldsValue({
-            firstName: student.firstName,
-            middleName: student.middleName || "",
-            lastName: student.lastName,
-            gender: student.gender,
-            dateOfBirth: student.dateOfBirth
-              ? dayjs(student.dateOfBirth)
-              : null,
-          });
-        }
+        form.setFieldsValue({
+          firstName: student.firstName,
+          middleName: student.middleName || (isView ? "-" : ""),
+          lastName: student.lastName,
+          gender: student.gender,
+          dateOfBirth: student.dateOfBirth ? dayjs(student.dateOfBirth) : null,
+        });
       } else {
         setPreviewUrl(null);
       }
     }
-  }, [open, student, isEdit, form]);
+  }, [open, student, isView, form]);
 
   const uploadProps: UploadProps = {
     onRemove: () => {
@@ -176,7 +173,12 @@ export const StudentDrawer = ({
         )
       }
     >
-      <Form form={form} layout="vertical" disabled={isView}>
+      <Form
+        form={form}
+        layout="vertical"
+        disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
+      >
         {/* Profile Image */}
         <Form.Item label="Profile Image">
           <Space direction="vertical" align="center" style={{ width: "100%" }}>
@@ -227,17 +229,31 @@ export const StudentDrawer = ({
 
         {/* Gender & DOB */}
         <Space style={{ display: "flex" }} size="middle">
-          <Form.Item
-            name="gender"
-            label="Gender"
-            rules={[{ required: true, message: "Required" }]}
-            style={{ flex: 1 }}
-          >
-            <Radio.Group>
-              <Radio value="male">Male</Radio>
-              <Radio value="female">Female</Radio>
-            </Radio.Group>
-          </Form.Item>
+          {isView ? (
+            <div style={{ flex: 1 }}>
+              <ReadOnlyField
+                label="Gender"
+                value={
+                  student?.gender
+                    ? student.gender.charAt(0).toUpperCase() +
+                      student.gender.slice(1)
+                    : undefined
+                }
+              />
+            </div>
+          ) : (
+            <Form.Item
+              name="gender"
+              label="Gender"
+              rules={[{ required: true, message: "Required" }]}
+              style={{ flex: 1 }}
+            >
+              <Radio.Group>
+                <Radio value="male">Male</Radio>
+                <Radio value="female">Female</Radio>
+              </Radio.Group>
+            </Form.Item>
+          )}
 
           <Form.Item
             name="dateOfBirth"
@@ -248,7 +264,7 @@ export const StudentDrawer = ({
             <DatePicker
               style={{ width: "100%" }}
               format="MMMM D, YYYY"
-              placeholder="Select date"
+              placeholder={isView ? "-" : "Select date"}
             />
           </Form.Item>
         </Space>
@@ -259,7 +275,7 @@ export const StudentDrawer = ({
             value={
               student?.admissionDate
                 ? dayjs(student.admissionDate).format("MMMM D, YYYY")
-                : "—"
+                : "-"
             }
             disabled
           />

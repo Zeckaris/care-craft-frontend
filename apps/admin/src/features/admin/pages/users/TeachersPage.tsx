@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Form, Input, message, Space, Typography, Alert, Avatar } from "antd";
+import { useEffect, useState } from "react";
+import { Form, Input, Space, Typography, Alert, Avatar } from "antd";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -13,8 +13,7 @@ const { Text } = Typography;
 
 export default function TeachersPage() {
   const [searchText, setSearchText] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
 
   const {
     teachers,
@@ -27,7 +26,11 @@ export default function TeachersPage() {
     remove,
     isUpdating,
     isDeleting,
-  } = useTeachers({ page: currentPage, pageSize });
+  } = useTeachers({ page: pagination.page, pageSize: pagination.pageSize });
+
+  useEffect(() => {
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, [searchText]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"view" | "edit">("view");
@@ -94,10 +97,8 @@ export default function TeachersPage() {
     if (!deleteConfirm.key) return;
     try {
       await remove(String(deleteConfirm.key));
-      message.success("Teacher deleted successfully");
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to delete teacher";
-      message.error(msg);
+    } catch {
+      // error toast is shown globally
     } finally {
       setDeleteConfirm({ open: false });
     }
@@ -108,7 +109,6 @@ export default function TeachersPage() {
     try {
       const values = await form.validateFields();
       await update(selectedUser._id, values);
-      message.success("Teacher updated successfully");
       closeDrawer();
     } catch (err: any) {
       console.error("Update error:", err);
@@ -146,14 +146,14 @@ export default function TeachersPage() {
         user.phoneNumber ? (
           <Text>{user.phoneNumber}</Text>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
       key: "createdAt",
       title: "Created",
       render: (user: IUser) =>
-        user.createdAt ? dayjs(user.createdAt).format("MMM D, YYYY") : "—",
+        user.createdAt ? dayjs(user.createdAt).format("MMM D, YYYY") : "-",
     },
   ];
 
@@ -225,11 +225,12 @@ export default function TeachersPage() {
           rowKey="_id"
           pagination={{
             total,
-            current: currentPage,
-            pageSize,
+            current: pagination.page,
+            pageSize: pagination.pageSize,
             showSizeChanger: true,
             showQuickJumper: true,
-            onChange: (page) => setCurrentPage(page),
+            onChange: (page, size) =>
+              setPagination({ page, pageSize: size || 10 }),
           }}
           onView={handleView}
           onEdit={handleEdit}

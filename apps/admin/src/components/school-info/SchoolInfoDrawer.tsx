@@ -1,9 +1,37 @@
 import { Drawer, Form, Input, Button, Space, Upload, message } from "antd";
-import { UploadOutlined, LoadingOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
-import { type ISchoolInfo, useSchoolInfo } from "@/hooks/useSchoolInfo";
+import {
+  UploadOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { useEffect } from "react";
+import {
+  type ISchoolInfo,
+  type SchoolInfoCreateInput,
+  useSchoolInfo,
+} from "@/hooks/useSchoolInfo";
 
 const { TextArea } = Input;
+
+const TELEPHONE_MAX_ITEMS = 5;
+const TELEPHONE_MIN_LENGTH = 6;
+const TELEPHONE_MAX_LENGTH = 20;
+const TELEPHONE_PATTERN = /^[0-9+\-() ]+$/;
+const ABOUT_MAX_LENGTH = 2000;
+
+const TELEPHONE_REQUIRED_ERROR = "At least one telephone number is required";
+const TELEPHONE_FORMAT_ERROR =
+  "telephone entries must be 6-20 characters using digits, spaces, +, -, (, )";
+const TELEPHONE_DUPLICATE_ERROR = "Telephone numbers must be unique";
+
+interface SchoolInfoFormValues {
+  name: string;
+  address: string;
+  contactEmail: string;
+  about?: string;
+  telephone?: (string | undefined)[];
+}
 
 interface SchoolInfoDrawerProps {
   open: boolean;
@@ -12,6 +40,17 @@ interface SchoolInfoDrawerProps {
   onClose: () => void;
   onSuccess: () => void;
 }
+
+const buildInitialValues = (data?: ISchoolInfo) => ({
+  name: data?.name ?? "",
+  address: data?.address ?? "",
+  contactEmail: data?.contactEmail ?? "",
+  about: data?.about ?? "",
+  telephone:
+    data?.telephone && data.telephone.length > 0
+      ? data.telephone.slice(0, TELEPHONE_MAX_ITEMS)
+      : [""],
+});
 
 export const SchoolInfoDrawer = ({
   open,
@@ -29,47 +68,51 @@ export const SchoolInfoDrawer = ({
     isSaving,
     logoFile,
   } = useSchoolInfo();
-  const [form] = Form.useForm();
-
-  const [fileList, setFileList] = useState<any[]>([]);
+  const [form] = Form.useForm<SchoolInfoFormValues>();
 
   useEffect(() => {
     if (open) {
       form.resetFields();
       if (mode === "create") {
         resetLogo();
-        setFileList([]);
       }
     }
   }, [open, mode, form, resetLogo]);
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: SchoolInfoFormValues) => {
+    const telephone = (values.telephone ?? [])
+      .map((value) => (value ?? "").trim())
+      .filter(Boolean);
+
+    const data: SchoolInfoCreateInput = {
+      name: values.name,
+      address: values.address,
+      contactEmail: values.contactEmail,
+      about: values.about?.trim() ?? "",
+      telephone,
+      logo: logoFile,
+    };
+
     try {
-      const data = {
-        ...values,
-        logo: logoFile,
-      };
       if (mode === "create") {
         await create(data);
       } else {
         await update(data);
       }
       onSuccess();
-    } catch (err) {
-      // ...
+    } catch {
+      // Errors are surfaced by useApi.
     }
   };
 
   const handleClose = () => {
     form.resetFields();
     resetLogo();
-    setFileList([]);
     onClose();
   };
 
   const uploadProps = {
     onRemove: () => {
-      setFileList([]);
       resetLogo();
     },
     beforeUpload: (file: File) => {
@@ -84,10 +127,8 @@ export const SchoolInfoDrawer = ({
         return false;
       }
       handleLogoChange(file);
-      setFileList([file]);
       return false; // Prevent auto upload
     },
-    fileList,
     maxCount: 1,
   };
 
@@ -120,19 +161,17 @@ export const SchoolInfoDrawer = ({
       <Form
         form={form}
         layout="vertical"
-        initialValues={initialData || {}}
+        initialValues={buildInitialValues(initialData)}
         onFinish={handleSubmit}
         autoComplete="off"
       >
         {/* Logo Upload */}
         <Form.Item label="School Logo">
           <Upload {...uploadProps} listType="picture-card">
-            {fileList.length === 0 && (
-              <div>
-                <UploadOutlined />
-                <div style={{ marginTop: 8 }}>Upload</div>
-              </div>
-            )}
+            <div>
+              <UploadOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
           </Upload>
           {previewLogo && (
             <img
@@ -179,13 +218,106 @@ export const SchoolInfoDrawer = ({
           <Input placeholder="school@example.com" size="large" />
         </Form.Item>
 
-        {/* Phone */}
-        <Form.Item
-          name="contactPhone"
-          label="Contact Phone"
-          rules={[{ required: true, message: "Please enter phone number" }]}
+        {/* Telephone list */}
+        <Form.List
+          name="telephone"
+          rules={[
+            {
+              validator: async (_, value?: (string | undefined)[]) => {
+                const entries = (value ?? []).filter(
+                  (entry) => (entry ?? "").trim() !== ""
+                );
+                if (mode === "create" && entries.length === 0) {
+                  throw new Error(TELEPHONE_REQUIRED_ERROR);
+                }
+                if (entries.length > TELEPHONE_MAX_ITEMS) {
+                  throw new Error(
+                    `You can add up to ${TELEPHONE_MAX_ITEMS} telephone numbers`
+                  );
+                }
+              },
+            },
+          ]}
         >
-          <Input placeholder="+251 911 123 456" size="large" />
+          {(fields, { add, remove }) => (
+            <Form.Item label="Telephone" required>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space
+                  key={key}
+                  style={{ display: "flex", marginBottom: 8 }}
+                  align="baseline"
+                >
+                  <Form.Item
+                    {...restField}
+                    name={name}
+                    style={{ marginBottom: 0, flex: 1, minWidth: 320 }}
+                    rules={[
+                      ({ getFieldValue }) => ({
+                        validator(_, value?: string) {
+                          const trimmed = (value ?? "").trim();
+                          if (!trimmed) return Promise.resolve();
+                          if (
+                            trimmed.length < TELEPHONE_MIN_LENGTH ||
+                            trimmed.length > TELEPHONE_MAX_LENGTH ||
+                            !TELEPHONE_PATTERN.test(trimmed)
+                          ) {
+                            return Promise.reject(
+                              new Error(TELEPHONE_FORMAT_ERROR)
+                            );
+                          }
+                          const all = (getFieldValue("telephone") ??
+                            []) as (string | undefined)[];
+                          const duplicates = all.filter(
+                            (entry) => (entry ?? "").trim() === trimmed
+                          ).length;
+                          if (duplicates > 1) {
+                            return Promise.reject(
+                              new Error(TELEPHONE_DUPLICATE_ERROR)
+                            );
+                          }
+                          return Promise.resolve();
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input
+                      placeholder="+251 911 123 456"
+                      size="large"
+                      disabled={isSaving}
+                    />
+                  </Form.Item>
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => remove(name)}
+                    disabled={fields.length === 1 || isSaving}
+                    aria-label="Remove telephone number"
+                  />
+                </Space>
+              ))}
+              <Button
+                type="dashed"
+                onClick={() => add("")}
+                block
+                icon={<PlusOutlined />}
+                disabled={fields.length >= TELEPHONE_MAX_ITEMS || isSaving}
+              >
+                Add Telephone
+              </Button>
+            </Form.Item>
+          )}
+        </Form.List>
+
+        {/* About */}
+        <Form.Item name="about" label="About">
+          <TextArea
+            rows={4}
+            maxLength={ABOUT_MAX_LENGTH}
+            showCount
+            placeholder="Tell parents and staff about the school"
+            disabled={isSaving}
+          />
         </Form.Item>
       </Form>
     </Drawer>

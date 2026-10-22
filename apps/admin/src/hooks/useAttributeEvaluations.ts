@@ -1,5 +1,6 @@
 import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IAttributeItem {
   attributeId: {
@@ -8,7 +9,7 @@ export interface IAttributeItem {
     description?: string;
     minScore: number;
     maxScore: number;
-  };
+  } | null;
   score: number;
   comment?: string;
 }
@@ -35,7 +36,7 @@ export interface IAttributeEvaluation {
     lastName: string;
     email: string;
     role: string;
-  };
+  } | null;
   attributes: IAttributeItem[];
   totalScore: number;
   remark?: string;
@@ -119,10 +120,14 @@ export const useAttributeEvaluations = (
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `${urlPath}/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: [urlPath] });
+        return result;
+      }),
+    );
 
   return {
     evaluations,

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Modal } from "antd";
 import { EmptyState } from "@/components/common/EmptyState";
 import { SchoolInfoView } from "@/components/school-info/SchoolInfoView";
 import { SchoolInfoDrawer } from "@/components/school-info/SchoolInfoDrawer";
@@ -7,12 +6,10 @@ import { useSchoolInfo } from "@/hooks/useSchoolInfo";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export const SchoolInfoPage = () => {
-  const { schoolInfo, isLoading, error, remove, isDeleting, resetLogo } =
-    useSchoolInfo();
+  const { schoolInfo, isLoading, error, resetLogo } = useSchoolInfo();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"create" | "edit">("create");
-  const [deleteModal, setDeleteModal] = useState(false);
 
   const openDrawer = (mode: "create" | "edit") => {
     setDrawerMode(mode);
@@ -26,15 +23,6 @@ export const SchoolInfoPage = () => {
 
   const handleSaveSuccess = () => {
     closeDrawer();
-  };
-
-  const handleDelete = async () => {
-    try {
-      await remove();
-      setDeleteModal(false);
-    } catch (err) {
-      // Error handled by useApi
-    }
   };
 
   if (isLoading) {
@@ -70,7 +58,6 @@ export const SchoolInfoPage = () => {
 
   return (
     <div>
-      {/* Breadcrumb — NO props */}
       <Breadcrumb />
 
       {/* Empty State */}
@@ -88,7 +75,6 @@ export const SchoolInfoPage = () => {
         <SchoolInfoView
           data={schoolInfo}
           onEdit={() => openDrawer("edit")}
-          onDelete={() => setDeleteModal(true)}
         />
       )}
 
@@ -102,22 +88,6 @@ export const SchoolInfoPage = () => {
         onClose={closeDrawer}
         onSuccess={handleSaveSuccess}
       />
-
-      {/* Delete Confirmation */}
-      <Modal
-        title="Delete School Profile"
-        open={deleteModal}
-        onOk={handleDelete}
-        onCancel={() => setDeleteModal(false)}
-        okText="Delete"
-        okButtonProps={{ danger: true, loading: isDeleting }}
-        cancelText="Cancel"
-      >
-        <p>
-          Are you sure you want to delete the school profile? This action cannot
-          be undone.
-        </p>
-      </Modal>
     </div>
   );
 };

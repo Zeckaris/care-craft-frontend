@@ -1,31 +1,34 @@
 import { useState } from "react";
 import {
+  Alert,
   Button,
   Card,
   Space,
   Typography,
-  Tag,
-  message,
   Modal,
   Empty,
   Form,
 } from "antd";
 import {
   PlusOutlined,
-  CrownOutlined,
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
+import { extractApiErrorMessage } from "@carecraft/query-core";
+import type { IAcademicCalendar } from "@carecraft/types";
 import { AcademicCalendarDrawer } from "@/components/calendar/AcademicCalendarDrawer";
+import { AcademicStatusTag } from "@/components/calendar/AcademicStatusTag";
+import { CurrentAcademicContextBanner } from "@/components/calendar/CurrentAcademicContextBanner";
 import { TermsPanel } from "@/components/terms/TermsPanel";
-import {
-  useAcademicCalendars,
-  type IAcademicCalendar,
-} from "@/hooks/useAcademicCalendars";
+import { useAcademicCalendars } from "@/hooks/useAcademicCalendars";
+import { isAcademicCurrentHighlight } from "@/utils/academic";
+import { toSchoolDate } from "@/utils/schoolDate";
 
 const { Text } = Typography;
+
+const DATE_FORMAT = "YYYY-MM-DD";
 
 export default function AcademicCalendarPage() {
   const [form] = Form.useForm();
@@ -33,31 +36,49 @@ export default function AcademicCalendarPage() {
   const [selectedCalendar, setSelectedCalendar] =
     useState<IAcademicCalendar | null>(null);
 
-  // Controlled modals states
-  const [confirmCurrentVisible, setConfirmCurrentVisible] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [pendingCalendar, setPendingCalendar] =
     useState<IAcademicCalendar | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const {
     calendars,
-    currentCalendar,
     isLoading,
     create,
     update,
     remove,
-    setCurrent,
     isCreating,
     isUpdating,
   } = useAcademicCalendars();
+
+  const formatDate = (date: string | Date | null | undefined) => {
+    const schoolDate = toSchoolDate(date);
+    return schoolDate ? dayjs(schoolDate).format("D MMMM YYYY") : "-";
+  };
 
   const openDrawer = (calendar: IAcademicCalendar | null) => {
     setSelectedCalendar(calendar);
     if (calendar) {
       form.setFieldsValue({
         academicYear: calendar.academicYear,
-        startDate: dayjs(calendar.startDate),
-        endDate: dayjs(calendar.endDate),
+        startDate: dayjs(toSchoolDate(calendar.startDate)),
+        endDate: dayjs(toSchoolDate(calendar.endDate)),
+        registrationStartDate: calendar.registrationStartDate
+          ? dayjs(toSchoolDate(calendar.registrationStartDate))
+          : null,
+        registrationEndDate: calendar.registrationEndDate
+          ? dayjs(toSchoolDate(calendar.registrationEndDate))
+          : null,
+        newStudentRegistrationStartDate:
+          calendar.newStudentRegistrationStartDate
+            ? dayjs(toSchoolDate(calendar.newStudentRegistrationStartDate))
+            : null,
+        newStudentRegistrationEndDate: calendar.newStudentRegistrationEndDate
+          ? dayjs(toSchoolDate(calendar.newStudentRegistrationEndDate))
+          : null,
+        holidayDates: calendar.holidayDates.map((date) =>
+          dayjs(toSchoolDate(date)),
+        ),
       });
     } else {
       form.resetFields();
@@ -71,29 +92,9 @@ export default function AcademicCalendarPage() {
     form.resetFields();
   };
 
-  const showSetCurrentConfirm = (calendar: IAcademicCalendar) => {
-    setPendingCalendar(calendar);
-    setConfirmCurrentVisible(true);
-  };
-
-  const handleSetCurrentOk = async () => {
-    if (!pendingCalendar) return;
-    try {
-      await setCurrent(pendingCalendar._id);
-      message.success(
-        `${pendingCalendar.academicYear} is now the current year`,
-      );
-    } catch (err: any) {
-      message.error("Failed to set current year");
-      console.error(err);
-    } finally {
-      setConfirmCurrentVisible(false);
-      setPendingCalendar(null);
-    }
-  };
-
   const showDeleteConfirm = (calendar: IAcademicCalendar) => {
     setPendingCalendar(calendar);
+    setDeleteError(null);
     setConfirmDeleteVisible(true);
   };
 
@@ -101,12 +102,13 @@ export default function AcademicCalendarPage() {
     if (!pendingCalendar) return;
     try {
       await remove(pendingCalendar._id);
-      message.success("Academic year deleted");
-    } catch {
-      message.error("Failed to delete");
-    } finally {
       setConfirmDeleteVisible(false);
       setPendingCalendar(null);
+      setDeleteError(null);
+    } catch (err) {
+      // The shared useApi handler already shows the backend message; keep the
+      // modal open and repeat it here so the blockers stay visible.
+      setDeleteError(extractApiErrorMessage(err));
     }
   };
 
@@ -114,29 +116,52 @@ export default function AcademicCalendarPage() {
     try {
       const values = await form.validateFields();
 
+      const toDateString = (
+        value: Dayjs | null | undefined,
+      ): string | null => (value ? value.format(DATE_FORMAT) : null);
+
+      const holidayDates = (
+        (values.holidayDates ?? []) as Array<Dayjs | null | undefined>
+      )
+        .filter((date): date is Dayjs => Boolean(date))
+        .map((date) => date.format(DATE_FORMAT));
+
       const payload = {
         academicYear: values.academicYear,
-        startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
-        isCurrent: false,
-        holidayDates: [] as Date[], // satisfies current type definition
+        startDate: toDateString(values.startDate) as string,
+        endDate: toDateString(values.endDate) as string,
+        registrationStartDate: toDateString(values.registrationStartDate),
+        registrationEndDate: toDateString(values.registrationEndDate),
+        newStudentRegistrationStartDate: toDateString(
+          values.newStudentRegistrationStartDate,
+        ),
+        newStudentRegistrationEndDate: toDateString(
+          values.newStudentRegistrationEndDate,
+        ),
+        holidayDates,
       };
 
       if (selectedCalendar) {
-        // Update - we send partial data
         await update(selectedCalendar._id, payload);
-        message.success("Academic year updated");
       } else {
-        // Create - type assertion only here to bypass strict check
-        await create(payload as any);
-        message.success("Academic year created");
+        await create(payload);
       }
 
       closeDrawer();
-    } catch (err: any) {
-      if (!err.errorFields) {
-        message.error("Please check your input");
+    } catch (err) {
+      const validationError = err as { errorFields?: unknown };
+      if (validationError?.errorFields) return;
+
+      const apiError = err as { response?: { status?: number } };
+      if (apiError?.response?.status === 409) {
+        form.setFields([
+          {
+            name: "academicYear",
+            errors: [extractApiErrorMessage(err)],
+          },
+        ]);
       }
+      // Non-validation failures are surfaced by the shared useApi handler.
     }
   };
 
@@ -161,14 +186,6 @@ export default function AcademicCalendarPage() {
       >
         <div>
           <h2 style={{ margin: 0 }}>Academic Calendar</h2>
-          {currentCalendar && (
-            <Text type="secondary">
-              Current Year:{" "}
-              <Tag icon={<CrownOutlined />} color="green">
-                {currentCalendar.academicYear}
-              </Tag>
-            </Text>
-          )}
         </div>
         <Button
           type="primary"
@@ -178,6 +195,8 @@ export default function AcademicCalendarPage() {
           Add Academic Year
         </Button>
       </div>
+
+      <CurrentAcademicContextBanner />
 
       {/* No calendars yet */}
       {calendars.length === 0 ? (
@@ -194,7 +213,7 @@ export default function AcademicCalendarPage() {
           {calendars
             .sort((a, b) => b.academicYear.localeCompare(a.academicYear))
             .map((cal) => {
-              const isCurrent = cal._id === currentCalendar?._id;
+              const isStrongCurrent = isAcademicCurrentHighlight(cal.status);
 
               return (
                 <Card
@@ -202,7 +221,7 @@ export default function AcademicCalendarPage() {
                   style={{
                     borderRadius: 8,
                     overflow: "hidden",
-                    background: isCurrent
+                    background: isStrongCurrent
                       ? "var(--card-success-background)"
                       : undefined,
                   }}
@@ -226,23 +245,13 @@ export default function AcademicCalendarPage() {
                         >
                           {cal.academicYear}
                         </h3>
-                        {isCurrent && (
-                          <Tag icon={<CrownOutlined />} color="success">
-                            CURRENT YEAR
-                          </Tag>
-                        )}
+                        <AcademicStatusTag
+                          status={cal.status}
+                          isCurrent={cal.isCurrent}
+                        />
                       </Space>
 
                       <Space>
-                        {!isCurrent && (
-                          <Button
-                            type="primary"
-                            ghost
-                            onClick={() => showSetCurrentConfirm(cal)}
-                          >
-                            Set as Current
-                          </Button>
-                        )}
                         <Button
                           icon={<EditOutlined />}
                           onClick={() => openDrawer(cal)}
@@ -252,10 +261,7 @@ export default function AcademicCalendarPage() {
                         <Button
                           danger
                           icon={<DeleteOutlined />}
-                          disabled={isCurrent}
-                          onClick={() => {
-                            if (!isCurrent) showDeleteConfirm(cal);
-                          }}
+                          onClick={() => showDeleteConfirm(cal)}
                         >
                           Delete
                         </Button>
@@ -264,8 +270,7 @@ export default function AcademicCalendarPage() {
 
                     <div style={{ marginTop: 8 }}>
                       <Text type="secondary">
-                        {dayjs(cal.startDate).format("D MMMM YYYY")} –{" "}
-                        {dayjs(cal.endDate).format("D MMMM YYYY")}
+                        {formatDate(cal.startDate)} – {formatDate(cal.endDate)}
                       </Text>
                     </div>
                   </div>
@@ -274,6 +279,7 @@ export default function AcademicCalendarPage() {
                     <TermsPanel
                       academicYearId={cal._id}
                       academicYearName={cal.academicYear}
+                      calendars={calendars}
                     />
                   </div>
                 </Card>
@@ -293,28 +299,7 @@ export default function AcademicCalendarPage() {
         loading={isCreating || isUpdating}
       />
 
-      {/* Controlled Confirm Modals */}
-      <Modal
-        title={
-          <>
-            <ExclamationCircleOutlined
-              style={{ color: "var(--warning)", marginRight: 8 }}
-            />
-            Set as Current Year?
-          </>
-        }
-        open={confirmCurrentVisible}
-        onOk={handleSetCurrentOk}
-        onCancel={() => setConfirmCurrentVisible(false)}
-        okText="Yes, Set Current"
-        cancelText="Cancel"
-      >
-        <p>
-          This will make <strong>{pendingCalendar?.academicYear}</strong> the
-          active academic year.
-        </p>
-      </Modal>
-
+      {/* Delete confirmation */}
       <Modal
         title={
           <>
@@ -326,7 +311,11 @@ export default function AcademicCalendarPage() {
         }
         open={confirmDeleteVisible}
         onOk={handleDeleteOk}
-        onCancel={() => setConfirmDeleteVisible(false)}
+        onCancel={() => {
+          setConfirmDeleteVisible(false);
+          setPendingCalendar(null);
+          setDeleteError(null);
+        }}
         okText="Delete"
         okType="danger"
         cancelText="Cancel"
@@ -335,6 +324,14 @@ export default function AcademicCalendarPage() {
           <strong>{pendingCalendar?.academicYear}</strong> and all its terms
           will be permanently deleted.
         </p>
+        {deleteError && (
+          <Alert
+            type="error"
+            showIcon
+            message={deleteError}
+            style={{ marginTop: 16 }}
+          />
+        )}
       </Modal>
     </>
   );

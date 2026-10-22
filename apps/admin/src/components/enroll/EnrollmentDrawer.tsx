@@ -14,6 +14,8 @@ import { useGrades } from "@/hooks/useGrades";
 import { useStudents } from "@/hooks/useStudents";
 import { useAcademicCalendars } from "@/hooks/useAcademicCalendars"; // NEW import
 import { useEffect } from "react";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -110,7 +112,12 @@ export const EnrollmentDrawer = ({
         )
       }
     >
-      <Form form={form} layout="vertical" disabled={isView}>
+      <Form
+        form={form}
+        layout="vertical"
+        disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
+      >
         {/* Student Select (only in create) */}
         {isCreate && (
           <Form.Item
@@ -159,7 +166,7 @@ export const EnrollmentDrawer = ({
                   ? `${student.firstName} ${student.middleName || ""} ${
                       student.lastName
                     }`
-                  : "—"
+                  : "-"
               }
               disabled
               prefix={<UserOutlined />}
@@ -215,15 +222,10 @@ export const EnrollmentDrawer = ({
 
         {/* Created At */}
         {enrollment?.createdAt && (
-          <Form.Item label="Enrolled On">
-            <Text type="secondary">
-              {new Date(enrollment.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </Text>
-          </Form.Item>
+          <ReadOnlyField
+            label="Enrolled On"
+            value={formatDateTime(enrollment.createdAt)}
+          />
         )}
       </Form>
     </Drawer>

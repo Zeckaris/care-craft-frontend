@@ -3,7 +3,6 @@ import {
   Button,
   Form,
   Input,
-  message,
   Space,
   Typography,
   Alert,
@@ -103,10 +102,8 @@ export default function ParentsPage() {
     if (!deleteConfirm.key) return;
     try {
       await remove(String(deleteConfirm.key));
-      message.success("Parent deleted successfully");
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to delete parent";
-      message.error(msg);
+    } catch {
+      // error toast is shown globally
     } finally {
       setDeleteConfirm({ open: false });
     }
@@ -117,7 +114,6 @@ export default function ParentsPage() {
     try {
       const values = await form.validateFields();
       await update(selectedUser._id, values);
-      message.success("Parent updated successfully");
       closeDrawer();
     } catch (err: any) {
       console.error("Update error:", err);

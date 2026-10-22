@@ -1,5 +1,6 @@
 import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IGSA {
   _id: string;
@@ -26,9 +27,14 @@ export const useGSA = (
   {
     search = '',
     pagination = { page: 1, pageSize: 10 },
+    gradeId,
+    enabled = true,
   }: {
     search?: string;
     pagination?: { page: number; pageSize: number };
+    gradeId?: string;
+    /** Set false to defer the request until the required pickers are chosen. */
+    enabled?: boolean;
   } = {}
 ) => {
   const queryClient = useQueryClient();
@@ -39,18 +45,20 @@ export const useGSA = (
   // Build query params
   const params = new URLSearchParams();
   if (search) params.set('search', search);
+  if (gradeId) params.set('gradeId', gradeId);
   if (pagination) {
     params.set('page', String(pagination.page));
     params.set('limit', String(pagination.pageSize));
   }
 
   const fetchUrl = `${urlPath}?${params.toString()}`;
-  const queryKey = [urlPath, { search, pagination }];
+  const queryKey = [urlPath, { search, pagination, gradeId }];
 
   const { data: raw, isLoading, isError, error, refetch } = get(fetchUrl, {
     queryKey,
     keepPreviousData: true,
     staleTime: 30_000,
+    enabled,
   });
 
   const gsas: IGSA[] = raw?.success ? (raw.data as IGSA[]) : [];
@@ -83,10 +91,14 @@ export const useGSA = (
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `${urlPath}/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: [urlPath] });
+        return result;
+      }),
+    );
 
   return {
     gsas,

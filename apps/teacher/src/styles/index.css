@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CareCraft Teacher — Design Tokens
+   These values are fallbacks; the active school palette overrides the colours
+   at runtime via @carecraft/branding (applyBranding with semanticTokens).
+   Radii, shadows and layout tokens live here.
+───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* Brand */
+    --color-primary:         #1a56db;
+    --color-primary-hover:   #1648c0;
+    --color-primary-light:   #dbeafe;
+    --color-primary-fg:      #ffffff;
+
+    /* Surface
+       Fallbacks only — these are overridden at runtime by the active school
+       palette (see @carecraft/branding applyBranding with semanticTokens). */
+    --color-bg:              #f8fafc;
+    --color-surface:         #ffffff;
+    --color-surface-raised:  #f1f5f9;
+    --color-border:          #e2e8f0;
+
+    /* Text (secondary/muted fallbacks; palette-derived at runtime) */
+    --color-text:            #0f172a;
+    --color-text-secondary:  #475569;
+    --color-text-muted:      #94a3b8;
+
+    /* Desktop sidebar (palette sidebar colour + light text, as the admin) */
+    --color-sidebar:         #1e293b;
+    --color-sidebar-fg:      #ffffff;
+    --color-sidebar-muted:   rgba(255, 255, 255, 0.72);
+    --color-sidebar-hover:   rgba(255, 255, 255, 0.15);
+    --color-sidebar-active:  rgba(255, 255, 255, 0.25);
+    --color-sidebar-border:  rgba(255, 255, 255, 0.12);
+
+    /* Top header (palette header colour + light text, as the admin) */
+    --color-header:          #1e293b;
+    --color-header-fg:       #ffffff;
+    --color-header-muted:    rgba(255, 255, 255, 0.78);
+    --color-header-border:   rgba(255, 255, 255, 0.12);
+
+    /* Status */
+    --color-success:         #16a34a;
+    --color-success-light:   #dcfce7;
+    --color-warning:         #d97706;
+    --color-warning-light:   #fef3c7;
+    --color-warning-fg:      #ffffff;
+    --color-danger:          #dc2626;
+    --color-danger-light:    #fee2e2;
+    --color-danger-fg:       #ffffff;
+    --color-info:            #0891b2;
+    --color-info-light:      #cffafe;
+
+    /* Homeroom accent */
+    --color-homeroom:        #7c3aed;
+    --color-homeroom-light:  #ede9fe;
+
+    /* Radii */
+    --radius-sm:   0.375rem;  /* 6 px  */
+    --radius-md:   0.625rem;  /* 10 px */
+    --radius-lg:   0.875rem;  /* 14 px */
+    --radius-xl:   1.25rem;   /* 20 px */
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-nav:  0 -1px 8px 0 rgb(0 0 0 / 0.08);
+
+    /* Bottom nav height (used for padding body so content isn't hidden) */
+    --bottom-nav-h: 4rem;
+
+    /* Safe-area insets (populated by env() on iOS) */
+    --safe-top:    env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left:   env(safe-area-inset-left, 0px);
+    --safe-right:  env(safe-area-inset-right, 0px);
+  }
+
+  /* NOTE: OS-driven dark mode was removed intentionally. The palettes are
+     light-only, so following prefers-color-scheme mixed dark neutrals with
+     light palette colours. The single seam for a future dark variant is
+     `buildSemanticTokens` in @carecraft/branding — add a dark mapping there. */
+
+  /* Base resets */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-family-base, 'Inter', ui-sans-serif, system-ui, sans-serif);
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100%;
+    /* Prevent content from going under iOS home indicator */
+    padding-bottom: var(--safe-bottom);
+  }
+
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Inter from Google Fonts — loaded via @font-face for offline support */
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Utility classes
+───────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .safe-pt  { padding-top:    var(--safe-top); }
+  .safe-pb  { padding-bottom: var(--safe-bottom); }
+  .safe-pl  { padding-left:   var(--safe-left); }
+  .safe-pr  { padding-right:  var(--safe-right); }
+
+  /* Minimum touch target (48×48 px recommended by WCAG) */
+  .touch-target {
+    min-height: 48px;
+    min-width:  48px;
+  }
+
+  /* Skeleton loading shimmer */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface-raised) 25%,
+      var(--color-border) 50%,
+      var(--color-surface-raised) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+    border-radius: var(--radius-md);
+  }
+
+  @keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Fade-in animation for page transitions */
+  .fade-in {
+    animation: fade-in 0.2s ease-out both;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}

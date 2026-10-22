@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EmptyState } from "@/components/common/EmptyState";
 import { AssessmentTypeDrawer } from "@/components/assessments/AssessmentTypeDrawer";
 import {
@@ -141,12 +142,8 @@ export default function AssessmentTypesPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} assessment types deleted`);
-        } catch {
-          message.error("Some items could not be deleted");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "assessment type");
       },
     });
   };
@@ -157,10 +154,8 @@ export default function AssessmentTypesPage() {
 
       if (selectedType) {
         await update(selectedType._id, values);
-        message.success("Assessment type updated");
       } else {
         await create(values);
-        message.success("Assessment type created");
       }
       closeDrawer();
     } catch (err) {
@@ -196,14 +191,14 @@ export default function AssessmentTypesPage() {
         type.description ? (
           <Text style={{ maxWidth: 300 }}>{type.description}</Text>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
       key: "createdAt",
       title: "Created",
       render: (type: IAssessmentType) =>
-        type.createdAt ? dayjs(type.createdAt).format("MMM D, YYYY") : "—",
+        type.createdAt ? dayjs(type.createdAt).format("MMM D, YYYY") : "-",
     },
   ];
 

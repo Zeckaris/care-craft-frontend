@@ -10,11 +10,11 @@ interface MetricCardProps {
 export const MetricCard = ({ title, value, icon }: MetricCardProps) => {
   return (
     <Card className="metric-card">
-      <div style={{ fontSize: 32, color: "var(--accent)", marginBottom: 8 }}>
-        {icon}
+      <div className="metric-card-inner">
+        <span className="metric-icon">{icon}</span>
+        <span className="metric-value">{value}</span>
+        <span className="metric-title">{title}</span>
       </div>
-      <div className="metric-value">{value}</div>
-      <div className="metric-title">{title}</div>
     </Card>
   );
 };

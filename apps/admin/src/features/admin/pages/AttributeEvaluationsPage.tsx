@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Input, Modal, message, Typography, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { DataTable, type Column } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { AttributeEvaluationDrawer } from "@/components/attributeEvaluations/AttributeEvaluationDrawer";
 import {
   useAttributeEvaluations,
@@ -62,7 +63,7 @@ export default function AttributeEvaluationsPage() {
       form.setFieldsValue({
         studentId: evaluation.studentId?._id,
         studentEnrollmentId: evaluation.studentEnrollmentId?._id,
-        teacherId: evaluation.teacherId._id,
+        teacherId: evaluation.teacherId?._id,
         remark: evaluation.remark || "",
       });
     } else if (mode === "create" && extraData) {
@@ -82,16 +83,30 @@ export default function AttributeEvaluationsPage() {
 
   const handleView = (record: IAttributeEvaluation) =>
     openDrawer(record, "view");
-  const handleEdit = (record: IAttributeEvaluation) =>
+  const handleEdit = (record: IAttributeEvaluation) => {
+    const studentId = record.studentId?._id;
+    const enrollmentId = record.studentEnrollmentId?._id;
+    const teacherId = record.teacherId?._id;
+
+    if (!studentId || !enrollmentId || !teacherId) {
+      message.warning(
+        "Cannot edit evaluation: missing student, enrollment, or teacher data."
+      );
+      return;
+    }
+
     openDrawer(record, "edit");
+  };
 
   const handleNewEvaluation = (record: IAttributeEvaluation) => {
     const studentId = record.studentId?._id;
     const enrollmentId = record.studentEnrollmentId?._id;
-    const teacherId = record.teacherId._id;
+    const teacherId = record.teacherId?._id;
 
-    if (!studentId || !enrollmentId) {
-      message.warning("Cannot create evaluation: missing student data.");
+    if (!studentId || !enrollmentId || !teacherId) {
+      message.warning(
+        "Cannot create evaluation: missing student, enrollment, or teacher data."
+      );
       return;
     }
 
@@ -111,9 +126,8 @@ export default function AttributeEvaluationsPage() {
       onOk: async () => {
         try {
           await remove(String(key));
-          message.success("Evaluation deleted");
         } catch {
-          message.error("Failed to delete evaluation");
+          // error toast is shown globally
         }
       },
     });
@@ -124,12 +138,8 @@ export default function AttributeEvaluationsPage() {
     Modal.confirm({
       title: `Delete ${keys.length} evaluation${keys.length > 1 ? "s" : ""}?`,
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success("Deleted");
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "evaluation");
       },
     });
   };
@@ -162,15 +172,12 @@ export default function AttributeEvaluationsPage() {
 
       if (drawerMode === "create") {
         await create(payload);
-        message.success("Evaluation created");
       } else if (selectedEvaluation) {
         await update(selectedEvaluation._id, payload);
-        message.success("Evaluation updated");
       }
       closeDrawer();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error("Operation failed");
     }
   };
 
@@ -180,7 +187,9 @@ export default function AttributeEvaluationsPage() {
       title: "Student",
       render: (record: IAttributeEvaluation) => (
         <Text strong>
-          {record.studentId?.firstName} {record.studentId?.lastName}
+          {record.studentId
+            ? `${record.studentId.firstName} ${record.studentId.lastName}`
+            : "Deleted student"}
         </Text>
       ),
     },
@@ -201,7 +210,9 @@ export default function AttributeEvaluationsPage() {
       key: "teacher",
       title: "Teacher",
       render: (record: IAttributeEvaluation) =>
-        `${record.teacherId.firstName} ${record.teacherId.lastName}`,
+        record.teacherId
+          ? `${record.teacherId.firstName} ${record.teacherId.lastName}`
+          : "Deleted teacher",
     },
     {
       key: "date",
@@ -241,7 +252,7 @@ export default function AttributeEvaluationsPage() {
         }}
       >
         <h2>Attribute Evaluations</h2>
-        <Text type="secondary">Admin monitoring tool — use with care</Text>
+        <Text type="secondary">Admin monitoring tool. Use with care.</Text>
       </div>
 
       <div style={{ marginBottom: 16 }}>

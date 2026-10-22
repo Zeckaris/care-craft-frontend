@@ -184,13 +184,16 @@ body {
   z-index: 999;
 }
 
-/* === Search Bar === */
-.header-search {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  max-width: 300px;
+/* === School Name === */
+.header-school-name {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--white);
+  font-size: var(--font-medium);
+  font-weight: 600;
 }
 
 /* === Header Actions === */
@@ -320,8 +323,9 @@ body {
     margin-right: 16px;
   }
 
-  .header-search {
-    display: none;
+  .header-school-name {
+    font-size: var(--font-base);
+    margin-right: 12px;
   }
 
   .header-actions {

@@ -1,5 +1,6 @@
 import { Typography, Divider, Space } from "antd";
 import { BrandingSection } from "@/components/settings/BrandingSection";
+import { FeaturesSection } from "@/components/settings/FeaturesSection";
 import { SecuritySection } from "@/components/settings/SecuritySection";
 import { AnnouncementSection } from "@/components/settings/AnnouncementSection";
 
@@ -29,9 +30,11 @@ export const SettingsPage = () => {
       <div className="settings-sections">
         {/* 1. Branding - Fully Implemented */}
         <BrandingSection />
-        {/* 2. Security & Sessions - Now Active */}
+        {/* 2. Optional Features */}
+        <FeaturesSection />
+        {/* 3. Security & Sessions - Now Active */}
         <SecuritySection />
-        {/* 3. Announcements */}
+        {/* 4. Announcements */}
         <AnnouncementSection /> {/* <-- Activated */}
         {/* 4. Data Export & Print - Placeholder */}
         {/* <DataExportSection /> */}

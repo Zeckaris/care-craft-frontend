@@ -1,5 +1,6 @@
 import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IAttributeCategory {
   _id: string;
@@ -78,10 +79,14 @@ export const useAttributeCategories = (
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `${urlPath}/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: [urlPath] });
+        return result;
+      }),
+    );
 
   return {
     categories,

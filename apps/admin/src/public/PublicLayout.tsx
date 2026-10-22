@@ -349,7 +349,7 @@ export default function PublicLayout() {
             }}
           >
             © {new Date().getFullYear()} CareCraft • Built with care in Addis
-            Ababa for Elementary Schools.
+            Ababa for Ethiopian schools.
           </Paragraph>
         </div>
       </Footer>

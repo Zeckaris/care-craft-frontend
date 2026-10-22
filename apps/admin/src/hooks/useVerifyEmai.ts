@@ -24,7 +24,7 @@ export const useVerifyEmail = () => {
     }
 
     try {
-      const res = await post( { url : '/auth/sendVerification', body:{email}  });
+      const res = await post( { url : '/auth/sendVerification', body:{email}, toast: false });
       if (res.success) {
         message.success(res.message || 'Verification code sent!');
         setCanResend(false);

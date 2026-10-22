@@ -1,6 +1,6 @@
-import { message } from 'antd';
 import { useApi } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { settleMutations } from '@carecraft/query-core';
 
 export interface IAssessmentSetup {
   _id: string;
@@ -61,15 +61,19 @@ export const useAssessmentSetups = () => {
   };
 
   const remove = async (id: string) => {
-    const result = await del({ url: `/assessment/setup/${id}` });
+    const result = await del({ url: `/assessment/setup/${id}`, toast: false });
     queryClient.invalidateQueries({ queryKey: ['/assessment/setup'] });
     return result;
   };
 
-  const removeMany = async (ids: string[]) => {
-    const results = await Promise.all(ids.map(remove));
-    return results;
-  };
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `/assessment/setup/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: ['/assessment/setup'] });
+        return result;
+      }),
+    );
 
   return {
     // Data

@@ -92,7 +92,7 @@ export const useBroadcasts = () => {
     status?: "draft" | "sent";
     priority?: "urgent" | "normal" | "low";
   }) => {
-    const result = await post({ url: "/broadcast", body: data });
+    const result = await post({ url: "/broadcast", body: data, toast: false });
     queryClient.invalidateQueries({ queryKey: ["/broadcast"] });
     return result;
   };
@@ -108,7 +108,7 @@ export const useBroadcasts = () => {
       priority?: "urgent" | "normal" | "low";
     }
   ) => {
-    const result = await put({ url: `/broadcast/${id}`, body: data });
+    const result = await put({ url: `/broadcast/${id}`, body: data, toast: false });
     queryClient.invalidateQueries({ queryKey: ["/broadcast"] });
     return result;
   };

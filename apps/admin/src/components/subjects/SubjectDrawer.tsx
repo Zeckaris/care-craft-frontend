@@ -1,10 +1,12 @@
 import { Drawer, Form, Input, Button, Space, Typography, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import type { FormInstance } from "antd";
-import dayjs from "dayjs";
+import { useEffect } from "react";
 import type { ISubject } from "@/hooks/useSubjects";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
 
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 interface SubjectDrawerProps {
   open: boolean;
@@ -28,8 +30,14 @@ export const SubjectDrawer = ({
   const isView = mode === "view";
   const isEdit = mode === "edit";
 
-  const formatDate = (dateStr?: string) =>
-    dateStr ? dayjs(dateStr).format("MMMM D, YYYY") : "—";
+  useEffect(() => {
+    if (open && subject) {
+      form.setFieldsValue({
+        name: subject.name,
+        description: subject.description || "",
+      });
+    }
+  }, [open, subject, isView, form]);
 
   return (
     <Drawer
@@ -65,6 +73,7 @@ export const SubjectDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           name: subject?.name || "",
           description: subject?.description || "",
@@ -92,13 +101,15 @@ export const SubjectDrawer = ({
         {/* Read-only Info (View Mode Only) */}
         {isView && (
           <>
-            <Form.Item label="Created">
-              <Text>{formatDate(subject?.createdAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Created"
+              value={formatDateTime(subject?.createdAt)}
+            />
 
-            <Form.Item label="Last Updated">
-              <Text>{formatDate(subject?.updatedAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Last Updated"
+              value={formatDateTime(subject?.updatedAt)}
+            />
           </>
         )}
       </Form>

@@ -538,6 +538,13 @@ body {
 .ant-btn-primary {
   background: var(--primary) !important;
   border-color: var(--primary) !important;
+  color: var(--white) !important;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus,
+.ant-btn-primary:active {
+  color: var(--white) !important;
 }
 
 /* Global font override for most AntD components */

@@ -1,5 +1,5 @@
-import { Card, Typography, Space, Button, Avatar } from "antd";
-import { EditOutlined, DeleteOutlined, BankOutlined } from "@ant-design/icons";
+import { Typography, Space, Button, Avatar } from "antd";
+import { EditOutlined, BankOutlined } from "@ant-design/icons";
 import { type ISchoolInfo } from "@/hooks/useSchoolInfo";
 
 const { Title, Text } = Typography;
@@ -7,15 +7,11 @@ const { Title, Text } = Typography;
 interface SchoolInfoViewProps {
   data: ISchoolInfo;
   onEdit: () => void;
-  onDelete: () => void;
 }
 
-export const SchoolInfoView = ({
-  data,
-  onEdit,
-  onDelete,
-}: SchoolInfoViewProps) => {
-  const { name, address, contactEmail, contactPhone, logo } = data;
+export const SchoolInfoView = ({ data, onEdit }: SchoolInfoViewProps) => {
+  const { name, about, address, contactEmail, telephone, logo } = data;
+  const telephoneNumbers = telephone ?? [];
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto" }}>
@@ -38,6 +34,23 @@ export const SchoolInfoView = ({
           {name}
         </Title>
       </div>
+
+      {/* About */}
+      {about && (
+        <div style={{ marginBottom: 24 }}>
+          <Text
+            strong
+            style={{
+              display: "block",
+              marginBottom: 4,
+              color: "var(--text-dark)",
+            }}
+          >
+            About
+          </Text>
+          <Text>{about}</Text>
+        </div>
+      )}
 
       {/* Contact Details */}
       <Space direction="vertical" size="middle" style={{ width: "100%" }}>
@@ -78,31 +91,31 @@ export const SchoolInfoView = ({
               color: "var(--text-dark)",
             }}
           >
-            Phone
+            Telephone
           </Text>
-          <Text type="secondary">{contactPhone}</Text>
+          {telephoneNumbers.length > 0 ? (
+            <Space direction="vertical" size={2}>
+              {telephoneNumbers.map((number, index) => (
+                <Text key={`${number}-${index}`} type="secondary">
+                  {number}
+                </Text>
+              ))}
+            </Space>
+          ) : (
+            <Text type="secondary">Not set</Text>
+          )}
         </div>
       </Space>
 
       <div style={{ marginTop: 32, textAlign: "center" }}>
-        <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="large"
-            onClick={onEdit}
-          >
-            Edit
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            size="large"
-            onClick={onDelete}
-          >
-            Delete
-          </Button>
-        </Space>
+        <Button
+          type="primary"
+          icon={<EditOutlined />}
+          size="large"
+          onClick={onEdit}
+        >
+          Edit
+        </Button>
       </div>
     </div>
   );

@@ -1,0 +1,19 @@
+{
+  "name": "@carecraft/branding",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@carecraft/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

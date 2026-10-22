@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Button,
-  message,
   Form,
   Modal,
   Space,
@@ -12,6 +11,7 @@ import {
 } from "antd";
 import { PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { EmptyState } from "@/components/common/EmptyState";
 import { SubjectDrawer } from "@/components/subjects/SubjectDrawer";
 import { useSubjects, type ISubject } from "@/hooks/useSubjects";
@@ -92,9 +92,8 @@ export default function SubjectsPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Subject deleted");
     } catch {
-      message.error("Failed to delete");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -109,12 +108,8 @@ export default function SubjectsPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} subjects deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "subject");
       },
     });
   };
@@ -125,10 +120,8 @@ export default function SubjectsPage() {
 
       if (selectedSubject) {
         await update(selectedSubject._id, values);
-        message.success("Subject updated");
       } else {
         await create(values);
-        message.success("Subject created");
       }
       closeDrawer();
     } catch (err) {
@@ -159,7 +152,7 @@ export default function SubjectsPage() {
         subject.description ? (
           <Text style={{ maxWidth: 300 }}>{subject.description}</Text>
         ) : (
-          <Text type="secondary">—</Text>
+          <Text type="secondary">-</Text>
         ),
     },
     {
@@ -168,7 +161,7 @@ export default function SubjectsPage() {
       render: (subject: ISubject) =>
         subject.createdAt
           ? dayjs(subject.createdAt).format("MMM D, YYYY")
-          : "—",
+          : "-",
     },
   ];
 
@@ -246,7 +239,7 @@ export default function SubjectsPage() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onBulkDelete={handleBulkDelete}
-          pagination={false} // No pagination – small dataset
+          pagination={false} // No pagination (small dataset)
         />
       )}
 

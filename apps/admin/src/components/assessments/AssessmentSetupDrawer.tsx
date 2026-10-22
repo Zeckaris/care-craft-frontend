@@ -12,9 +12,10 @@ import {
 import { useState, useEffect } from "react"; // ← Only this
 import { SafetyOutlined } from "@ant-design/icons";
 import type { FormInstance } from "antd";
-import dayjs from "dayjs";
 import type { IAssessmentSetup } from "@/hooks/useAssessmentSetups";
 import { useAssessmentTypes } from "@/hooks/useAssessmentTypes";
+import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
 
 const { Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -50,14 +51,18 @@ export const AssessmentSetupDrawer = ({
 
   // === SYNC FORM WITH STATE ON MOUNT & EDIT ===
   useEffect(() => {
-    if (setup && isEdit) {
+    if (setup) {
       setSelectedTypeIds(setup.assessmentTypeIds);
-      form.setFieldsValue({ assessmentTypeIds: setup.assessmentTypeIds });
-    } else if (!setup) {
+      form.setFieldsValue({
+        name: setup.name,
+        description: setup.description || "",
+        assessmentTypeIds: setup.assessmentTypeIds,
+      });
+    } else {
       setSelectedTypeIds([]);
       form.setFieldsValue({ assessmentTypeIds: [] });
     }
-  }, [setup, form, isEdit]);
+  }, [setup, form, isView]);
 
   // === LIVE WEIGHT SUM ===
   const totalWeight = types
@@ -103,9 +108,6 @@ export const AssessmentSetupDrawer = ({
     }
   };
 
-  const formatDate = (dateStr?: string) =>
-    dateStr ? dayjs(dateStr).format("MMMM D, YYYY") : "—";
-
   return (
     <Drawer
       title={
@@ -145,6 +147,7 @@ export const AssessmentSetupDrawer = ({
         form={form}
         layout="vertical"
         disabled={isView}
+        className={isView ? "cc-readonly-form" : undefined}
         initialValues={{
           name: setup?.name || "",
           description: setup?.description || "",
@@ -231,9 +234,10 @@ export const AssessmentSetupDrawer = ({
               </Space>
             </Form.Item>
 
-            <Form.Item label="Created">
-              <Text>{formatDate(setup?.createdAt)}</Text>
-            </Form.Item>
+            <ReadOnlyField
+              label="Created"
+              value={formatDateTime(setup?.createdAt)}
+            />
           </>
         )}
       </Form>

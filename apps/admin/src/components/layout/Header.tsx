@@ -2,7 +2,6 @@ import {
   Avatar,
   Badge,
   Dropdown,
-  Input,
   Layout,
   Menu,
   Space,
@@ -20,8 +19,8 @@ import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/hooks/useLogout";
 import { useUser } from "@/context/UserContext";
 import { useNotificationCounts } from "@/hooks/notifications/useNotificationCounts";
+import { useSchoolInfo } from "@/hooks/useSchoolInfo";
 
-const { Search } = Input;
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
 
@@ -40,6 +39,8 @@ const Header = ({ setMobileMenuOpen }: HeaderProps) => {
   const notificationData = useNotificationCounts({ enabled: !!user });
   const unreadCount = notificationData.unreadCount ?? 0;
   const isLoading = notificationData.isLoading ?? false;
+
+  const { schoolInfo, isLoading: isSchoolLoading } = useSchoolInfo(!!user);
 
   const userMenu = user ? (
     <Menu
@@ -72,15 +73,9 @@ const Header = ({ setMobileMenuOpen }: HeaderProps) => {
         />
       </div>
 
-      {/* LEFT: Search (hidden on mobile via existing CSS) */}
-      <div className="header-search">
-        <Search
-          placeholder="Search students, teachers, subjects..."
-          allowClear
-          size="middle"
-          enterButton
-          onSearch={(value) => console.log("Search:", value)}
-        />
+      {/* LEFT: School name (nothing while loading) */}
+      <div className="header-school-name">
+        {!isSchoolLoading && schoolInfo?.name ? schoolInfo.name : null}
       </div>
 
       {/* RIGHT: Icons + Avatar Dropdown */}

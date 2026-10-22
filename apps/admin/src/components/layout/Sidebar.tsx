@@ -11,24 +11,39 @@ import {
   SafetyOutlined,
   CalendarOutlined,
   ScheduleOutlined,
-  ReconciliationOutlined,
   AppstoreOutlined,
   RadarChartOutlined,
   StrikethroughOutlined,
+  BarsOutlined,
+  FieldTimeOutlined,
+  CheckSquareOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { MdPlaylistAddCheck } from "react-icons/md";
+import { useEffect, useState, type ReactNode } from "react";
 import { RiMedal2Line } from "react-icons/ri";
 import { EyeOutlined } from "@ant-design/icons";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface SidebarProps {
   collapsed: boolean;
 }
 
-const menuItems = [
+interface SidebarMenuItemType {
+  key: string;
+  icon: ReactNode;
+  label: ReactNode;
+  roles?: string[];
+  children?: { key: string; label: ReactNode; roles?: string[] }[];
+}
+
+const menuItems: SidebarMenuItemType[] = [
   { key: "/app/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   { key: "/app/students", icon: <UserOutlined />, label: "Students" },
+  {
+    key: "/app/attendance",
+    icon: <CheckSquareOutlined />,
+    label: "Attendance",
+  },
   {
     key: "/app/enroll",
     icon: <CalendarOutlined />,
@@ -37,6 +52,13 @@ const menuItems = [
   { key: "/app/teachers", icon: <TeamOutlined />, label: "Teachers" },
   { key: "/app/subjects", icon: <BookOutlined />, label: "Subjects" },
   { key: "/app/grades", icon: <TrophyOutlined />, label: "Grades" },
+  { key: "/app/sections", icon: <BarsOutlined />, label: "Sections" },
+  {
+    key: "/app/schedule",
+    icon: <FieldTimeOutlined />,
+    label: "Schedule",
+    roles: ["admin", "coordinator"],
+  },
   { key: "/app/parents", icon: <HeartFilled />, label: "Parents" },
   { key: "/app/school-info", icon: <BankOutlined />, label: "School Info" },
   {
@@ -56,6 +78,11 @@ const menuItems = [
       {
         key: "/app/assessments/setup",
         label: <Link to="/app/assessments/setup">Setup</Link>,
+      },
+      {
+        key: "/app/assessments/results",
+        label: <Link to="/app/assessments/results">Results</Link>,
+        roles: ["admin", "coordinator"],
       },
     ],
   },
@@ -80,11 +107,6 @@ const menuItems = [
     label: "Attribute Evaluation",
   },
   {
-    key: "/app/action-plans",
-    icon: <MdPlaylistAddCheck style={{ fontSize: 18 }} />,
-    label: "Action Plans",
-  },
-  {
     key: "/app/badges",
     icon: <RiMedal2Line style={{ fontSize: 18 }} />,
     label: "Badges",
@@ -94,12 +116,12 @@ const menuItems = [
         label: <Link to="/app/badges/definitions">Definitions</Link>,
       },
       {
-        key: "/app/badges/criteria",
-        label: <Link to="/app/badges/criteria">Criteria</Link>,
-      },
-      {
         key: "/app/badges/awards",
         label: <Link to="/app/badges/awards">Awards</Link>,
+      },
+      {
+        key: "/app/badges/gifts",
+        label: <Link to="/app/badges/gifts">Gifts</Link>,
       },
     ],
   },
@@ -113,6 +135,7 @@ const menuItems = [
 const Sidebar = ({ collapsed }: SidebarProps) => {
   const location = useLocation();
   const selectedKey = location.pathname;
+  const { user } = useCurrentUser();
 
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
@@ -139,24 +162,31 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
     }
   };
 
-  const items = menuItems.map((item) => {
-    if (item.children) {
+  const canSeeItem = (roles?: string[]) =>
+    !roles || (!!user && roles.includes(user.role));
+
+  const items = menuItems
+    .filter((item) => canSeeItem(item.roles))
+    .map((item) => {
+      if (item.children) {
+        return {
+          key: item.key,
+          icon: item.icon,
+          label: item.label,
+          children: item.children
+            .filter((child) => canSeeItem(child.roles))
+            .map((child) => ({
+              key: child.key,
+              label: child.label, // Already has <Link>
+            })),
+        };
+      }
       return {
         key: item.key,
         icon: item.icon,
-        label: item.label,
-        children: item.children.map((child) => ({
-          key: child.key,
-          label: child.label, // Already has <Link>
-        })),
+        label: <Link to={item.key}>{item.label}</Link>,
       };
-    }
-    return {
-      key: item.key,
-      icon: item.icon,
-      label: <Link to={item.key}>{item.label}</Link>,
-    };
-  });
+    });
 
   return (
     <>

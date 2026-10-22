@@ -11,7 +11,8 @@ export const useSecurity = () => {
   const toggleMfa = async (enable: boolean) => {
     await patch({ 
       url: `${basePath}/mfa`, 
-      body: { mfaEnabled: enable } 
+      body: { mfaEnabled: enable },
+      toast: false,
     });
     // Invalidate me query to refresh MFA status
     queryClient.invalidateQueries({ queryKey: ['/auth/me'] });
@@ -21,16 +22,20 @@ export const useSecurity = () => {
   const suspendUser = async (userId: string, reason?: string) => {
     await patch({ 
       url: `${basePath}/users/${userId}/suspend`, 
-      body: reason ? { suspensionReason: reason } : {} 
+      body: reason ? { suspensionReason: reason } : {},
+      toast: false,
     });
+    await queryClient.invalidateQueries({ queryKey: ['userSearch'] });
   };
 
   // Unsuspend a user (admin only)
   const unsuspendUser = async (userId: string) => {
     await patch({ 
       url: `${basePath}/users/${userId}/unsuspend`, 
-      body: {} 
+      body: {},
+      toast: false,
     });
+    await queryClient.invalidateQueries({ queryKey: ['userSearch'] });
   };
 
   const isSaving = postMutation.isPending || putMutation.isPending || patchMutation.isPending;

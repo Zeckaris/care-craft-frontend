@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Button, message, Form, Modal, Input, Space, Typography } from "antd";
+import { Button, Form, Modal, Input, Space, Typography } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
+import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
 import { GradeDrawer } from "@/components/grades/GradeDrawer";
 import { useGrades } from "@/hooks/useGrades";
 import type { IGrade as HookIGrade } from "@/hooks/useGrades";
@@ -87,9 +88,8 @@ export default function GradesPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Grade deleted");
-    } catch (err) {
-      message.error("Failed to delete");
+    } catch {
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -104,12 +104,8 @@ export default function GradesPage() {
       okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
-        try {
-          await removeMany(keys.map(String));
-          message.success(`${keys.length} grades deleted`);
-        } catch {
-          message.error("Failed to delete");
-        }
+        const result = await removeMany(keys.map(String));
+        reportBulkDelete(result, "grade");
       },
     });
   };
@@ -119,10 +115,8 @@ export default function GradesPage() {
       const values = await form.validateFields();
       if (selectedGrade) {
         await update(selectedGrade._id, values);
-        message.success("Updated");
       } else {
         await create(values);
-        message.success("Created");
       }
       closeDrawer();
     } catch (err) {
@@ -164,7 +158,7 @@ export default function GradesPage() {
         </Button>
       </div>
 
-      {/* SEARCH BAR — NOW ON TOP! */}
+      {/* Search bar, now on top */}
       <div style={{ marginBottom: 16 }}>
         <Input
           placeholder="Search grades by level or description..."
