@@ -116,10 +116,6 @@ const menuItems: SidebarMenuItemType[] = [
         label: <Link to="/app/badges/definitions">Definitions</Link>,
       },
       {
-        key: "/app/badges/criteria",
-        label: <Link to="/app/badges/criteria">Criteria</Link>,
-      },
-      {
         key: "/app/badges/awards",
         label: <Link to="/app/badges/awards">Awards</Link>,
       },

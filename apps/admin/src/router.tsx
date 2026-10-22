@@ -20,9 +20,8 @@ import AcademicCalendarPage from "./features/admin/pages/AcademicCalendarPage";
 import GradeSubjectAssessmentsPage from "./features/admin/pages/GradeSubjectAssessmentsPage";
 import AttributeCategoriesPage from "./features/admin/pages/AttributeCategoriesPage";
 import AttributeEvaluationsPage from "./features/admin/pages/AttributeEvaluationsPage";
-import { Typography } from "antd";
-import BadgeCriteriaPage from "./features/admin/pages/badge/BadgeCriteriaPage";
 import BadgeDefinitionsPage from "./features/admin/pages/badge/BadgeDefinitionsPage";
+import BadgeAwardsPage from "./features/admin/pages/badge/BadgeAwardsPage";
 import ObservationsPage from "./features/admin/pages/ObservationsPage";
 import { SettingsPage } from "./features/admin/pages/SettingsPage";
 import { NotificationsPage } from "./features/admin/pages/NotificationsPage";
@@ -33,8 +32,6 @@ import LandingPage from "@/public/pages/LandingPage";
 import FeaturesPage from "@/public/pages/FeaturesPage";
 import AboutPage from "@/public/pages/AboutPage";
 import PublicLayout from "@/public/PublicLayout";
-
-const { Title, Text } = Typography;
 
 export const router = createBrowserRouter([
   // 1. Public root
@@ -210,17 +207,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "criteria",
-            element: <BadgeCriteriaPage />,
-            handle: { crumb: () => "Criteria" },
+            element: <Navigate to="/app/badges/definitions" replace />,
           },
           {
             path: "awards",
-            element: (
-              <div style={{ padding: 24, textAlign: "center" }}>
-                <Title level={3}>Student Badge Awards</Title>
-                <Text type="secondary">Coming soon...</Text>
-              </div>
-            ),
+            element: <BadgeAwardsPage />,
             handle: { crumb: () => "Awards" },
           },
         ],

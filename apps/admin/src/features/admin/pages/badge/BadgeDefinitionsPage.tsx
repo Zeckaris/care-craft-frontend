@@ -8,33 +8,49 @@ import {
   Typography,
   Alert,
   Empty,
-  message,
   Modal,
   Avatar,
+  Tag,
 } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
+import type { BadgeDefinition } from "@carecraft/types";
 import { DataTable } from "@/components/common/DataTable";
 import { BadgeDefinitionDrawer } from "@/components/badge/BadgeDefinitionDrawer";
+import { BadgeDetailDrawer } from "@/components/badge/BadgeDetailDrawer";
+import { useBadgeDefinitions } from "@/hooks/useBadgeDefinitions";
+import { useGradeOptions } from "@/hooks/useGradeOptions";
+import { formatDate } from "@/utils/dateFormat";
 import {
-  useBadgeDefinitions,
-  type IBadgeDefinition,
-} from "@/hooks/useBadgeDefinitions";
-import { useBadgeCriteria } from "@/hooks/useBadgeCriteria";
-import dayjs from "dayjs";
+  BADGE_LEVEL_OPTIONS,
+  getBadgeLevelLabel,
+  getEligibleGradeLabels,
+  normalizeEligibleGradeIds,
+} from "@/utils/badges";
 import type { Key } from "antd/es/table/interface";
 import Title from "antd/es/typography/Title";
 
 const { Text } = Typography;
 
+const autoAwardFilterOptions = [
+  { value: "true", label: "Auto award" },
+  { value: "false", label: "Manual award" },
+];
+
 export default function BadgeDefinitionsPage() {
   const [searchName, setSearchName] = useState("");
   const [selectedLevel, setSelectedLevel] = useState<number | undefined>(
-    undefined
+    undefined,
   );
+  const [selectedAutoAward, setSelectedAutoAward] = useState<
+    boolean | undefined
+  >(undefined);
+  const [selectedEligibleGradeId, setSelectedEligibleGradeId] = useState<
+    string | undefined
+  >(undefined);
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
 
   const {
@@ -47,41 +63,33 @@ export default function BadgeDefinitionsPage() {
     fetchError,
     refetch,
     create,
-    update,
     remove,
     isCreating,
-    isUpdating,
     isDeleting,
   } = useBadgeDefinitions({
     name: searchName,
     level: selectedLevel,
+    autoAward: selectedAutoAward,
+    eligibleGradeId: selectedEligibleGradeId,
     pagination,
   });
 
-  // For criteria selection in drawer
-  const { criteria: allCriteria } = useBadgeCriteria(); // No filters
+  const {
+    gradeOptions,
+    gradeLabelById,
+    isLoading: gradesLoading,
+  } = useGradeOptions();
 
-  const availableCriteriaOptions = allCriteria.map((c) => ({
-    value: c._id,
-    label: `${c.type.replace(/([A-Z])/g, " $1").trim()} ${
-      c.description ? `- ${c.description}` : ""
-    }`,
-  }));
-
-  const levelOptions = [
-    { value: 1, label: "Level 1 (Bronze)" },
-    { value: 2, label: "Level 2 (Silver)" },
-    { value: 3, label: "Level 3 (Gold)" },
-    { value: 4, label: "Level 4 (Platinum)" },
-  ];
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<"view" | "create" | "edit">(
-    "view"
-  );
-  const [selectedDefinition, setSelectedDefinition] =
-    useState<IBadgeDefinition | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
   const [form] = Form.useForm();
+
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailBadgeId, setDetailBadgeId] = useState<string | undefined>(
+    undefined,
+  );
+  const [detailInitialBadge, setDetailInitialBadge] =
+    useState<BadgeDefinition | null>(null);
+  const [detailNotice, setDetailNotice] = useState<string | null>(null);
 
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
@@ -90,92 +98,72 @@ export default function BadgeDefinitionsPage() {
     open: false,
   });
 
-  // Reset page when filters change
   useEffect(() => {
-    setPagination((p) => ({ ...p, page: 1 }));
-  }, [searchName, selectedLevel]);
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, [
+    searchName,
+    selectedLevel,
+    selectedAutoAward,
+    selectedEligibleGradeId,
+  ]);
 
-  const openDrawer = (
-    definition: IBadgeDefinition | null,
-    mode: "view" | "create" | "edit"
+  const openDetail = (
+    definition: BadgeDefinition | null,
+    notice: string | null = null,
   ) => {
-    setSelectedDefinition(definition);
-    setDrawerMode(mode);
-    if (definition && mode !== "create") {
-      form.setFieldsValue({
-        name: definition.name,
-        description: definition.description,
-        level: definition.level,
-        criteria: definition.criteria.map((c) => c._id),
-      });
-    } else {
-      form.resetFields();
-    }
-    setDrawerOpen(true);
+    setDetailBadgeId(definition?._id);
+    setDetailInitialBadge(definition);
+    setDetailNotice(notice);
+    setDetailOpen(true);
   };
 
-  const closeDrawer = () => {
-    setDrawerOpen(false);
-    setSelectedDefinition(null);
+  const closeDetail = () => {
+    setDetailOpen(false);
+    setDetailBadgeId(undefined);
+    setDetailInitialBadge(null);
+    setDetailNotice(null);
+  };
+
+  const openCreate = () => {
+    form.resetFields();
+    setCreateOpen(true);
+  };
+
+  const closeCreate = () => {
+    setCreateOpen(false);
     form.resetFields();
   };
 
-  const handleSubmit = async (values: any, iconFile: File | null) => {
+  const handleCreate = async (
+    values: {
+      name: string;
+      description: string;
+      howToEarn: string;
+      level: number;
+      eligibleGrades: string[];
+    },
+    iconFile: File | null,
+  ) => {
     try {
-      // Clean values: ensure required fields are present
-      const cleanValues: {
-        name: string;
-        description: string;
-        level: number;
-        criteria?: string[];
-      } = {
-        name: values.name as string,
-        description: values.description as string,
-        level: values.level as number,
-        criteria: values.criteria || undefined,
-      };
-
-      if (drawerMode === "create") {
-        await create(cleanValues, iconFile || undefined);
-        message.success("Badge definition created successfully");
-      } else if (drawerMode === "edit" && selectedDefinition) {
-        // For update, we only send fields that changed (optional)
-        const updateValues: {
-          name?: string;
-          description?: string;
-          level?: number;
-          criteria?: string[];
-        } = {
-          name:
-            values.name !== selectedDefinition.name ? values.name : undefined,
-          description:
-            values.description !== selectedDefinition.description
-              ? values.description
-              : undefined,
-          level:
-            values.level !== selectedDefinition.level
-              ? values.level
-              : undefined,
-          criteria: values.criteria || undefined, // always allow updating criteria
-        };
-
-        // Only send if something changed
-        await update(
-          selectedDefinition._id,
-          updateValues,
-          iconFile || undefined
-        );
-        message.success("Badge definition updated successfully");
-      }
-
-      closeDrawer();
-    } catch (error: any) {
-      // Error already handled by useApi (shows message.error)
+      const result = await create(
+        { ...values, autoAward: false },
+        iconFile || undefined,
+      );
+      const created = (result as { data?: BadgeDefinition } | undefined)?.data;
+      closeCreate();
+      openDetail(
+        created ?? null,
+        "Badge created. You can add criteria now, or leave it teacher-awarded.",
+      );
+    } catch {
+      // Errors are shown by useApi, including backend validation messages.
     }
   };
-  const handleView = (def: IBadgeDefinition) => openDrawer(def, "view");
-  const handleEdit = (def: IBadgeDefinition) => openDrawer(def, "edit");
-  const handleCreate = () => openDrawer(null, "create");
+
+  const handleRowClick = (definition: BadgeDefinition) =>
+    openDetail(definition);
+  const handleView = (definition: BadgeDefinition) => openDetail(definition);
+  const handleEdit = (definition: BadgeDefinition) => openDetail(definition);
 
   const handleDelete = (key: Key) => {
     setConfirmDelete({ open: true, key });
@@ -185,19 +173,58 @@ export default function BadgeDefinitionsPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Badge definition deleted successfully");
-    } catch (error: any) {
-      // Handled by useApi
+    } catch {
+      // Errors are shown by useApi.
     } finally {
       setConfirmDelete({ open: false });
     }
+  };
+
+  const renderEligibleGrades = (record: BadgeDefinition) => {
+    const ids = normalizeEligibleGradeIds(record.eligibleGrades);
+    if (ids.length === 0) {
+      return <Tag color="red">No eligible grades</Tag>;
+    }
+
+    if (gradeOptions.length > 0 && ids.length === gradeOptions.length) {
+      return <Tag color="blue">All grades</Tag>;
+    }
+
+    const labels = getEligibleGradeLabels(
+      record.eligibleGrades,
+      gradeLabelById,
+    );
+    const summary = labels.join(", ");
+
+    return (
+      <Text ellipsis={{ tooltip: summary }} style={{ maxWidth: 220 }}>
+        {summary}
+      </Text>
+    );
+  };
+
+  const renderAwardStatus = (record: BadgeDefinition) => {
+    const count = record.criteria?.length ?? 0;
+    if (count === 0) {
+      return <Tag color="gold">Teacher-awarded</Tag>;
+    }
+    return (
+      <Space wrap size={4}>
+        <Tag color="blue">
+          {count} criteria
+        </Tag>
+        <Tag color={record.autoAward ? "green" : "default"}>
+          {record.autoAward ? "Auto-award on" : "Auto-award off"}
+        </Tag>
+      </Space>
+    );
   };
 
   const columns = [
     {
       key: "icon",
       title: "Icon",
-      render: (record: IBadgeDefinition) => (
+      render: (record: BadgeDefinition) => (
         <Avatar
           size={48}
           icon={<TrophyOutlined />}
@@ -209,38 +236,49 @@ export default function BadgeDefinitionsPage() {
     {
       key: "name",
       title: "Name",
-      render: (record: IBadgeDefinition) => (
-        <Space direction="vertical">
+      render: (record: BadgeDefinition) => (
+        <Space direction="vertical" size={0}>
           <Text strong>{record.name}</Text>
-          <Text type="secondary">Level {record.level}</Text>
+          <Text type="secondary">{getBadgeLevelLabel(record.level)}</Text>
         </Space>
       ),
     },
     {
       key: "description",
       title: "Description",
-      dataIndex: "description",
-      ellipsis: true,
+      render: (record: BadgeDefinition) => record.description || "",
     },
     {
-      key: "criteria",
-      title: "Criteria",
-      render: (record: IBadgeDefinition) => record.criteria.length,
-    },
-    {
-      key: "createdBy",
-      title: "Created By",
-      render: (record: IBadgeDefinition) => (
-        <Text>
-          {record.createdBy.firstName} {record.createdBy.lastName}
+      key: "howToEarn",
+      title: "How to Earn",
+      render: (record: BadgeDefinition) => (
+        <Text ellipsis={{ tooltip: record.howToEarn || "" }} style={{ maxWidth: 220 }}>
+          {record.howToEarn || ""}
         </Text>
       ),
     },
     {
+      key: "eligibleGrades",
+      title: "Eligible Grades",
+      render: (record: BadgeDefinition) => renderEligibleGrades(record),
+    },
+    {
+      key: "awardStatus",
+      title: "Award Status",
+      render: (record: BadgeDefinition) => renderAwardStatus(record),
+    },
+    {
+      key: "createdBy",
+      title: "Created By",
+      render: (record: BadgeDefinition) =>
+        record.createdBy && typeof record.createdBy !== "string"
+          ? `${record.createdBy.firstName} ${record.createdBy.lastName}`
+          : "",
+    },
+    {
       key: "createdAt",
       title: "Created",
-      render: (record: IBadgeDefinition) =>
-        dayjs(record.createdAt).format("MMM D, YYYY"),
+      render: (record: BadgeDefinition) => formatDate(record.createdAt),
     },
   ];
 
@@ -260,19 +298,19 @@ export default function BadgeDefinitionsPage() {
                 Badge Definitions
               </Title>
               <Text type="secondary">
-                Create and manage achievement badges for students
+                Create badges, add criteria and manage auto-award from each
+                badge detail.
               </Text>
             </Space>
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={handleCreate}
+              onClick={openCreate}
             >
               Create Badge
             </Button>
           </div>
 
-          {/* Filters */}
           <div
             style={{
               display: "flex",
@@ -285,7 +323,7 @@ export default function BadgeDefinitionsPage() {
             <Input
               placeholder="Search by name..."
               value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              onChange={(event) => setSearchName(event.target.value)}
               prefix={<SearchOutlined />}
               style={{ width: 240 }}
               allowClear
@@ -296,11 +334,39 @@ export default function BadgeDefinitionsPage() {
               value={selectedLevel ?? null}
               onChange={(value) => setSelectedLevel(value ?? undefined)}
               allowClear
-              options={levelOptions}
+              options={BADGE_LEVEL_OPTIONS}
+            />
+            <Select
+              style={{ width: 200 }}
+              placeholder="All Award Modes"
+              value={
+                selectedAutoAward === undefined
+                  ? null
+                  : String(selectedAutoAward)
+              }
+              onChange={(value) =>
+                setSelectedAutoAward(
+                  value === undefined || value === null
+                    ? undefined
+                    : value === "true",
+                )
+              }
+              allowClear
+              options={autoAwardFilterOptions}
+            />
+            <Select
+              style={{ width: 240 }}
+              placeholder="All Eligible Grades"
+              value={selectedEligibleGradeId ?? null}
+              onChange={(value) => setSelectedEligibleGradeId(value ?? undefined)}
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              loading={gradesLoading}
+              options={gradeOptions}
             />
           </div>
 
-          {/* Error Alert */}
           {isError && fetchError && (
             <Alert
               type="error"
@@ -313,10 +379,9 @@ export default function BadgeDefinitionsPage() {
             />
           )}
 
-          {/* Table or Empty */}
           {definitions.length === 0 && !isLoading ? (
             <Empty description="No badge definitions yet">
-              <Button type="primary" onClick={handleCreate}>
+              <Button type="primary" onClick={openCreate}>
                 Create Your First Badge
               </Button>
             </Empty>
@@ -326,6 +391,7 @@ export default function BadgeDefinitionsPage() {
               columns={columns}
               loading={isLoading}
               rowKey="_id"
+              onRowClick={handleRowClick}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
@@ -343,7 +409,6 @@ export default function BadgeDefinitionsPage() {
         </Space>
       </div>
 
-      {/* Delete Confirmation */}
       <Modal
         title="Confirm Delete"
         open={confirmDelete.open}
@@ -360,17 +425,24 @@ export default function BadgeDefinitionsPage() {
         </p>
       </Modal>
 
-      {/* Drawer - REMOVED the 4 file/preview props */}
       <BadgeDefinitionDrawer
-        open={drawerOpen}
-        onClose={closeDrawer}
-        definition={selectedDefinition}
-        mode={drawerMode}
+        open={createOpen}
+        onClose={closeCreate}
+        definition={null}
+        mode="create"
         form={form}
-        onSubmit={handleSubmit}
-        loading={isCreating || isUpdating}
-        availableCriteria={availableCriteriaOptions}
-        levelOptions={levelOptions}
+        onSubmit={handleCreate}
+        loading={isCreating}
+        gradeOptions={gradeOptions}
+        levelOptions={BADGE_LEVEL_OPTIONS}
+      />
+
+      <BadgeDetailDrawer
+        open={detailOpen}
+        onClose={closeDetail}
+        badgeId={detailBadgeId}
+        initialBadge={detailInitialBadge}
+        notice={detailNotice}
       />
     </>
   );

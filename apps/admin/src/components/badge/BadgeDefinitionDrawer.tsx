@@ -7,20 +7,21 @@ import {
   Avatar,
   Upload,
   Select,
-  Tag,
   Typography,
-  List,
-  Alert,
 } from "antd";
-import {
-  UploadOutlined,
-  TrophyOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { UploadOutlined, TrophyOutlined } from "@ant-design/icons";
 import type { FormInstance } from "antd";
 import { useState, useEffect } from "react";
-import type { IBadgeDefinition } from "@/hooks/useBadgeDefinitions";
+import type { BadgeDefinition } from "@carecraft/types";
 import { ReadOnlyField } from "@/components/common/ReadOnlyField";
+import { formatDateTime } from "@/utils/dateFormat";
+import {
+  BADGE_LEVEL_OPTIONS,
+  getBadgeCriteriaTypeLabel,
+  getBadgeLevelLabel,
+  getEligibleGradeLabels,
+  normalizeEligibleGradeIds,
+} from "@/utils/badges";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -28,12 +29,21 @@ const { TextArea } = Input;
 interface BadgeDefinitionDrawerProps {
   open: boolean;
   onClose: () => void;
-  definition: IBadgeDefinition | null;
+  definition: BadgeDefinition | null;
   mode: "view" | "create" | "edit";
   form: FormInstance;
-  onSubmit: (values: Partial<IBadgeDefinition>, iconFile: File | null) => void;
+  onSubmit: (
+    values: {
+      name: string;
+      description: string;
+      howToEarn: string;
+      level: number;
+      eligibleGrades: string[];
+    },
+    iconFile: File | null,
+  ) => void;
   loading?: boolean;
-  availableCriteria?: { value: string; label: string }[];
+  gradeOptions?: { value: string; label: string }[];
   levelOptions?: { value: number; label: string }[];
 }
 
@@ -45,26 +55,24 @@ export const BadgeDefinitionDrawer = ({
   form,
   onSubmit,
   loading = false,
-  availableCriteria = [],
-  levelOptions = [
-    { value: 1, label: "Level 1 (Bronze)" },
-    { value: 2, label: "Level 2 (Silver)" },
-    { value: 3, label: "Level 3 (Gold)" },
-    { value: 4, label: "Level 4 (Platinum)" },
-  ],
+  gradeOptions = [],
+  levelOptions = BADGE_LEVEL_OPTIONS,
 }: BadgeDefinitionDrawerProps) => {
   const isView = mode === "view";
   const isCreate = mode === "create";
 
-  // Local state for file and preview
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState<string>(
     definition?.icon || "",
   );
 
-  const hasNoCriteriaAvailable = availableCriteria.length === 0;
+  useEffect(() => {
+    if (open) {
+      setIconPreview(definition?.icon || "");
+      setIconFile(null);
+    }
+  }, [open, mode, definition]);
 
-  // Handle file selection
   const handleUploadChange = (info: any) => {
     const file = info.fileList[0]?.originFileObj as File;
     if (file) {
@@ -74,15 +82,6 @@ export const BadgeDefinitionDrawer = ({
     }
   };
 
-  // Reset on open/change mode
-  useEffect(() => {
-    if (open) {
-      setIconPreview(definition?.icon || "");
-      setIconFile(null);
-    }
-  }, [open, mode, definition]);
-
-  // Cleanup on close (revoke blob URL)
   const handleClose = () => {
     if (iconPreview.startsWith("blob:")) {
       URL.revokeObjectURL(iconPreview);
@@ -92,17 +91,53 @@ export const BadgeDefinitionDrawer = ({
     onClose();
   };
 
-  // Handle submit button (validate and pass to parent)
   const handleDrawerSubmit = () => {
     form
       .validateFields()
       .then((values) => {
-        onSubmit(values, iconFile);
+        onSubmit(
+          {
+            name: values.name,
+            description: values.description,
+            howToEarn: values.howToEarn ?? "",
+            level: values.level,
+            eligibleGrades: values.eligibleGrades || [],
+          },
+          iconFile,
+        );
       })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
+      .catch(() => {
+        // Validation messages are shown by the form.
       });
   };
+
+  const handleSelectAllGrades = () => {
+    form.setFieldsValue({
+      eligibleGrades: gradeOptions.map((option) => option.value),
+    });
+  };
+
+  const levelOptionsWithCurrent =
+    definition && !levelOptions.some((option) => option.value === definition.level)
+      ? [
+          ...levelOptions,
+          { value: definition.level, label: `Level ${definition.level}` },
+        ]
+      : levelOptions;
+
+  const eligibleGradeIds = normalizeEligibleGradeIds(definition?.eligibleGrades);
+  const gradeLabelById = new Map(
+    gradeOptions.map((option) => [option.value, option.label]),
+  );
+  const eligibleGradeLabels = getEligibleGradeLabels(
+    definition?.eligibleGrades,
+    gradeLabelById,
+  ).join(", ");
+  const criteriaSummary = definition?.criteria?.length
+    ? definition.criteria
+        .map((criterion) => getBadgeCriteriaTypeLabel(criterion.type))
+        .join(", ")
+    : "No criteria";
 
   return (
     <Drawer
@@ -140,158 +175,192 @@ export const BadgeDefinitionDrawer = ({
         )
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        disabled={isView}
-        className={isView ? "cc-readonly-form" : undefined}
-        initialValues={{
-          name: definition?.name || "",
-          description: definition?.description || (isView ? "-" : ""),
-          level: definition?.level || 1,
-          criteria: definition?.criteria.map((c) => c._id) || [],
-        }}
-      >
-        {/* Icon Upload/Preview  */}
-        <Form.Item label="Badge Icon (optional)">
-          <Space direction="vertical" align="center" style={{ width: "100%" }}>
-            <Avatar
-              size={120}
-              icon={<TrophyOutlined />}
-              src={iconPreview || undefined}
-              style={{ backgroundColor: "#f56a00" }}
-            />
-            {!isView && (
-              <>
-                <Upload
-                  accept="image/*"
-                  showUploadList={false}
-                  beforeUpload={() => false}
-                  onChange={handleUploadChange}
-                  maxCount={1}
-                >
-                  <Button icon={<UploadOutlined />}>
-                    {iconFile ? "Change Icon" : "Upload Icon"}
-                  </Button>
-                </Upload>
-                <Text type="secondary">
-                  Recommended: square image (e.g., 256x256)
-                </Text>
-              </>
-            )}
-            {isView && !iconPreview && (
-              <Text type="secondary">No icon set</Text>
-            )}
-          </Space>
-        </Form.Item>
-
-        {/* Name & Level */}
-        <Space style={{ display: "flex" }} size="large">
-          <Form.Item
-            name="name"
-            label="Badge Name"
-            rules={[{ required: true, message: "Badge name is required" }]}
-            style={{ flex: 1 }}
-          >
-            <Input placeholder="e.g., Communication Excellence" />
-          </Form.Item>
-
-          <Form.Item
-            name="level"
-            label="Level"
-            rules={[{ required: true, message: "Level is required" }]}
-          >
-            <Select options={levelOptions} style={{ width: 180 }} />
-          </Form.Item>
-        </Space>
-
-        {/* Description */}
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ required: true, message: "Description is required" }]}
-        >
-          <TextArea
-            placeholder="Describe what this badge represents and why it's awarded..."
-            autoSize={{ minRows: 3, maxRows: 6 }}
-          />
-        </Form.Item>
-
-        {/* Criteria Selection */}
-        <Form.Item
-          name="criteria"
-          label="Criteria (optional - add later if needed)"
-        >
-          {isView ? (
-            <List
-              bordered
-              dataSource={definition?.criteria || []}
-              locale={{ emptyText: "No criteria defined yet" }}
-              renderItem={(item) => (
-                <List.Item>
-                  <Space direction="vertical">
-                    <Text strong>
-                      {item.type.replace(/([A-Z])/g, " $1").trim()}
-                    </Text>
-                    <Text type="secondary">{item.description || "-"}</Text>
-                    {(item.minScore ||
-                      item.minProgress ||
-                      item.minObservations) && (
-                      <Space>
-                        {item.minScore && <Tag>Min Score: {item.minScore}</Tag>}
-                        {item.minProgress && (
-                          <Tag>Min Progress: {item.minProgress}%</Tag>
-                        )}
-                        {item.minObservations && (
-                          <Tag>Min Observations: {item.minObservations}</Tag>
-                        )}
-                        {item.scope && (
-                          <Tag>
-                            {item.scope === "yearly" ? "Yearly" : "All Time"}
-                          </Tag>
-                        )}
-                      </Space>
-                    )}
-                  </Space>
-                </List.Item>
-              )}
-            />
-          ) : (
-            <>
-              <Select
-                mode="multiple"
-                placeholder="Select existing criteria (optional)"
-                options={availableCriteria}
-                optionFilterProp="label"
-                allowClear
-              />
-              {hasNoCriteriaAvailable && (
-                <Alert
-                  message="No criteria available yet"
-                  description={
-                    <>
-                      You can save this badge now and add criteria later from
-                      the <strong>Criteria</strong> tab.
-                    </>
-                  }
-                  type="info"
-                  showIcon
-                  icon={<InfoCircleOutlined />}
-                  style={{ marginTop: 12 }}
+      {isView ? (
+        <Form layout="vertical" disabled>
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Form.Item label="Badge Icon">
+              <Space
+                direction="vertical"
+                align="center"
+                style={{ width: "100%" }}
+              >
+                <Avatar
+                  size={120}
+                  icon={<TrophyOutlined />}
+                  src={iconPreview || undefined}
+                  style={{ backgroundColor: "#f56a00" }}
                 />
-              )}
-            </>
-          )}
-        </Form.Item>
+                {!iconPreview && <Text type="secondary">No icon set</Text>}
+              </Space>
+            </Form.Item>
 
-        {/* Created By (view only) */}
-        {isView && definition?.createdBy && (
-          <ReadOnlyField
-            label="Created By"
-            value={`${definition.createdBy.firstName} ${definition.createdBy.lastName}`}
-          />
-        )}
-      </Form>
+            <ReadOnlyField label="Badge Name" value={definition?.name} />
+            <ReadOnlyField
+              label="Level"
+              value={getBadgeLevelLabel(definition?.level)}
+            />
+            <ReadOnlyField label="Description" value={definition?.description} />
+            <ReadOnlyField
+              label="How to Earn"
+              value={definition?.howToEarn}
+            />
+            <ReadOnlyField
+              label="Eligible Grades"
+              value={eligibleGradeLabels || "No eligible grades"}
+            />
+            <ReadOnlyField
+              label="Auto Award"
+              value={definition?.autoAward ? "Enabled" : "Disabled"}
+            />
+            <ReadOnlyField label="Criteria" value={criteriaSummary} />
+            <ReadOnlyField
+              label="Created By"
+              value={
+                definition?.createdBy && typeof definition.createdBy !== "string"
+                  ? `${definition.createdBy.firstName} ${definition.createdBy.lastName}`
+                  : "-"
+              }
+            />
+            <ReadOnlyField
+              label="Created"
+              value={formatDateTime(definition?.createdAt)}
+            />
+            <ReadOnlyField
+              label="Last Updated"
+              value={formatDateTime(definition?.updatedAt)}
+            />
+          </Space>
+        </Form>
+      ) : (
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{
+            name: definition?.name || "",
+            description: definition?.description || "",
+            howToEarn: definition?.howToEarn || "",
+            level: definition?.level || 1,
+            eligibleGrades: eligibleGradeIds,
+          }}
+        >
+          <Form.Item label="Badge Icon (optional)">
+            <Space
+              direction="vertical"
+              align="center"
+              style={{ width: "100%" }}
+            >
+              <Avatar
+                size={120}
+                icon={<TrophyOutlined />}
+                src={iconPreview || undefined}
+                style={{ backgroundColor: "#f56a00" }}
+              />
+              <Upload
+                accept="image/*"
+                showUploadList={false}
+                beforeUpload={() => false}
+                onChange={handleUploadChange}
+                maxCount={1}
+              >
+                <Button icon={<UploadOutlined />}>
+                  {iconFile ? "Change Icon" : "Upload Icon"}
+                </Button>
+              </Upload>
+              <Text type="secondary">
+                Recommended: square image (e.g., 256x256)
+              </Text>
+            </Space>
+          </Form.Item>
+
+          <Space style={{ display: "flex" }} size="large">
+            <Form.Item
+              name="name"
+              label="Badge Name"
+              rules={[{ required: true, message: "Badge name is required" }]}
+              style={{ flex: 1 }}
+            >
+              <Input placeholder="e.g., Communication Excellence" />
+            </Form.Item>
+
+            <Form.Item
+              name="level"
+              label="Level"
+              rules={[{ required: true, message: "Level is required" }]}
+            >
+              <Select
+                options={levelOptionsWithCurrent}
+                style={{ width: 180 }}
+              />
+            </Form.Item>
+          </Space>
+
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Description is required" }]}
+          >
+            <TextArea
+              placeholder="Describe what this badge represents and why it is awarded..."
+              autoSize={{ minRows: 3, maxRows: 6 }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="howToEarn"
+            label="How to Earn"
+            extra="Optional. Shown to teachers and students. Up to 500 characters."
+          >
+            <TextArea
+              maxLength={500}
+              showCount
+              placeholder="Explain how a student can earn this badge"
+              autoSize={{ minRows: 3, maxRows: 6 }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <Space>
+                <span>Eligible Grades</span>
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={handleSelectAllGrades}
+                  disabled={gradeOptions.length === 0}
+                >
+                  Select all grades
+                </Button>
+              </Space>
+            }
+            name="eligibleGrades"
+            rules={[
+              {
+                required: true,
+                type: "array",
+                min: 1,
+                message: "Select at least one eligible grade",
+              },
+            ]}
+            extra="A badge can only be awarded to students in the selected grades."
+          >
+            <Select
+              mode="multiple"
+              placeholder="Select eligible grades"
+              options={gradeOptions}
+              showSearch
+              optionFilterProp="label"
+              allowClear
+              maxTagCount="responsive"
+            />
+          </Form.Item>
+
+          <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+            {isCreate
+              ? "After creating the badge, its detail drawer opens so you can add criteria or leave it teacher-awarded."
+              : "Criteria and auto-award are managed from the badge detail drawer."}
+          </Text>
+        </Form>
+      )}
     </Drawer>
   );
 };
