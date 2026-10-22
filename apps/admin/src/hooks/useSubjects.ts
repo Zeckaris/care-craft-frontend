@@ -49,7 +49,14 @@ export const useSubjects = () => {
     return result;
   };
 
-  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `/subject/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: ['/subject'] });
+        return result;
+      }),
+    );
 
   return {
     subjects,

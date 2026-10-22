@@ -48,7 +48,14 @@ export const useAssessmentTypes = () => {
     return result;
   };
 
-  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `/assessment/type/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: ['/assessment/type'] });
+        return result;
+      }),
+    );
 
   return {
     // Data

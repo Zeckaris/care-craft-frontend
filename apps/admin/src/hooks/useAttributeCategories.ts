@@ -79,7 +79,14 @@ export const useAttributeCategories = (
     return result;
   };
 
-  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `${urlPath}/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: [urlPath] });
+        return result;
+      }),
+    );
 
   return {
     categories,

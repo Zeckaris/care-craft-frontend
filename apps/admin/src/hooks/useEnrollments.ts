@@ -166,7 +166,14 @@ export const useEnrollments = ({
     return result;
   };
 
-  const removeMany = (ids: string[]) => settleMutations(ids.map(remove));
+  const removeMany = (ids: string[]) =>
+    settleMutations(
+      ids.map(async (id) => {
+        const result = await del({ url: `/enrollment/${id}`, toast: false });
+        queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
+        return result;
+      }),
+    );
 
   return {
     // Data
