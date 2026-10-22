@@ -12,6 +12,18 @@ export function formatTime(iso: string | null | undefined): string {
   });
 }
 
+/** Formats an ISO date, e.g. "Oct 12, 2026". */
+export function formatDate(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 /** Formats an ISO timestamp as a 12-hour date and time, e.g. "Oct 12, 2026, 2:50 PM". */
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return '';

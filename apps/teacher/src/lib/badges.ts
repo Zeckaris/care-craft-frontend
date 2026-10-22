@@ -46,3 +46,5 @@ export function resolveBadgeIcon(path?: string | null): string | null {
   if (/^https?:\/\//i.test(path)) return path;
   return `${ASSETS_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
 }
+
+export const resolveGiftImage = resolveBadgeIcon;

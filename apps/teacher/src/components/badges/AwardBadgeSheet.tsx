@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Check, RefreshCw } from 'lucide-react';
 import type { BadgeDefinition } from '@carecraft/types';
+import { getGiftLabel } from '@carecraft/badges';
 import { extractApiErrorMessage } from '@carecraft/query-core';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -8,6 +9,7 @@ import { Label } from '@/components/ui/Label';
 import { Modal } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { BadgeIcon } from '@/components/badges/BadgeIcon';
+import { GiftThumb } from '@/components/badges/GiftThumb';
 import { getBadgeTierLabel } from '@/lib/badges';
 import { cn } from '@/lib/utils';
 
@@ -94,6 +96,10 @@ export function AwardBadgeSheet({
           <div className="space-y-2">
             {badges.map((badge) => {
               const selected = selectedBadgeId === badge._id;
+              const gift =
+                badge.giftId && typeof badge.giftId === 'object'
+                  ? badge.giftId
+                  : null;
               return (
                 <button
                   key={badge._id}
@@ -137,6 +143,19 @@ export function AwardBadgeSheet({
                     {badge.howToEarn && (
                       <span className="mt-1 block text-xs text-[var(--color-text-muted)]">
                         How to earn: {badge.howToEarn}
+                      </span>
+                    )}
+                    {badge.giftId && (
+                      <span className="mt-2 flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+                        <GiftThumb
+                          image={gift?.image}
+                          name={gift?.name ?? 'Gift'}
+                        />
+                        Comes with a gift:{' '}
+                        {getGiftLabel(
+                          gift?.name,
+                          badge.giftQuantity ?? null,
+                        )}
                       </span>
                     )}
                   </span>

@@ -9,9 +9,10 @@ import type {
   StudentBadgeProgressCriterion,
   StudentBadgeProgressItem,
 } from '@carecraft/types';
-import { formatCriterionProgress } from '@carecraft/badges';
+import { formatCriterionProgress, getGiftLabel } from '@carecraft/badges';
 import { Badge } from '@/components/ui/Badge';
 import { BadgeIcon } from '@/components/badges/BadgeIcon';
+import { GiftThumb } from '@/components/badges/GiftThumb';
 import { getBadgeTierLabel } from '@/lib/badges';
 import { cn } from '@/lib/utils';
 
@@ -158,7 +159,12 @@ export function InProgressBadges({
             </p>
           )}
 
-          {inProgress.map((item) => (
+          {inProgress.map((item) => {
+            const gift =
+              item.badge.giftId && typeof item.badge.giftId === 'object'
+                ? item.badge.giftId
+                : null;
+            return (
             <div key={item.badge._id} className="space-y-2">
               <div className="flex items-center gap-2.5">
                 <BadgeIcon
@@ -178,6 +184,16 @@ export function InProgressBadges({
                       How to earn: {item.badge.howToEarn}
                     </p>
                   )}
+                  {item.badge.giftId && (
+                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-[var(--color-text-secondary)]">
+                      <GiftThumb
+                        image={gift?.image}
+                        name={gift?.name ?? 'Gift'}
+                      />
+                      Comes with a gift:{' '}
+                      {getGiftLabel(gift?.name, item.badge.giftQuantity ?? null)}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -189,7 +205,8 @@ export function InProgressBadges({
                 ))}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>

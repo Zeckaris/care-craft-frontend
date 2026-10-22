@@ -15,7 +15,10 @@ import { useUser } from '@/context/UserContext';
 import { useMySections } from '@/hooks/useMySections';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useSectionRoster } from '@/hooks/useSectionRoster';
-import { useStudentBadgeProgress } from '@/hooks/useBadgeProgress';
+import {
+  useStudentBadgeProgress,
+  useStudentBadgeGiftMutation,
+} from '@/hooks/useBadgeProgress';
 import { useEligibleBadges } from '@/hooks/useEligibleBadges';
 import {
   useBadgeAwardMutations,
@@ -31,7 +34,9 @@ import { AwardedBadgeItem } from '@/components/badges/AwardedBadgeItem';
 import { BadgeOfflineBanner } from '@/components/badges/BadgeOfflineBanner';
 import { EditAwardNoteModal } from '@/components/badges/EditAwardNoteModal';
 import { InProgressBadges } from '@/components/badges/InProgressBadges';
+import { MarkGiftGivenModal } from '@/components/badges/MarkGiftGivenModal';
 import { RevokeAwardModal } from '@/components/badges/RevokeAwardModal';
+import { UndoGiftModal } from '@/components/badges/UndoGiftModal';
 
 function fullName(first?: string, middle?: string, last?: string): string {
   return [first, middle, last].filter(Boolean).join(' ');
@@ -39,6 +44,24 @@ function fullName(first?: string, middle?: string, last?: string): string {
 
 function initials(first?: string, last?: string): string {
   return `${first?.[0] ?? ''}${last?.[0] ?? ''}`.toUpperCase();
+}
+
+function isForbidden(error: unknown): boolean {
+  const candidate = error as
+    | { status?: number; response?: { status?: number } }
+    | undefined;
+  return (
+    candidate?.status === 403 || candidate?.response?.status === 403
+  );
+}
+
+function giftActionError(error: unknown, fallback: string): string {
+  const message = extractApiErrorMessage(error);
+  if (isForbidden(error)) {
+    if (message && /homeroom/i.test(message)) return message;
+    return 'Only the homeroom teacher can update gift status for this student.';
+  }
+  return message || fallback;
 }
 
 export default function BadgeStudentPage() {
@@ -121,15 +144,24 @@ export default function BadgeStudentPage() {
     isRevoking,
   } = useBadgeAwardMutations();
 
+  const {
+    mutateAsync: updateGiftStatus,
+    isPending: isUpdatingGift,
+  } = useStudentBadgeGiftMutation();
+
   const [awardOpen, setAwardOpen] = useState(false);
   const [editAward, setEditAward] = useState<StudentBadge | null>(null);
   const [revokeAward, setRevokeAward] = useState<StudentBadge | null>(null);
+  const [markGiftAward, setMarkGiftAward] = useState<StudentBadge | null>(null);
+  const [undoGiftAward, setUndoGiftAward] = useState<StudentBadge | null>(null);
 
   useEffect(() => {
     if (online) return;
     setAwardOpen(false);
     setEditAward(null);
     setRevokeAward(null);
+    setMarkGiftAward(null);
+    setUndoGiftAward(null);
   }, [online]);
 
   const awardedBadgeIds = useMemo(
@@ -199,6 +231,43 @@ export default function BadgeStudentPage() {
     } catch (error) {
       toast.error(
         extractApiErrorMessage(error) || 'Could not revoke this badge.',
+      );
+      throw error;
+    }
+  };
+
+  const canManageGift = online && Boolean(sectionItem?.isHomeroom);
+
+  const handleMarkGiftGiven = async (note?: string) => {
+    if (!markGiftAward) return;
+    try {
+      await updateGiftStatus({
+        awardId: markGiftAward._id,
+        given: true,
+        note,
+      });
+      toast.success('Gift marked as given.');
+      setMarkGiftAward(null);
+    } catch (error) {
+      toast.error(
+        giftActionError(error, 'Could not update the gift status.'),
+      );
+      throw error;
+    }
+  };
+
+  const handleUndoGift = async () => {
+    if (!undoGiftAward) return;
+    try {
+      await updateGiftStatus({
+        awardId: undoGiftAward._id,
+        given: false,
+      });
+      toast.success('Gift status undone.');
+      setUndoGiftAward(null);
+    } catch (error) {
+      toast.error(
+        giftActionError(error, 'Could not update the gift status.'),
       );
       throw error;
     }
@@ -484,8 +553,11 @@ export default function BadgeStudentPage() {
                         award={award}
                         canEdit={canEditAward(award)}
                         canRevoke={canRevokeAward(award)}
+                        canManageGift={canManageGift}
                         onEdit={setEditAward}
                         onRevoke={setRevokeAward}
+                        onMarkGiftGiven={setMarkGiftAward}
+                        onUndoGift={setUndoGiftAward}
                       />
                     ))}
                   </div>
@@ -523,6 +595,24 @@ export default function BadgeStudentPage() {
             award={revokeAward}
             isPending={isRevoking}
             onConfirm={handleRevoke}
+          />
+          <MarkGiftGivenModal
+            open={Boolean(markGiftAward)}
+            onOpenChange={(open) => {
+              if (!open) setMarkGiftAward(null);
+            }}
+            award={markGiftAward}
+            isPending={isUpdatingGift}
+            onSave={handleMarkGiftGiven}
+          />
+          <UndoGiftModal
+            open={Boolean(undoGiftAward)}
+            onOpenChange={(open) => {
+              if (!open) setUndoGiftAward(null);
+            }}
+            award={undoGiftAward}
+            isPending={isUpdatingGift}
+            onConfirm={handleUndoGift}
           />
         </>
       )}
