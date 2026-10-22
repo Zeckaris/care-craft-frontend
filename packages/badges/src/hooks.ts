@@ -1,7 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import type { StudentBadgeProgress } from '@carecraft/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { StudentBadge, StudentBadgeProgress } from '@carecraft/types';
 import type { BadgesApi } from './api';
-import { badgesKeys } from './keys';
+import {
+  badgesKeys,
+  invalidateStudentGiftQueries,
+} from './keys';
+
+export interface UpdateStudentBadgeGiftVariables {
+  awardId: string;
+  given: boolean;
+  note?: string;
+}
 
 export function createBadgeHooks(api: BadgesApi) {
   function useStudentBadgeProgress(studentId?: string) {
@@ -16,5 +25,16 @@ export function createBadgeHooks(api: BadgesApi) {
     });
   }
 
-  return { useStudentBadgeProgress };
+  function useStudentBadgeGiftMutation() {
+    const queryClient = useQueryClient();
+
+    return useMutation<StudentBadge, Error, UpdateStudentBadgeGiftVariables>({
+      mutationFn: ({ awardId, given, note }) =>
+        api.updateStudentBadgeGift(awardId, { given, note }),
+      onSuccess: (_data, variables) =>
+        invalidateStudentGiftQueries(queryClient, variables.awardId),
+    });
+  }
+
+  return { useStudentBadgeProgress, useStudentBadgeGiftMutation };
 }

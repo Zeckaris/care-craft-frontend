@@ -17,6 +17,8 @@ export const badgesKeys = {
   studentAwardsRoot: ['studentBadge'] as const,
   studentAwards: (params?: Record<string, unknown>) =>
     ['studentBadge', 'list', params ?? {}] as const,
+  studentAwardDetail: (awardId: string) =>
+    ['studentBadge', 'detail', awardId] as const,
   studentProgress: (studentId: string) =>
     [BADGES_QUERY_ROOT, 'student-progress', studentId] as const,
 };
@@ -41,6 +43,30 @@ export function invalidateBadgeQueries(
     tasks.push(
       queryClient.invalidateQueries({
         queryKey: badgesKeys.definitionDetail(badgeId),
+      }),
+    );
+  }
+
+  return Promise.all(tasks).then(() => undefined);
+}
+
+/**
+ * Refreshes the student badge lists, the open award detail and the progress
+ * queries after a gift status change.
+ */
+export function invalidateStudentGiftQueries(
+  queryClient: QueryClient,
+  awardId?: string,
+): Promise<void> {
+  const tasks = [
+    queryClient.invalidateQueries({ queryKey: badgesKeys.studentAwardsRoot }),
+    queryClient.invalidateQueries({ queryKey: badgesKeys.root }),
+  ];
+
+  if (awardId) {
+    tasks.push(
+      queryClient.invalidateQueries({
+        queryKey: badgesKeys.studentAwardDetail(awardId),
       }),
     );
   }
