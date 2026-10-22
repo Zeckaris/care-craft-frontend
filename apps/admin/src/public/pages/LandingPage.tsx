@@ -18,12 +18,11 @@ export default function LandingPage() {
     <>
       <Helmet>
         <title>
-          CareCraft - Best Parent Teacher Communication App for Schools in
-          Ethiopia
+          CareCraft | School Management System for Ethiopian Schools
         </title>
         <meta
           name="description"
-          content="Secure, affordable app for teacher-parent collaboration. Real-time chat, student progress tracking, action plans & emotional alerts."
+          content="Enrollment, timetables, attendance, results and parent updates in one system built for Ethiopian schools."
         />
       </Helmet>
 
@@ -36,12 +35,13 @@ export default function LandingPage() {
                 <Title className="hero-title">CareCraft</Title>
 
                 <Title level={3} className="hero-subtitle">
-                  Simple, Secure Collaboration for Ethiopian Schools
+                  One system to run your whole school.
                 </Title>
 
                 <Paragraph className="hero-description">
-                  Secure teacher-parent chat. Track student progress. Share
-                  action plans. Build stronger school communities.
+                  Enroll students, assign teachers, generate timetables, take
+                  attendance, record results and keep families informed. Built
+                  in Addis Ababa for how Ethiopian schools actually work.
                 </Paragraph>
 
                 <Space size="large" wrap style={{ marginTop: "16px" }}>
@@ -116,10 +116,11 @@ export default function LandingPage() {
             Why CareCraft?
           </Title>
           <Paragraph className="vision-text">
-            CareCraft is not just a messaging app. It's a structured student
-            development collaboration platform that turns everyday observations
-            into measurable action across academics, emotional growth, social
-            skills, and personal development.
+            CareCraft is a complete school management system. It runs the daily
+            work of a school, from enrollment, timetables and attendance to
+            marks and results, and it goes further by tracking academics,
+            social skills, emotional growth and personal development, so every
+            child is seen as a whole person and not just a set of grades.
           </Paragraph>
 
           <div className="vision-cards-grid">
@@ -148,7 +149,7 @@ export default function LandingPage() {
                 <h4 className="vision-card-title">Soft Skills</h4>
                 <p className="vision-card-desc">
                   Build confidence, communication and leadership through daily
-                  observations and collaborative growth plans.
+                  observations and character evaluations.
                 </p>
                 <div className="vision-card-tag">Character Building</div>
               </div>
@@ -198,39 +199,52 @@ export default function LandingPage() {
           </Title>
 
           <Row gutter={[32, 32]} style={{ marginTop: "24px" }}>
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <div className="step-card">
                 <div className="step-badge">1</div>
                 <Title level={4}>Step 1: School Sets Up & Invites</Title>
                 <Paragraph>
-                  Admin creates classes, assigns teachers, adds students, and
-                  generates secure invitation codes. Parents and teachers sign
-                  up securely no public access.
+                  The school creates the academic calendar, grades and subjects,
+                  then invites teachers and parents with secure invitation
+                  codes.
                 </Paragraph>
               </div>
             </Col>
 
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <div className="step-card">
                 <div className="step-badge">2</div>
-                <Title level={4}>Step 2: Teachers Share Insights</Title>
+                <Title level={4}>Step 2: Enroll & Organize</Title>
                 <Paragraph>
-                  Teachers log structured observations with ratings on
-                  academics, soft skills, social skills, emotional well-being,
-                  and extracurriculars. Flags trigger alerts and collaborative
-                  action plans for growth.
+                  Students are enrolled one by one or imported from Excel. Each
+                  grade is split into sections automatically, but the school
+                  sets the section sizes and can move any student to another
+                  section. Teachers are assigned to sections and subjects, and
+                  the school-wide timetable is generated in one pass.
                 </Paragraph>
               </div>
             </Col>
 
-            <Col xs={24} md={8}>
+            <Col xs={24} md={6}>
               <div className="step-card">
                 <div className="step-badge">3</div>
-                <Title level={4}>Step 3: Parents & Teachers Collaborate</Title>
+                <Title level={4}>Step 3: Teachers Run the Day</Title>
                 <Paragraph>
-                  Parents receive alerts, contribute to action plans, track
-                  progress, and celebrate achievements together with badges and
-                  trend reports.
+                  Teachers take attendance, enter marks and record observations
+                  from their phones, even on an unreliable connection.
+                  Everything syncs as soon as the network returns.
+                </Paragraph>
+              </div>
+            </Col>
+
+            <Col xs={24} md={6}>
+              <div className="step-card">
+                <div className="step-badge">4</div>
+                <Title level={4}>Step 4: Everyone Stays Informed</Title>
+                <Paragraph>
+                  Admins see live insights, parents are notified when their
+                  child is absent, and results are locked once teachers complete
+                  them.
                 </Paragraph>
               </div>
             </Col>
@@ -254,27 +268,28 @@ export default function LandingPage() {
                     <CloseCircleOutlined
                       style={{ color: "#ff4d4f", fontSize: "18px" }}
                     />
-                    <span>Public or shareable groups → privacy risks</span>
+                    <span>Public or shareable groups are a privacy risk</span>
                   </li>
                   <li className="comparison-item">
                     <CloseCircleOutlined
                       style={{ color: "#ff4d4f", fontSize: "18px" }}
                     />
-                    <span>Lost/delayed personal updates</span>
+                    <span>Personal updates get lost or delayed</span>
                   </li>
                   <li className="comparison-item">
                     <CloseCircleOutlined
                       style={{ color: "#ff4d4f", fontSize: "18px" }}
                     />
                     <span>
-                      Chaotic group chats → hard to track child's progress
+                      Chaotic group chats make it hard to follow a child's
+                      progress
                     </span>
                   </li>
                   <li className="comparison-item">
                     <CloseCircleOutlined
                       style={{ color: "#ff4d4f", fontSize: "18px" }}
                     />
-                    <span>No structured follow-up or action plans</span>
+                    <span>No structured follow-up or record of progress</span>
                   </li>
                 </ul>
               </div>
@@ -289,21 +304,21 @@ export default function LandingPage() {
                     <CheckCircleOutlined
                       style={{ color: "#52c41a", fontSize: "18px" }}
                     />
-                    <span>Private per-student chats → fully secure</span>
+                    <span>Direct contact with each student's homeroom teacher</span>
                   </li>
                   <li className="comparison-item">
                     <CheckCircleOutlined
                       style={{ color: "#52c41a", fontSize: "18px" }}
                     />
-                    <span>Digital updates → no lost notes</span>
+                    <span>Digital records, so no lost notes</span>
                   </li>
                   <li className="comparison-item">
                     <CheckCircleOutlined
                       style={{ color: "#52c41a", fontSize: "18px" }}
                     />
                     <span>
-                      Structured growth tracking → academics, soft skills,
-                      emotional development
+                      Structured growth tracking across academics, soft skills
+                      and emotional development
                     </span>
                   </li>
                   <li className="comparison-item">
@@ -311,8 +326,8 @@ export default function LandingPage() {
                       style={{ color: "#52c41a", fontSize: "18px" }}
                     />
                     <span>
-                      Joint action plans, badges, trends → celebrate
-                      achievements
+                      Tailored observations and remarks from each subject
+                      teacher
                     </span>
                   </li>
                   <li className="comparison-item">
@@ -320,14 +335,18 @@ export default function LandingPage() {
                       style={{ color: "#52c41a", fontSize: "18px" }}
                     />
                     <span>
-                      Optional admin tools → registration, fees, enrollment
+                      Features your school can switch on or off, such as
+                      observations and attribute evaluations
                     </span>
                   </li>
                   <li className="comparison-item">
                     <CheckCircleOutlined
                       style={{ color: "#52c41a", fontSize: "18px" }}
                     />
-                    <span>Mobile-friendly → low-data optimized</span>
+                    <span>
+                      Take attendance and enter marks from a phone, even without
+                      a connection. Everything syncs later.
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -353,60 +372,48 @@ export default function LandingPage() {
                 {
                   question: "What is CareCraft?",
                   answer:
-                    "CareCraft is a secure parent teacher communication app in Ethiopia designed for schools. It goes beyond messaging to track academics, confidence, social skills, emotional growth, and extracurriculars, with shared action plans and dashboards.",
+                    "CareCraft is a complete school management system built for Ethiopian schools. It handles enrollment, sections, teacher assignments, timetables, attendance, marks and results, and parent notifications, and it tracks soft skills and personal growth alongside grades.",
                 },
                 {
-                  question:
-                    "Why do Ethiopian schools and parents need CareCraft?",
+                  question: "Why do Ethiopian schools need CareCraft?",
                   answer:
-                    "CareCraft turns Ethiopia's cultural strengths into structured growth. Teachers can flag concerns, share observations, create joint action plans, and track progress in skills like communication, confidence, teamwork, and emotional resilience.",
+                    "Many schools still run on paper registers, Excel marklists and Telegram groups, which makes records hard to keep accurate and student progress hard to see. CareCraft brings everything into one system designed around how Ethiopian schools work, including marks entered out of each assessment's weight, academic years that run from September to July, and flexible daily period patterns.",
                 },
                 {
                   question: "Is CareCraft free to use?",
                   answer:
-                    "Yes. Core features are completely free. Optional low-cost hosting/support is available. No ads or hidden fees.",
+                    "Yes. Core features are completely free, with no ads or hidden fees.",
                 },
                 {
-                  question: "How do parents sign up?",
+                  question: "How do teachers and parents sign up?",
                   answer:
-                    "Parents receive a secure invitation code from the school. They sign up and link to their child securely. Multiple children can be managed in one account.",
+                    "The school sends each teacher and parent a secure invitation code. They sign up with it, and a parent's account is linked to their child from the start.",
                 },
                 {
-                  question: "Does CareCraft support Amharic?",
+                  question: "Can CareCraft build our class timetable?",
                   answer:
-                    "Yes. English is available now; Amharic support is rolling out for full accessibility across Ethiopia.",
+                    "Yes. The school sets its daily period pattern and how many periods each subject gets per week, and CareCraft generates a school-wide timetable in one pass. Teachers then see their own schedule in the app.",
                 },
                 {
-                  question: "How private and secure is CareCraft?",
+                  question: "Does it work with a poor internet connection?",
                   answer:
-                    "All student data is encrypted and accessible only by assigned teachers and parents. No data is sold. No ads.",
+                    "Yes. Teachers can take attendance and enter marks without a connection, and everything syncs when the network returns. CareCraft runs as a phone-friendly web app that can be installed on a teacher's phone.",
                 },
                 {
-                  question: "Can teachers and parents chat privately?",
+                  question: "How private and secure is our school's data?",
                   answer:
-                    "Yes. Each student has a private chat for their assigned teacher and parent(s), ideal for sensitive topics.",
+                    "Access is role based, so admins, teachers and parents only see what their role allows. Passwords are stored securely, and schools can turn on email verification codes at sign-in. No data is sold and there are no ads.",
                 },
                 {
-                  question: "What updates can teachers share?",
+                  question: "Can our school choose which features to use?",
                   answer:
-                    "Structured observations with ratings on academics, soft skills, social skills, emotional well-being, and extracurriculars giving a full picture of the child’s growth.",
-                },
-                {
-                  question:
-                    "How does CareCraft build confidence and communication skills?",
-                  answer:
-                    "Flagged concerns trigger shared action plans where parents and teachers collaborate on steps. Progress is tracked and positive achievements rewarded with badges.",
-                },
-                {
-                  question: "Do parents receive alerts for concerns?",
-                  answer:
-                    "Yes. Alerts show ratings, trends, and progress in real-time, keeping parents proactively involved.",
+                    "Yes. Admins can switch features such as observations and attribute evaluations on or off in settings, and the school's own color palette and fonts are applied across the app.",
                 },
                 {
                   question:
-                    "Can CareCraft be used on phones with limited data?",
+                    "How does CareCraft track growth beyond grades?",
                   answer:
-                    "Yes. Mobile-first, lightweight design optimized for low-data connections in Ethiopia.",
+                    "Teachers record observations about a student and evaluate character and soft-skill attributes that the school defines. These sit alongside grades, so progress is seen as a whole.",
                 },
               ].map((faq, idx) => (
                 <Collapse.Panel header={faq.question} key={idx}>
@@ -421,7 +428,7 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="landing-cta">
         <div className="container">
-          <Title level={2}>Ready to Connect Your School Community?</Title>
+          <Title level={2}>Ready to run your school on CareCraft?</Title>
 
           <Space size="large" wrap style={{ marginTop: "24px" }}>
             <Link to="/signin">
