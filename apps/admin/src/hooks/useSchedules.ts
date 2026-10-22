@@ -36,6 +36,7 @@ export const useSchedules = (schoolYear?: string) => {
     const result = await del({
       url: `${base}/${scheduleId}`,
       invalidateKey: false,
+      toast: false,
     });
     queryClient.invalidateQueries({ queryKey: [base] });
     return result?.data as IDiscardScheduleResult | undefined;

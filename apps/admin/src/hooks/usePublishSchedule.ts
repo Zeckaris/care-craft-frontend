@@ -23,6 +23,7 @@ export const usePublishSchedule = () => {
       url: `/schedule/schedules/${scheduleId}/publish`,
       body: payload,
       invalidateKey: false,
+      toast: false,
     });
     queryClient.invalidateQueries({ queryKey: ['/schedule/schedules'] });
     queryClient.invalidateQueries({ queryKey: ['/schedule/draft'] });

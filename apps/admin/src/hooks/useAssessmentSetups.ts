@@ -61,7 +61,7 @@ export const useAssessmentSetups = () => {
   };
 
   const remove = async (id: string) => {
-    const result = await del({ url: `/assessment/setup/${id}` });
+    const result = await del({ url: `/assessment/setup/${id}`, toast: false });
     queryClient.invalidateQueries({ queryKey: ['/assessment/setup'] });
     return result;
   };

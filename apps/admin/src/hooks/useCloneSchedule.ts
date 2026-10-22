@@ -24,6 +24,7 @@ export const useCloneSchedule = () => {
       url: `/schedule/schedules/${scheduleId}/clone`,
       body: payload,
       invalidateKey: false,
+      toast: false,
     });
     queryClient.invalidateQueries({ queryKey: ['/schedule/schedules'] });
     queryClient.invalidateQueries({ queryKey: ['/schedule/draft'] });

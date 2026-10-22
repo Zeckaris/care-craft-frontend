@@ -43,7 +43,7 @@ export const useAssessmentTypes = () => {
   };
 
   const remove = async (id: string) => {
-    const result = await del({ url: `/assessment/type/${id}` });
+    const result = await del({ url: `/assessment/type/${id}`, toast: false });
     queryClient.invalidateQueries({ queryKey: ['/assessment/type'] });
     return result;
   };

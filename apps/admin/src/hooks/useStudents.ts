@@ -140,6 +140,7 @@ export const useStudents = ({
     const result = await post({
       url: '/student/batch',
       body: formData,
+      toast: false,
     });
 
     queryClient.invalidateQueries({ queryKey: ['/student'] });

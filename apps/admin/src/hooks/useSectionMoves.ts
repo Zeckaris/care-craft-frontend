@@ -29,6 +29,7 @@ export const useSectionMoves = () => {
       url: `/enrollment/${enrollmentId}/section`,
       body: { targetSectionId },
       invalidateKey: false,
+      toast: false,
     });
     invalidateDependents();
     return result?.data as IEnrollment;
@@ -42,6 +43,7 @@ export const useSectionMoves = () => {
       url: '/enrollment/bulk-move-section',
       body: { enrollmentIds, targetSectionId },
       invalidateKey: false,
+      toast: false,
     });
     invalidateDependents();
     return result?.data as IBulkMoveSectionResult;

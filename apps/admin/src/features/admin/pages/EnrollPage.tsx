@@ -198,11 +198,12 @@ export default function EnrollPage() {
       message.success("Students enrolled successfully");
       closeBulkDrawer();
     } catch (err: any) {
-      const errors = err.response?.data?.errors;
+      const data = err.response?.data;
+      const errors = data?.errors;
       if (errors?.length) {
         errors.slice(0, 5).forEach((e: string) => message.error(e));
       } else {
-        message.error("Failed to enroll students");
+        message.error(data?.message || "Failed to enroll students");
       }
     }
   };

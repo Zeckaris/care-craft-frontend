@@ -30,6 +30,7 @@ export const useSectionGeneration = () => {
       url: '/section/generate',
       body: { ...input, dryRun },
       invalidateKey: false,
+      toast: false,
     });
 
     if (!dryRun) {

@@ -143,7 +143,7 @@ export const useEnrollments = ({
   };
 
   const bulkCreate = async (data: { studentIds: string[]; gradeId: string }) => {
-    const result = await post({ url: '/enrollment/bulk', body: data });
+    const result = await post({ url: '/enrollment/bulk', body: data, toast: false });
     queryClient.invalidateQueries({ queryKey: ['/enrollment'] });
     return result;
   };

@@ -15,6 +15,7 @@ import {
   Input,
 } from "antd";
 import { LockOutlined, UserAddOutlined } from "@ant-design/icons";
+import { extractApiErrorMessage } from "@carecraft/query-core";
 import { useSecurity } from "@/hooks/useSecurity";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useUserSearch, type SearchUser } from "@/hooks/useUserSearch";
@@ -65,8 +66,13 @@ export const SecuritySection = () => {
         } successfully`,
       );
       refetch();
-    } catch {
-      message.error("Failed to update MFA setting");
+    } catch (err) {
+      const errorMessage = extractApiErrorMessage(err);
+      message.error(
+        errorMessage === "Request Failed"
+          ? "Failed to update MFA setting"
+          : errorMessage,
+      );
     } finally {
       setMfaLoading(false);
     }
@@ -88,8 +94,11 @@ export const SecuritySection = () => {
       setSuspendModalOpen(false);
       setSelectedForSuspend(null);
       setSuspendSearch("");
-    } catch {
-      message.error("Failed to suspend account.");
+    } catch (err) {
+      const errorMessage = extractApiErrorMessage(err);
+      message.error(
+        errorMessage === "Request Failed" ? "Failed to suspend account." : errorMessage,
+      );
     } finally {
       setSuspending(false);
     }
@@ -103,8 +112,11 @@ export const SecuritySection = () => {
       message.success(`${selectedForUnsuspend.fullName} has been restored.`);
       setSelectedForUnsuspend(null);
       setUnsuspendSearch("");
-    } catch {
-      message.error("Failed to restore account.");
+    } catch (err) {
+      const errorMessage = extractApiErrorMessage(err);
+      message.error(
+        errorMessage === "Request Failed" ? "Failed to restore account." : errorMessage,
+      );
     }
   };
 

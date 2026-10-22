@@ -14,6 +14,7 @@ import {
   Space,
 } from "antd";
 import { useState, useEffect } from "react";
+import { extractApiErrorMessage } from "@carecraft/query-core";
 import { useBroadcasts } from "@/hooks/useBroadcasts";
 
 const { TextArea } = Input;
@@ -45,6 +46,12 @@ export const AnnouncementSection = () => {
   const handleSaveDraft = async () => {
     try {
       await form.validateFields();
+    } catch {
+      message.error("Please fill all required fields");
+      return;
+    }
+
+    try {
       setSaving(true);
       const values = await form.getFieldsValue();
 
@@ -57,8 +64,8 @@ export const AnnouncementSection = () => {
       form.resetFields();
       setSelectedDraft(null);
       setDraftSearch("");
-    } catch {
-      message.error("Please fill all required fields");
+    } catch (err) {
+      message.error(extractApiErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -67,6 +74,12 @@ export const AnnouncementSection = () => {
   const handleSend = async () => {
     try {
       await form.validateFields();
+    } catch {
+      message.error("Please fill all required fields");
+      return;
+    }
+
+    try {
       setSending(true);
       const values = await form.getFieldsValue();
 
@@ -86,8 +99,8 @@ export const AnnouncementSection = () => {
       form.resetFields();
       setSelectedDraft(null);
       setDraftSearch("");
-    } catch {
-      message.error("Please fill all required fields");
+    } catch (err) {
+      message.error(extractApiErrorMessage(err));
     } finally {
       setSending(false);
     }

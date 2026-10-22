@@ -57,7 +57,7 @@ export const useTeachingAssignments = ({
     role: TeachingRole;
     subjectId?: string;
   }) => {
-    const result = await post({ url: urlPath, body: data });
+    const result = await post({ url: urlPath, body: data, toast: false });
     queryClient.invalidateQueries({ queryKey: [urlPath] });
     return result;
   };
@@ -67,13 +67,14 @@ export const useTeachingAssignments = ({
     const result = await patch({
       url: `${urlPath}/${id}/reassign`,
       body: { teacherId },
+      toast: false,
     });
     queryClient.invalidateQueries({ queryKey: [urlPath] });
     return result;
   };
 
   const remove = async (id: string) => {
-    const result = await del({ url: `${urlPath}/${id}` });
+    const result = await del({ url: `${urlPath}/${id}`, toast: false });
     queryClient.invalidateQueries({ queryKey: [urlPath] });
     return result;
   };
