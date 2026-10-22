@@ -13,6 +13,7 @@
     "@carecraft/api-client": "workspace:*",
     "@carecraft/attendance": "workspace:*",
     "@carecraft/auth-hooks": "workspace:*",
+    "@carecraft/badges": "workspace:*",
     "@carecraft/branding": "workspace:*",
     "@carecraft/grades": "workspace:*",
     "@carecraft/query-core": "workspace:*",

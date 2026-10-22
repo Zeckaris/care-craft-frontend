@@ -13,6 +13,7 @@
     "@ant-design/icons": "^6.1.0",
     "@carecraft/api-client": "workspace:*",
     "@carecraft/auth-hooks": "workspace:*",
+    "@carecraft/badges": "workspace:*",
     "@carecraft/branding": "workspace:*",
     "@carecraft/grades": "workspace:*",
     "@carecraft/query-core": "workspace:*",
