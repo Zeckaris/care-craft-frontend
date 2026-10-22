@@ -359,66 +359,314 @@ export interface IObservation {
 // Badges
 // ---------------------------------------------------------------------------
 
-export interface IBadgeCriterionBase {
+export interface BadgeUserRef {
   _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+
+export interface BadgeGradeRef {
+  _id: string;
+  level: string;
+  description?: string | null;
+}
+
+/** Eligible grades are returned as IDs in list responses and populated in GET /:id. */
+export type BadgeEligibleGrade = string | BadgeGradeRef;
+
+export type BadgeScope = 'term' | 'year';
+
+export type BadgeStreakMode = 'noAbsence' | 'onTime';
+
+export type BadgeCriteriaType =
+  | 'attributeAverage'
+  | 'attendanceRate'
+  | 'attendanceStreak'
+  | 'academicAverage'
+  | 'academicImprovement'
+  | 'academicConsistency';
+
+export interface BadgeCriteriaBase {
+  _id: string;
+  badgeDefinitionId: string;
+  type: BadgeCriteriaType;
+  description?: string | null;
+  createdAt?: string;
+  /** Legacy phase-1 field. It is never sent by the frontend. */
+  minLockedWeightPercentage?: number | null;
+}
+
+export interface AttributeAverageBadgeCriteria extends BadgeCriteriaBase {
+  type: 'attributeAverage';
+  attributeCategoryId?: string | IAttributeCategory | null;
+  minScore: number;
+  minEvaluationCount: number;
+  scope: BadgeScope;
+}
+
+export interface AttendanceRateBadgeCriteria extends BadgeCriteriaBase {
+  type: 'attendanceRate';
+  minPercentage: number;
+  minRecordedSchoolDays: number;
+  scope: BadgeScope;
+}
+
+export interface AttendanceStreakBadgeCriteria extends BadgeCriteriaBase {
+  type: 'attendanceStreak';
+  mode: BadgeStreakMode;
+  minDays: number;
+}
+
+export interface AcademicAverageBadgeCriteria extends BadgeCriteriaBase {
+  type: 'academicAverage';
+  minPercentage: number;
+  subjectId?: string | { _id: string; name: string } | null;
+  scope: BadgeScope;
+}
+
+export interface AcademicImprovementBadgeCriteria extends BadgeCriteriaBase {
+  type: 'academicImprovement';
+  minPoints: number;
+}
+
+export interface AcademicConsistencyBadgeCriteria extends BadgeCriteriaBase {
+  type: 'academicConsistency';
+  minPercentage: number;
+}
+
+/** A badge criterion, discriminated by its `type`. */
+export type BadgeCriteria =
+  | AttributeAverageBadgeCriteria
+  | AttendanceRateBadgeCriteria
+  | AttendanceStreakBadgeCriteria
+  | AcademicAverageBadgeCriteria
+  | AcademicImprovementBadgeCriteria
+  | AcademicConsistencyBadgeCriteria;
+
+export interface AttributeAverageBadgeCriterionInput {
+  type: 'attributeAverage';
+  attributeCategoryId?: string | null;
+  minScore: number;
+  minEvaluationCount: number;
+  scope: BadgeScope;
   description?: string;
 }
 
-export interface IObservationCountBadgeCriterion extends IBadgeCriterionBase {
-  type: 'observationCount';
-  minObservations?: number | null;
+export interface AttendanceRateBadgeCriterionInput {
+  type: 'attendanceRate';
+  minPercentage: number;
+  minRecordedSchoolDays: number;
+  scope: BadgeScope;
+  description?: string;
 }
 
-export interface IScoreThresholdBadgeCriterion extends IBadgeCriterionBase {
-  type: 'scoreThreshold';
-  attributeCategoryId?: string | null;
-  minScore?: number | null;
+export interface AttendanceStreakBadgeCriterionInput {
+  type: 'attendanceStreak';
+  mode: BadgeStreakMode;
+  minDays: number;
+  description?: string;
 }
 
-export interface IActionPlanProgressBadgeCriterion extends IBadgeCriterionBase {
-  type: 'actionPlanProgress';
-  actionPlanId?: string | null;
-  minProgress?: number | null;
+export interface AcademicAverageBadgeCriterionInput {
+  type: 'academicAverage';
+  minPercentage: number;
+  subjectId?: string | null;
+  scope: BadgeScope;
+  description?: string;
 }
 
-export interface IAttributeEvaluationAverageBadgeCriterion
-  extends IBadgeCriterionBase {
-  type: 'attributeEvaluationAverage';
-  minScore?: number | null;
-  scope?: 'yearly' | 'allTime' | null;
+export interface AcademicImprovementBadgeCriterionInput {
+  type: 'academicImprovement';
+  minPoints: number;
+  description?: string;
 }
 
-export interface ICustomBadgeCriterion extends IBadgeCriterionBase {
-  type: 'custom';
+export interface AcademicConsistencyBadgeCriterionInput {
+  type: 'academicConsistency';
+  minPercentage: number;
+  description?: string;
 }
 
-export type IBadgeCriterion =
-  | IObservationCountBadgeCriterion
-  | IScoreThresholdBadgeCriterion
-  | IActionPlanProgressBadgeCriterion
-  | IAttributeEvaluationAverageBadgeCriterion
-  | ICustomBadgeCriterion;
+/** Payload sent to POST /api/badgeCriteria and PUT /api/badgeCriteria/:id. */
+export type BadgeCriterionInput =
+  | AttributeAverageBadgeCriterionInput
+  | AttendanceRateBadgeCriterionInput
+  | AttendanceStreakBadgeCriterionInput
+  | AcademicAverageBadgeCriterionInput
+  | AcademicImprovementBadgeCriterionInput
+  | AcademicConsistencyBadgeCriterionInput;
 
-export type IBadgeCriteria = IBadgeCriterion & {
+export type BadgeCriterionCreateInput = BadgeCriterionInput & {
   badgeDefinitionId: string;
-  createdAt: string;
 };
 
-export interface IBadgeDefinition {
+export interface BadgeDefinition {
   _id: string;
   name: string;
   description: string;
-  icon: string;
+  howToEarn?: string;
+  icon?: string | null;
   level: number;
-  createdBy: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  };
-  criteria: IBadgeCriterion[];
+  eligibleGrades: BadgeEligibleGrade[];
+  autoAward: boolean;
+  criteria: BadgeCriteria[];
+  createdBy?: BadgeUserRef | string | null;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export type StudentBadgeSource = 'teacher' | 'admin' | 'system';
+
+export interface StudentBadgeTermRef {
+  _id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface StudentBadgeStudentRef {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface StudentBadgeBadgeRef {
+  _id: string;
+  name: string;
+  description?: string;
+  howToEarn?: string;
+  icon?: string | null;
+  level: number;
+  eligibleGrades?: BadgeEligibleGrade[];
+  autoAward?: boolean;
+}
+
+/** An award of a badge to a student for one academic term. */
+export interface StudentBadge {
+  _id: string;
+  badgeId: StudentBadgeBadgeRef | null;
+  studentId: StudentBadgeStudentRef | null;
+  schoolYear: string;
+  academicTermId: StudentBadgeTermRef | string | null;
+  source: StudentBadgeSource;
+  awardedBy?: BadgeUserRef | null;
+  note?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/** Unit of a progress value returned by GET /studentBadge/progress. */
+export type BadgeProgressUnit =
+  | 'score'
+  | 'percent'
+  | 'points'
+  | 'days'
+  | 'manual';
+
+export interface BadgeSubjectAverageProgress {
+  subjectId: string;
+  subjectName: string;
+  average: number | null;
+  met: boolean;
+}
+
+/**
+ * Counts and context that explain a progress criterion. The populated keys
+ * depend on the criterion type.
+ */
+export interface BadgeProgressDetails {
+  evaluationCount?: number;
+  requiredEvaluationCount?: number;
+  recordedSchoolDays?: number;
+  requiredRecordedSchoolDays?: number;
+  presentCount?: number;
+  lateCount?: number;
+  excusedCount?: number;
+  absentCount?: number;
+  mode?: BadgeStreakMode;
+  recordedDays?: number;
+  bestStreak?: number;
+  currentStreak?: number;
+  target?: number;
+  subjectId?: string | null;
+  subjectName?: string | null;
+  subjectHasSetup?: boolean;
+  fullyLocked?: boolean;
+  waitingForAssessments?: boolean;
+  lockedShare?: number | null;
+  lockedWeightPercentage?: number;
+  lockedStageCount?: number;
+  requiredStageCount?: number;
+  notApplicable?: boolean;
+  reason?: string;
+  currentTermId?: string;
+  currentTermName?: string;
+  currentTermAverage?: number | null;
+  previousTermId?: string | null;
+  previousTermName?: string;
+  previousTermAverage?: number | null;
+  changePoints?: number | null;
+  currentTermFullyLocked?: boolean;
+  previousTermFullyLocked?: boolean;
+  currentTermLockedShare?: number;
+  previousTermLockedShare?: number;
+  subjectCount?: number;
+  lowestSubjectId?: string | null;
+  lowestSubjectName?: string;
+  lowestSubjectAverage?: number | null;
+  subjectAverages?: BadgeSubjectAverageProgress[];
+  unsupported?: boolean;
+}
+
+export interface StudentBadgeProgressCriterion {
+  criterionId: string;
+  type: BadgeCriteriaType;
+  scope: BadgeScope | null;
+  current: number | null;
+  target: number | null;
+  unit: BadgeProgressUnit;
+  enoughData: boolean;
+  met: boolean;
+  notApplicable?: boolean;
+  waitingForAssessments?: boolean;
+  lockedShare?: number | null;
+  details: BadgeProgressDetails;
+}
+
+export interface StudentBadgeProgressBadge {
+  _id: string;
+  name: string;
+  description: string;
+  howToEarn?: string;
+  icon?: string | null;
+  level: number;
+  autoAward: boolean;
+}
+
+export interface StudentBadgeProgressItem {
+  badge: StudentBadgeProgressBadge;
+  earned: boolean;
+  awardId: string | null;
+  awardedAt: string | null;
+  source: StudentBadgeSource | null;
+  criteria: StudentBadgeProgressCriterion[];
+  allMet: boolean;
+}
+
+export interface StudentBadgeProgressTerm {
+  _id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface StudentBadgeProgress {
+  studentId: string;
+  schoolYear: string;
+  academicTerm: StudentBadgeProgressTerm;
+  badges: StudentBadgeProgressItem[];
 }
 
 // ---------------------------------------------------------------------------
