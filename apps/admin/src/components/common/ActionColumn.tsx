@@ -54,7 +54,10 @@ export function ActionColumn<
               fontSize: 16,
               transition: "color 0.2s ease",
             }}
-            onClick={() => onView(record)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onView(record);
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "var(--action-hover)";
             }}
@@ -74,7 +77,10 @@ export function ActionColumn<
               fontSize: 16,
               transition: "color 0.2s ease",
             }}
-            onClick={() => onEdit(record)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onEdit(record);
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "var(--action-hover)";
             }}
@@ -94,7 +100,10 @@ export function ActionColumn<
               fontSize: 16,
               transition: "color 0.2s ease",
             }}
-            onClick={() => onDelete(key)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete(key);
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "var(--action-hover)";
             }}

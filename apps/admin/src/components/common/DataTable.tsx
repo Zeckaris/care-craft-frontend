@@ -29,6 +29,7 @@ interface DataTableProps<T extends DataType> {
   rowKey?: keyof T | ((record: T) => React.Key);
   searchPlaceholder?: string;
   emptyText?: string;
+  onRowClick?: (record: T) => void;
   onView?: (record: T) => void;
   onEdit?: (record: T) => void;
   onDelete?: (key: React.Key) => void;
@@ -43,6 +44,7 @@ export function DataTable<T extends DataType>({
   loading = false,
   rowKey = "_id" as keyof T,
   emptyText = "No data found",
+  onRowClick,
   onView,
   onEdit,
   onDelete,
@@ -144,7 +146,7 @@ export function DataTable<T extends DataType>({
           columns={antdColumns}
           dataSource={data}
           rowKey={getRowKey}
-          rowSelection={rowSelection}
+          rowSelection={onBulkDelete ? rowSelection : undefined}
           pagination={
             pagination === false
               ? false
@@ -156,6 +158,10 @@ export function DataTable<T extends DataType>({
           }
           scroll={{ x: "max-content" }}
           locale={{ emptyText }}
+          onRow={(record) => ({
+            onClick: onRowClick ? () => onRowClick(record) : undefined,
+            style: onRowClick ? { cursor: "pointer" } : undefined,
+          })}
         />
       )}
     </div>
