@@ -227,7 +227,7 @@ export const SchoolInfoDrawer = ({
                 const entries = (value ?? []).filter(
                   (entry) => (entry ?? "").trim() !== ""
                 );
-                if (entries.length === 0) {
+                if (mode === "create" && entries.length === 0) {
                   throw new Error(TELEPHONE_REQUIRED_ERROR);
                 }
                 if (entries.length > TELEPHONE_MAX_ITEMS) {

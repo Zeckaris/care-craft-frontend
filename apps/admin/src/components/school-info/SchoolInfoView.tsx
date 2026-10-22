@@ -1,5 +1,5 @@
 import { Typography, Space, Button, Avatar } from "antd";
-import { EditOutlined, DeleteOutlined, BankOutlined } from "@ant-design/icons";
+import { EditOutlined, BankOutlined } from "@ant-design/icons";
 import { type ISchoolInfo } from "@/hooks/useSchoolInfo";
 
 const { Title, Text } = Typography;
@@ -7,14 +7,9 @@ const { Title, Text } = Typography;
 interface SchoolInfoViewProps {
   data: ISchoolInfo;
   onEdit: () => void;
-  onDelete: () => void;
 }
 
-export const SchoolInfoView = ({
-  data,
-  onEdit,
-  onDelete,
-}: SchoolInfoViewProps) => {
+export const SchoolInfoView = ({ data, onEdit }: SchoolInfoViewProps) => {
   const { name, about, address, contactEmail, telephone, logo } = data;
   const telephoneNumbers = telephone ?? [];
 
@@ -107,30 +102,20 @@ export const SchoolInfoView = ({
               ))}
             </Space>
           ) : (
-            <Text type="secondary">—</Text>
+            <Text type="secondary">Not set</Text>
           )}
         </div>
       </Space>
 
       <div style={{ marginTop: 32, textAlign: "center" }}>
-        <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="large"
-            onClick={onEdit}
-          >
-            Edit
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            size="large"
-            onClick={onDelete}
-          >
-            Delete
-          </Button>
-        </Space>
+        <Button
+          type="primary"
+          icon={<EditOutlined />}
+          size="large"
+          onClick={onEdit}
+        >
+          Edit
+        </Button>
       </div>
     </div>
   );

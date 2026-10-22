@@ -102,7 +102,7 @@ const buildSchoolInfoFormData = (data: object) => {
 };
 
 export const useSchoolInfo = (enabled = true) => {
-  const { get, post, put, patch, del, postMutation, putMutation, patchMutation, deleteMutation } = useApi();
+  const { get, post, put, patch, postMutation, putMutation, patchMutation } = useApi();
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
@@ -141,12 +141,20 @@ export const useSchoolInfo = (enabled = true) => {
 
   // Full create (initial setup)
   const create = async (data: SchoolInfoCreateInput) => {
-    return post({ url: basePath, body: buildSchoolInfoFormData(data) });
+    return post({
+      url: basePath,
+      body: buildSchoolInfoFormData(data),
+      invalidateKey: [basePath],
+    });
   };
 
   // Full update (used for name, contact, about, logo changes)
   const update = async (data: SchoolInfoUpdateInput) => {
-    return put({ url: basePath, body: buildSchoolInfoFormData(data) });
+    return put({
+      url: basePath,
+      body: buildSchoolInfoFormData(data),
+      invalidateKey: [basePath],
+    });
   };
 
   // Partial update for branding only
@@ -178,8 +186,6 @@ export const useSchoolInfo = (enabled = true) => {
     return result;
   };
 
-  const remove = () => del({ url: basePath });
-
   return {
     schoolInfo,
     isLoading,
@@ -190,11 +196,9 @@ export const useSchoolInfo = (enabled = true) => {
     update,
     updateBranding,
     updateFeatures,
-    remove,
 
     isSaving: postMutation.isPending || putMutation.isPending || patchMutation.isPending,
     isSavingFeatures: patchMutation.isPending,
-    isDeleting: deleteMutation.isPending,
 
     previewLogo,
     handleLogoChange,
