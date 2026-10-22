@@ -8,7 +8,7 @@
  */
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import type { AxiosError } from 'axios';
+import { extractApiErrorMessage } from '@carecraft/query-core';
 import { useApi } from '@/hooks/useApi';
 import { useUser } from '@/context/UserContext';
 import { capitalizeFirstLetter } from '@carecraft/utils';
@@ -54,6 +54,7 @@ export function useSignup() {
       const res = await post({
         url: '/auth/sendVerification',
         body: { email },
+        toast: false,
       });
 
       if (res.success) {
@@ -65,9 +66,12 @@ export function useSignup() {
         toast.error(res.message || 'Failed to send verification code');
       }
     } catch (err) {
-      const axiosErr = err as AxiosError<{ message?: string }>;
-      const msg = axiosErr?.response?.data?.message || 'Failed to send verification code';
-      toast.error(msg);
+      const errorMessage = extractApiErrorMessage(err);
+      toast.error(
+        errorMessage === 'Request Failed'
+          ? 'Failed to send verification code'
+          : errorMessage,
+      );
     } finally {
       setVerifying(false);
     }
@@ -79,6 +83,7 @@ export function useSignup() {
       const res = await post({
         url: '/auth/signup',
         body: data,
+        toast: false,
       });
 
       if (res.success) {
@@ -103,15 +108,14 @@ export function useSignup() {
 
       const msg = res.message || 'Signup failed. Please check your invite token and try again.';
       setError(msg);
-      toast.error(msg);
       return null;
     } catch (err) {
-      const axiosErr = err as AxiosError<{ message?: string }>;
-      const backendMsg =
-        axiosErr?.response?.data?.message ||
-        'Signup failed. Please verify your invite token or check connection.';
-      setError(backendMsg);
-      toast.error(backendMsg);
+      const errorMessage = extractApiErrorMessage(err);
+      const msg =
+        errorMessage === 'Request Failed'
+          ? 'Signup failed. Please verify your invite token or check connection.'
+          : errorMessage;
+      setError(msg);
       return null;
     }
   };

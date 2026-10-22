@@ -10,6 +10,7 @@ export const useMarkNotificationAsRead = () => {
       const response = await patch({
         url: `/notifications/${notificationId}/read`,
         body: {}, // no body required
+        toast: false,
       });
 
       // Invalidate relevant queries to refresh lists & counts
