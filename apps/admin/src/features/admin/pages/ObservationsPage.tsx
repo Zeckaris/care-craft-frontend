@@ -10,7 +10,6 @@ import {
   Space,
   Tag,
   Typography,
-  message,
 } from "antd";
 import {
   DeleteOutlined,
@@ -168,7 +167,6 @@ export default function ObservationsPage() {
         setDeletingId(record._id);
         try {
           await remove(record._id);
-          message.success("Observation deleted successfully");
           setSelectedObservation((current) =>
             current?._id === record._id ? null : current,
           );
@@ -196,7 +194,6 @@ export default function ObservationsPage() {
         setDeletingStudentId(student._id);
         try {
           await bulkRemoveByStudent(student._id);
-          message.success(`All observations for ${studentName} deleted`);
           setSelectedObservation((current) =>
             current?.studentId?._id === student._id ? null : current,
           );

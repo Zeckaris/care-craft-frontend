@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, message, Form, Modal, Input, Space, Typography } from "antd";
+import { Button, Form, Modal, Input, Space, Typography } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
 import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
@@ -88,9 +88,8 @@ export default function GradesPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Grade deleted");
-    } catch (err) {
-      message.error("Failed to delete");
+    } catch {
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -116,10 +115,8 @@ export default function GradesPage() {
       const values = await form.validateFields();
       if (selectedGrade) {
         await update(selectedGrade._id, values);
-        message.success("Updated");
       } else {
         await create(values);
-        message.success("Created");
       }
       closeDrawer();
     } catch (err) {

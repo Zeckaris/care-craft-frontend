@@ -154,10 +154,8 @@ export default function AssessmentTypesPage() {
 
       if (selectedType) {
         await update(selectedType._id, values);
-        message.success("Assessment type updated");
       } else {
         await create(values);
-        message.success("Assessment type created");
       }
       closeDrawer();
     } catch (err) {

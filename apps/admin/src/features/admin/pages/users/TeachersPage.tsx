@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Input, message, Space, Typography, Alert, Avatar } from "antd";
+import { Form, Input, Space, Typography, Alert, Avatar } from "antd";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -94,10 +94,8 @@ export default function TeachersPage() {
     if (!deleteConfirm.key) return;
     try {
       await remove(String(deleteConfirm.key));
-      message.success("Teacher deleted successfully");
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to delete teacher";
-      message.error(msg);
+    } catch {
+      // error toast is shown globally
     } finally {
       setDeleteConfirm({ open: false });
     }
@@ -108,7 +106,6 @@ export default function TeachersPage() {
     try {
       const values = await form.validateFields();
       await update(selectedUser._id, values);
-      message.success("Teacher updated successfully");
       closeDrawer();
     } catch (err: any) {
       console.error("Update error:", err);

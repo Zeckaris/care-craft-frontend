@@ -159,10 +159,8 @@ export default function AssessmentSetupPage() {
 
       if (selectedSetup) {
         await update(selectedSetup._id, values);
-        message.success("Assessment setup updated");
       } else {
         await create(values);
-        message.success("Assessment setup created");
       }
       closeDrawer();
     } catch (err) {

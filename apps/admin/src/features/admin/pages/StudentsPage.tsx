@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Button,
-  message,
   Form,
   Modal,
   Select,
@@ -94,9 +93,8 @@ export default function StudentsPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Student deleted");
     } catch {
-      message.error("Failed to delete");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -121,14 +119,12 @@ export default function StudentsPage() {
     try {
       if (selectedStudent) {
         await update(selectedStudent._id, formData);
-        message.success("Student updated successfully");
       } else {
         await create(formData);
-        message.success("Student created successfully");
       }
       closeDrawer();
-    } catch (err) {
-      message.error("Failed to save student");
+    } catch {
+      // error toast is shown globally
     }
   };
 

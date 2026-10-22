@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Button,
-  message,
   Form,
   Modal,
   Space,
@@ -93,9 +92,8 @@ export default function SubjectsPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Subject deleted");
     } catch {
-      message.error("Failed to delete");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -122,10 +120,8 @@ export default function SubjectsPage() {
 
       if (selectedSubject) {
         await update(selectedSubject._id, values);
-        message.success("Subject updated");
       } else {
         await create(values);
-        message.success("Subject created");
       }
       closeDrawer();
     } catch (err) {

@@ -3,7 +3,6 @@ import {
   Button,
   Form,
   Input,
-  message,
   Modal,
   Select,
   Tag,
@@ -163,17 +162,12 @@ export default function SectionsPage() {
           name: values.name,
           isActive: values.isActive,
         });
-        message.success("Section updated successfully");
       } else {
         await create(values);
-        message.success("Section created successfully");
       }
       closeDrawer();
     } catch (err: any) {
       if (err?.errorFields) return;
-      const msg =
-        err?.response?.data?.message || err?.message || "Operation failed";
-      message.error(msg);
     }
   };
 
@@ -181,13 +175,8 @@ export default function SectionsPage() {
     if (!confirmDelete.id) return;
     try {
       await remove(confirmDelete.id);
-      message.success("Section deleted successfully");
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to delete section";
-      message.error(msg);
+    } catch {
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }

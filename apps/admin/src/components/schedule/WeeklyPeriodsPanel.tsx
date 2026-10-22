@@ -13,7 +13,6 @@ import {
   Table,
   Tag,
   Typography,
-  message,
 } from "antd";
 import {
   CopyOutlined,
@@ -171,9 +170,8 @@ export function WeeklyPeriodsPanel({
     }
     try {
       await removeItem(row.itemId);
-      message.success("Requirement removed");
-    } catch (err) {
-      message.error(getErrorMessage(err));
+    } catch {
+      // error toast is shown globally
     }
   };
 
@@ -186,9 +184,8 @@ export function WeeklyPeriodsPanel({
           doublePeriod: r.doublePeriod,
         }))
       );
-      message.success("Weekly periods saved");
-    } catch (err) {
-      message.error(getErrorMessage(err));
+    } catch {
+      // error toast is shown globally
     }
   };
 
@@ -204,9 +201,8 @@ export function WeeklyPeriodsPanel({
       );
       // Refetch the target grade so the real total and status appear.
       await refetch();
-      message.success("Requirements copied");
-    } catch (err) {
-      message.error(getErrorMessage(err));
+    } catch {
+      // error toast is shown globally
     }
   };
 

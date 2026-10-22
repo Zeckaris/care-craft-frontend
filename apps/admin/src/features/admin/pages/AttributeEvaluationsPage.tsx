@@ -126,9 +126,8 @@ export default function AttributeEvaluationsPage() {
       onOk: async () => {
         try {
           await remove(String(key));
-          message.success("Evaluation deleted");
         } catch {
-          message.error("Failed to delete evaluation");
+          // error toast is shown globally
         }
       },
     });
@@ -173,15 +172,12 @@ export default function AttributeEvaluationsPage() {
 
       if (drawerMode === "create") {
         await create(payload);
-        message.success("Evaluation created");
       } else if (selectedEvaluation) {
         await update(selectedEvaluation._id, payload);
-        message.success("Evaluation updated");
       }
       closeDrawer();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error("Operation failed");
     }
   };
 

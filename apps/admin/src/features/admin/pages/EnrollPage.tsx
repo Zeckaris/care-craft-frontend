@@ -151,9 +151,8 @@ export default function EnrollPage() {
     if (!confirmDelete.key) return;
     try {
       await remove(String(confirmDelete.key));
-      message.success("Enrollment deleted");
     } catch {
-      message.error("Failed to delete");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -179,7 +178,6 @@ export default function EnrollPage() {
       const values = await form.validateFields();
       if (selectedEnrollment) {
         await update(selectedEnrollment._id, values);
-        message.success("Enrollment updated");
       } else {
         const { studentId, gradeId } = values;
         if (!studentId) {
@@ -187,7 +185,6 @@ export default function EnrollPage() {
           return;
         }
         await create({ studentId, gradeId });
-        message.success("Student enrolled successfully");
       }
       closeSingleDrawer();
     } catch (err) {
@@ -213,9 +210,8 @@ export default function EnrollPage() {
   const handleToggleActive = async (id: string) => {
     try {
       await toggleActive(id);
-      message.success("Status updated");
     } catch {
-      message.error("Failed to update status");
+      // error toast is shown globally
     }
   };
 

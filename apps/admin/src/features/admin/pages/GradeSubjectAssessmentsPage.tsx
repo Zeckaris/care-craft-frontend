@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Input, Modal, Typography, message, Tag } from "antd";
+import { Button, Input, Modal, Typography, Tag } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { DataTable } from "@/components/common/DataTable";
 import { reportBulkDelete } from "@/utils/bulkDeleteFeedback";
@@ -80,9 +80,8 @@ export default function GradeSubjectAssessmentsPage() {
     if (!confirmDelete.id) return;
     try {
       await remove(confirmDelete.id);
-      message.success("GSA deleted successfully");
     } catch {
-      message.error("Failed to delete GSA");
+      // error toast is shown globally
     } finally {
       setConfirmDelete({ open: false });
     }
@@ -110,16 +109,12 @@ export default function GradeSubjectAssessmentsPage() {
 
       if (selectedGSA) {
         await update(selectedGSA._id, values);
-        message.success("GSA updated successfully");
       } else {
         await create(values);
-        message.success("GSA created successfully");
       }
       closeDrawer();
     } catch (err: any) {
       if (err?.errorFields) return;
-      const backendMsg = err?.response?.data?.message || "Operation failed";
-      message.error(backendMsg);
     }
   };
 

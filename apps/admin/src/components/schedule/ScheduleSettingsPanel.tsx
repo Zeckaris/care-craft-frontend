@@ -13,7 +13,6 @@ import {
   Statistic,
   Tag,
   Typography,
-  message,
 } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
 import type { DayOfWeek, IBellSchedule, IScheduleBlock, IScheduleSettings } from "@carecraft/types";
@@ -167,9 +166,8 @@ export function ScheduleSettingsPanel({ schoolYear }: ScheduleSettingsPanelProps
         maximumWeeklyTaughtPeriods: state.maximumWeeklyTaughtPeriods,
         maximumConsecutivePeriods: state.maximumConsecutivePeriods,
       });
-      message.success("Schedule settings saved");
-    } catch (err) {
-      message.error(getErrorMessage(err));
+    } catch {
+      // error toast is shown globally
     }
   };
 
