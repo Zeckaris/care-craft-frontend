@@ -367,6 +367,29 @@ export interface BadgeUserRef {
   role: string;
 }
 
+export type GiftStatus = 'none' | 'pending' | 'given';
+
+/** Active gift shape returned by GET /api/gift/options and embedded in badges. */
+export interface GiftOption {
+  _id: string;
+  name: string;
+  description?: string | null;
+  image?: string | null;
+  isActive: boolean;
+}
+
+/** Full gift entity returned by GET /api/gift. */
+export interface Gift {
+  _id: string;
+  name: string;
+  description?: string | null;
+  image?: string | null;
+  isActive: boolean;
+  createdBy?: BadgeUserRef | string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface BadgeGradeRef {
   _id: string;
   level: string;
@@ -512,6 +535,8 @@ export interface BadgeDefinition {
   eligibleGrades: BadgeEligibleGrade[];
   autoAward: boolean;
   criteria: BadgeCriteria[];
+  giftId?: GiftOption | string | null;
+  giftQuantity?: number | null;
   createdBy?: BadgeUserRef | string | null;
   createdAt: string;
   updatedAt?: string;
@@ -541,6 +566,8 @@ export interface StudentBadgeBadgeRef {
   level: number;
   eligibleGrades?: BadgeEligibleGrade[];
   autoAward?: boolean;
+  giftId?: GiftOption | string | null;
+  giftQuantity?: number | null;
 }
 
 /** An award of a badge to a student for one academic term. */
@@ -553,6 +580,16 @@ export interface StudentBadge {
   source: StudentBadgeSource;
   awardedBy?: BadgeUserRef | null;
   note?: string | null;
+  /** Live populated gift, or null. Missing on legacy awards. */
+  giftId?: GiftOption | null;
+  /** Snapshot of the gift name at award time. Missing on legacy awards. */
+  giftName?: string | null;
+  giftQuantity?: number | null;
+  giftStatus?: GiftStatus;
+  giftGivenAt?: string | null;
+  giftGivenBy?: BadgeUserRef | null;
+  giftNote?: string | null;
+  giftClaimBy?: string | null;
   createdAt: string;
   updatedAt?: string;
 }
@@ -643,6 +680,8 @@ export interface StudentBadgeProgressBadge {
   icon?: string | null;
   level: number;
   autoAward: boolean;
+  giftId?: GiftOption | null;
+  giftQuantity?: number | null;
 }
 
 export interface StudentBadgeProgressItem {
