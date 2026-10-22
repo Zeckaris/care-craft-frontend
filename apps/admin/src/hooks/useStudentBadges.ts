@@ -1,6 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { BADGES_QUERY_ROOT } from '@carecraft/badges';
-import type { StudentBadge, StudentBadgeSource } from '@carecraft/types';
+import {
+  badgesKeys,
+  invalidateStudentGiftQueries,
+} from '@carecraft/badges';
+import type {
+  GiftStatus,
+  StudentBadge,
+  StudentBadgeSource,
+} from '@carecraft/types';
 import { useApi } from '@/hooks/useApi';
 
 interface PaginationMeta {
@@ -16,12 +23,18 @@ interface UseStudentBadgesParams {
   academicTermId?: string;
   source?: StudentBadgeSource;
   awardedBy?: string;
+  giftStatus?: Exclude<GiftStatus, 'none'>;
   pagination?: { page: number; pageSize: number };
 }
 
 export interface AwardStudentBadgeInput {
   badgeId: string;
   studentId: string;
+  note?: string;
+}
+
+export interface UpdateStudentBadgeGiftInput {
+  given: boolean;
   note?: string;
 }
 
@@ -32,10 +45,21 @@ export const useStudentBadges = ({
   academicTermId,
   source,
   awardedBy,
+  giftStatus,
   pagination = { page: 1, pageSize: 10 },
 }: UseStudentBadgesParams = {}) => {
   const queryClient = useQueryClient();
-  const { get, post, put, del, postMutation, putMutation, deleteMutation } = useApi();
+  const {
+    get,
+    post,
+    put,
+    patch,
+    del,
+    postMutation,
+    putMutation,
+    patchMutation,
+    deleteMutation,
+  } = useApi();
 
   const params = new URLSearchParams();
   if (studentId) params.set('studentId', studentId);
@@ -44,22 +68,21 @@ export const useStudentBadges = ({
   if (academicTermId) params.set('academicTermId', academicTermId);
   if (source) params.set('source', source);
   if (awardedBy) params.set('awardedBy', awardedBy);
+  if (giftStatus) params.set('giftStatus', giftStatus);
   params.set('page', String(pagination.page));
   params.set('limit', String(pagination.pageSize));
 
   const fetchUrl = `/studentBadge?${params.toString()}`;
-  const queryKey = [
-    '/studentBadge',
-    {
-      studentId,
-      badgeId,
-      schoolYear,
-      academicTermId,
-      source,
-      awardedBy,
-      pagination,
-    },
-  ];
+  const queryKey = badgesKeys.studentAwards({
+    studentId,
+    badgeId,
+    schoolYear,
+    academicTermId,
+    source,
+    awardedBy,
+    giftStatus,
+    pagination,
+  });
 
   const {
     data: raw,
@@ -80,8 +103,8 @@ export const useStudentBadges = ({
     raw?.pagination ?? { total: 0, page: 1, limit: 10 };
 
   const invalidateAwards = () => {
-    queryClient.invalidateQueries({ queryKey: ['/studentBadge'] });
-    queryClient.invalidateQueries({ queryKey: [BADGES_QUERY_ROOT] });
+    queryClient.invalidateQueries({ queryKey: badgesKeys.studentAwardsRoot });
+    queryClient.invalidateQueries({ queryKey: badgesKeys.root });
   };
 
   const create = async (data: AwardStudentBadgeInput) => {
@@ -93,6 +116,18 @@ export const useStudentBadges = ({
   const update = async (id: string, data: { note: string }) => {
     const result = await put({ url: `/studentBadge/${id}`, body: data });
     invalidateAwards();
+    return result;
+  };
+
+  const updateGift = async (
+    id: string,
+    data: UpdateStudentBadgeGiftInput,
+  ): Promise<{ data?: StudentBadge; message?: string }> => {
+    const result = await patch({
+      url: `/studentBadge/${id}/gift`,
+      body: data,
+    });
+    await invalidateStudentGiftQueries(queryClient, id);
     return result;
   };
 
@@ -115,10 +150,12 @@ export const useStudentBadges = ({
     refetch,
     create,
     update,
+    updateGift,
     remove,
 
     isCreating: postMutation.isPending,
     isUpdating: putMutation.isPending,
+    isUpdatingGift: patchMutation.isPending,
     isDeleting: deleteMutation.isPending,
   };
 };

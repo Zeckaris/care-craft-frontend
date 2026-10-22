@@ -13,7 +13,16 @@ import {
   Typography,
 } from "antd";
 import { PlusOutlined, TrophyOutlined } from "@ant-design/icons";
-import type { StudentBadge, StudentBadgeSource } from "@carecraft/types";
+import type {
+  GiftStatus,
+  StudentBadge,
+  StudentBadgeSource,
+} from "@carecraft/types";
+import {
+  awardHasGift,
+  getGiftLabel,
+  getGiftStatusLabel,
+} from "@carecraft/badges";
 import { extractApiErrorMessage } from "@carecraft/query-core";
 import { DataTable } from "@/components/common/DataTable";
 import { BadgeAwardDrawer } from "@/components/badge/BadgeAwardDrawer";
@@ -74,6 +83,9 @@ function BadgeAwardsTab() {
     undefined,
   );
   const [awardedByQuery, setAwardedByQuery] = useState("");
+  const [giftStatus, setGiftStatus] = useState<
+    Exclude<GiftStatus, "none"> | undefined
+  >(undefined);
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10 });
 
   const {
@@ -86,9 +98,11 @@ function BadgeAwardsTab() {
     fetchError,
     create,
     update,
+    updateGift,
     remove,
     isCreating,
     isUpdating,
+    isUpdatingGift,
     isDeleting,
   } = useStudentBadges({
     studentId,
@@ -97,6 +111,7 @@ function BadgeAwardsTab() {
     academicTermId,
     source,
     awardedBy: canFilterAwardedBy ? awardedBy : undefined,
+    giftStatus,
     pagination,
   });
 
@@ -178,6 +193,7 @@ function BadgeAwardsTab() {
     academicTermId,
     source,
     awardedBy,
+    giftStatus,
   ]);
 
   useEffect(() => {
@@ -279,6 +295,21 @@ function BadgeAwardsTab() {
     });
   };
 
+  const handleMarkGiftGiven = async (note?: string) => {
+    if (!selectedAward) return;
+    const result = await updateGift(selectedAward._id, {
+      given: true,
+      note,
+    });
+    if (result?.data) setSelectedAward(result.data);
+  };
+
+  const handleUndoGift = async () => {
+    if (!selectedAward) return;
+    const result = await updateGift(selectedAward._id, { given: false });
+    if (result?.data) setSelectedAward(result.data);
+  };
+
   const columns = [
     {
       key: "student",
@@ -334,6 +365,33 @@ function BadgeAwardsTab() {
       render: (record: StudentBadge) => {
         const meta = getStudentBadgeSourceMeta(record.source);
         return <Tag color={meta.color}>{meta.label}</Tag>;
+      },
+    },
+    {
+      key: "gift",
+      title: "Gift",
+      render: (record: StudentBadge) => {
+        if (!awardHasGift(record)) return null;
+        const liveName =
+          record.giftId && typeof record.giftId === "object"
+            ? record.giftId.name
+            : undefined;
+        const statusLabel = getGiftStatusLabel(record.giftStatus);
+        return (
+          <Space direction="vertical" size={2}>
+            <Text>
+              {getGiftLabel(
+                record.giftName || liveName,
+                record.giftQuantity ?? null,
+              )}
+            </Text>
+            {statusLabel && (
+              <Tag color={record.giftStatus === "given" ? "green" : "gold"}>
+                {statusLabel}
+              </Tag>
+            )}
+          </Space>
+        );
       },
     },
     {
@@ -442,6 +500,22 @@ function BadgeAwardsTab() {
               value={source}
               onChange={(value) => setSource(value || undefined)}
             />
+            <Select
+              style={{ width: 180 }}
+              options={[
+                { value: "all", label: "All gift statuses" },
+                { value: "pending", label: "Pending" },
+                { value: "given", label: "Given" },
+              ]}
+              value={giftStatus ?? "all"}
+              onChange={(value) =>
+                setGiftStatus(
+                  value === "pending" || value === "given"
+                    ? value
+                    : undefined,
+                )
+              }
+            />
             {canFilterAwardedBy && (
               <Select
                 style={{ width: 240 }}
@@ -517,6 +591,11 @@ function BadgeAwardsTab() {
         loading={isCreating || isUpdating || isDeleting}
         studentOptions={studentOptions}
         badgeOptions={badgeOptions}
+        giftActionLoading={isUpdatingGift}
+        onMarkGiftGiven={
+          drawerMode === "view" ? handleMarkGiftGiven : undefined
+        }
+        onUndoGift={drawerMode === "view" ? handleUndoGift : undefined}
       />
     </>
   );

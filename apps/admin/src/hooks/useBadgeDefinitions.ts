@@ -21,6 +21,8 @@ export interface BadgeDefinitionInput {
   level: number;
   eligibleGrades?: string[];
   autoAward?: boolean;
+  giftId?: string;
+  giftQuantity?: number | null;
 }
 
 interface UseBadgeDefinitionsParams {
@@ -102,6 +104,12 @@ export const useBadgeDefinitions = ({
     }
     if (data.autoAward !== undefined) {
       formData.append('autoAward', String(data.autoAward));
+    }
+    if (data.giftId !== undefined) {
+      formData.append('giftId', data.giftId);
+    }
+    if (data.giftQuantity !== undefined && data.giftQuantity !== null) {
+      formData.append('giftQuantity', String(data.giftQuantity));
     }
     if (iconFile) {
       formData.append('icon', iconFile);

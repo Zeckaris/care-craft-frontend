@@ -18,6 +18,7 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons";
 import type { BadgeDefinition } from "@carecraft/types";
+import { getGiftLabel } from "@carecraft/badges";
 import { DataTable } from "@/components/common/DataTable";
 import { BadgeDefinitionDrawer } from "@/components/badge/BadgeDefinitionDrawer";
 import { BadgeDetailDrawer } from "@/components/badge/BadgeDetailDrawer";
@@ -266,6 +267,22 @@ export default function BadgeDefinitionsPage() {
       key: "awardStatus",
       title: "Award Status",
       render: (record: BadgeDefinition) => renderAwardStatus(record),
+    },
+    {
+      key: "gift",
+      title: "Gift",
+      render: (record: BadgeDefinition) => {
+        if (!record.giftId) {
+          return <Text type="secondary">No gift</Text>;
+        }
+        const giftName =
+          typeof record.giftId === "object" ? record.giftId.name : undefined;
+        return (
+          <Tag color="purple">
+            {getGiftLabel(giftName, record.giftQuantity ?? null)}
+          </Tag>
+        );
+      },
     },
     {
       key: "createdBy",

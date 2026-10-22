@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   Alert,
   Avatar,
@@ -20,15 +20,22 @@ import {
 import {
   DeleteOutlined,
   EditOutlined,
+  GiftOutlined,
   PlusOutlined,
   TrophyOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import type { BadgeCriteria, BadgeDefinition } from '@carecraft/types';
+import type {
+  BadgeCriteria,
+  BadgeDefinition,
+  GiftOption,
+} from '@carecraft/types';
 import {
   formatCriterionSummary,
   getBadgeCriteriaTypeLabel,
   getBadgeProgressScopeLabel,
+  getGiftLabel,
+  getGiftOptionId,
   isKnownBadgeCriteriaType,
 } from '@carecraft/badges';
 import { extractApiErrorMessage } from '@carecraft/query-core';
@@ -39,6 +46,7 @@ import {
   useBadgeDefinitionDetail,
   useBadgeDefinitions,
 } from '@/hooks/useBadgeDefinitions';
+import { useGiftOptions } from '@/hooks/useGifts';
 import { useGradeOptions } from '@/hooks/useGradeOptions';
 import { useSubjects } from '@/hooks/useSubjects';
 import {
@@ -47,6 +55,7 @@ import {
   getEligibleGradeLabels,
   normalizeEligibleGradeIds,
 } from '@/utils/badges';
+import { resolveGiftImage } from '@/utils/gift';
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -91,6 +100,10 @@ export function BadgeDetailDrawer({
   const { gradeOptions, gradeLabelById } = useGradeOptions();
   const { categories } = useAttributeCategories({ all: true });
   const { subjects } = useSubjects();
+  const {
+    options: giftOptions,
+    isLoading: giftOptionsLoading,
+  } = useGiftOptions();
 
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState('');
@@ -98,6 +111,8 @@ export function BadgeDetailDrawer({
   const [criterionDrawerOpen, setCriterionDrawerOpen] = useState(false);
   const [editingCriterion, setEditingCriterion] =
     useState<BadgeCriteria | null>(null);
+  const [giftId, setGiftId] = useState('');
+  const [giftQuantity, setGiftQuantity] = useState<number | null>(null);
 
   const attributeCategoryNameById = useMemo(
     () => new Map(categories.map((category) => [category._id, category.name])),
@@ -130,6 +145,12 @@ export function BadgeDetailDrawer({
   }, [badge, form, open]);
 
   useEffect(() => {
+    if (!open || !badge) return;
+    setGiftId(getGiftOptionId(badge.giftId) ?? '');
+    setGiftQuantity(badge.giftQuantity ?? null);
+  }, [open, badge?._id, badge?.giftId, badge?.giftQuantity]);
+
+  useEffect(() => {
     return () => {
       if (iconPreview.startsWith('blob:')) {
         URL.revokeObjectURL(iconPreview);
@@ -142,6 +163,41 @@ export function BadgeDetailDrawer({
     isKnownBadgeCriteriaType(criterion.type),
   ).length;
   const hasCriteria = criteria.length > 0;
+
+  const currentGift = useMemo<GiftOption | null>(() => {
+    if (!giftId) return null;
+    const option = giftOptions.find((gift) => gift._id === giftId);
+    if (option) return option;
+    if (
+      badge?.giftId &&
+      typeof badge.giftId === 'object' &&
+      badge.giftId._id === giftId
+    ) {
+      return badge.giftId;
+    }
+    return null;
+  }, [badge?.giftId, giftId, giftOptions]);
+
+  const giftSelectOptions = useMemo<{ value: string; label: ReactNode }[]>(
+    () => {
+      const options: { value: string; label: ReactNode }[] = giftOptions.map(
+        (gift) => ({ value: gift._id, label: gift.name }),
+      );
+      if (giftId && !options.some((option) => option.value === giftId)) {
+        options.unshift({
+          value: giftId,
+          label: (
+            <Space size={4}>
+              <span>{currentGift?.name ?? 'Current gift'}</span>
+              <Tag color="default">Inactive</Tag>
+            </Space>
+          ),
+        });
+      }
+      return options;
+    },
+    [currentGift?.name, giftId, giftOptions],
+  );
 
   const handleUploadChange = (info: any) => {
     const file = info.fileList[0]?.originFileObj as File | undefined;
@@ -188,6 +244,65 @@ export function BadgeDetailDrawer({
     } catch (error) {
       setActionError(extractApiErrorMessage(error));
     }
+  };
+
+  const handleSaveGift = async () => {
+    if (!badge) return;
+    setActionError(null);
+
+    if (!giftId) {
+      try {
+        await update(badge._id, { giftId: '' });
+        setGiftQuantity(null);
+        await refetch();
+        onSaved?.();
+      } catch (error) {
+        setActionError(extractApiErrorMessage(error));
+      }
+      return;
+    }
+
+    if (
+      giftQuantity === null ||
+      !Number.isInteger(giftQuantity) ||
+      giftQuantity < 1 ||
+      giftQuantity > 100
+    ) {
+      setActionError('Gift quantity must be a whole number from 1 to 100.');
+      return;
+    }
+
+    try {
+      await update(badge._id, { giftId, giftQuantity });
+      await refetch();
+      onSaved?.();
+    } catch (error) {
+      setActionError(extractApiErrorMessage(error));
+    }
+  };
+
+  const handleClearGift = () => {
+    if (!badge) return;
+    Modal.confirm({
+      title: 'Clear this gift?',
+      content:
+        'New awards will not include a gift. Awards already given keep their original gift.',
+      okText: 'Clear gift',
+      cancelText: 'Cancel',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        setActionError(null);
+        try {
+          await update(badge._id, { giftId: '' });
+          setGiftId('');
+          setGiftQuantity(null);
+          await refetch();
+          onSaved?.();
+        } catch (error) {
+          setActionError(extractApiErrorMessage(error));
+        }
+      },
+    });
   };
 
   const handleAddCriterion = () => {
@@ -435,6 +550,112 @@ export function BadgeDetailDrawer({
                   </div>
                 </div>
               </Form>
+            </section>
+
+            <Divider style={{ margin: 0 }} />
+
+            <section>
+              <Typography.Title level={5} style={{ marginTop: 0 }}>
+                Gift
+              </Typography.Title>
+              <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
+                Applies to awards made from now on. Awards already given keep
+                their original gift.
+              </Text>
+
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Space wrap align="start">
+                  <div>
+                    <Text strong style={{ display: 'block', marginBottom: 4 }}>
+                      Gift
+                    </Text>
+                    <Select
+                      style={{ width: 280 }}
+                      placeholder="No gift"
+                      value={giftId || undefined}
+                      onChange={(value) => {
+                        setGiftId(value ?? '');
+                        setGiftQuantity((current) =>
+                          value ? (current ?? 1) : null,
+                        );
+                      }}
+                      allowClear
+                      showSearch
+                      optionFilterProp="label"
+                      options={giftSelectOptions}
+                      loading={giftOptionsLoading}
+                      notFoundContent="No active gifts found"
+                    />
+                  </div>
+                  <div>
+                    <Text strong style={{ display: 'block', marginBottom: 4 }}>
+                      Quantity
+                    </Text>
+                    <InputNumber
+                      min={1}
+                      max={100}
+                      precision={0}
+                      value={giftQuantity}
+                      onChange={(value) =>
+                        setGiftQuantity(typeof value === 'number' ? value : null)
+                      }
+                      disabled={!giftId}
+                      style={{ width: 140 }}
+                    />
+                  </div>
+                </Space>
+
+                {giftId && (
+                  <Space
+                    align="center"
+                    style={{
+                      border: '1px solid #f0f0f0',
+                      borderRadius: 8,
+                      padding: 12,
+                      width: '100%',
+                    }}
+                  >
+                    <Avatar
+                      shape="square"
+                      size={48}
+                      icon={<GiftOutlined />}
+                      src={resolveGiftImage(currentGift?.image)}
+                      style={{ backgroundColor: '#f56a00' }}
+                    />
+                    <Space direction="vertical" size={0}>
+                      <Text strong>
+                        {getGiftLabel(
+                          currentGift?.name ??
+                            (typeof badge.giftId === 'string'
+                              ? undefined
+                              : badge.giftId?.name),
+                          giftQuantity,
+                        )}
+                      </Text>
+                      {currentGift && !currentGift.isActive && (
+                        <Tag color="default">Inactive</Tag>
+                      )}
+                    </Space>
+                  </Space>
+                )}
+
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => void handleSaveGift()}
+                    loading={isUpdating}
+                  >
+                    Save gift
+                  </Button>
+                  <Button
+                    danger
+                    onClick={handleClearGift}
+                    disabled={!getGiftOptionId(badge.giftId)}
+                  >
+                    Clear gift
+                  </Button>
+                </Space>
+              </Space>
             </section>
 
             <Divider style={{ margin: 0 }} />
