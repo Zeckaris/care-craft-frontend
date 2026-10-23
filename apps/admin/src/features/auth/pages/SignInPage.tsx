@@ -10,6 +10,7 @@ import {
   Divider,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
+import { fillDemoAccount } from "@carecraft/auth-hooks";
 import { useLogin } from "@/hooks/useLogin";
 import { useState } from "react";
 
@@ -22,9 +23,8 @@ export default function SignInPage() {
   const [showMfaInput, setShowMfaInput] = useState(false);
 
   const handleTryDemo = () => {
-    form.setFieldsValue({
-      email: "test@example.com",
-      password: "password123",
+    fillDemoAccount("admin", (credentials) => {
+      form.setFieldsValue(credentials);
     });
     message.info("Demo credentials loaded! Click 'Sign In' to continue.");
   };
@@ -91,7 +91,7 @@ export default function SignInPage() {
             Just exploring? Try the demo!
           </Text>
           <Text type="secondary" style={{ display: "block", marginBottom: 12 }}>
-            See the full dashboard in seconds — no signup required.
+            See the full dashboard in seconds. No signup required.
           </Text>
           <Button
             type="primary"

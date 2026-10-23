@@ -41,6 +41,47 @@ import { useState } from 'react';
 import type { AuthUser } from '@carecraft/types';
 import { capitalizeFirstLetter, clearUser } from '@carecraft/utils';
 
+// ---------------------------------------------------------------------------
+// Demo accounts
+// ---------------------------------------------------------------------------
+
+export type DemoAccountApp = 'admin' | 'teacher';
+
+export interface DemoCredentials {
+  email: string;
+  password: string;
+}
+
+const DEMO_PASSWORD = 'pass@123word';
+
+/**
+ * Demo sign-in credentials shared by the admin and teacher apps.
+ * Kept here as the single source of truth so both apps stay in sync.
+ */
+export const DEMO_CREDENTIALS: Record<DemoAccountApp, DemoCredentials> = {
+  admin: {
+    email: 'test@example.com',
+    password: DEMO_PASSWORD,
+  },
+  teacher: {
+    email: 'mulugeta.abera@kidusmikael.edu.et',
+    password: DEMO_PASSWORD,
+  },
+};
+
+/**
+ * Fills a login form with the demo credentials for `app`.
+ * The caller owns the form library, so it passes an `apply` callback.
+ */
+export function fillDemoAccount(
+  app: DemoAccountApp,
+  apply: (credentials: DemoCredentials) => void,
+): DemoCredentials {
+  const credentials = DEMO_CREDENTIALS[app];
+  apply(credentials);
+  return credentials;
+}
+
 // We accept a generic `useApi` function rather than importing it so the hook
 // is not coupled to a specific Axios instance.
 type UseApiFn = () => {
