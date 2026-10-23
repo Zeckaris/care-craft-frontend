@@ -15,6 +15,7 @@ import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { fillDemoAccount } from '@carecraft/auth-hooks';
+import { resolveSignInUrl } from '@carecraft/utils';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -49,6 +50,11 @@ export default function LoginPage() {
   const [mfaStep, setMfaStep] = useState(false);
   // Cache credentials for MFA step 2
   const [cachedCredentials, setCachedCredentials] = useState<{ email: string; password: string } | null>(null);
+  const adminSignInUrl = resolveSignInUrl(
+    import.meta.env.VITE_ADMIN_APP_URL,
+    'http://localhost:5173',
+    import.meta.env.DEV,
+  );
 
   const step1 = useForm<Step1Values>({ resolver: zodResolver(step1Schema) });
   const step2 = useForm<Step2Values>({ resolver: zodResolver(step2Schema) });
@@ -278,6 +284,17 @@ export default function LoginPage() {
             </Button>
           </form>
         </>
+      )}
+
+      {adminSignInUrl && (
+        <div className="mt-3 text-center">
+          <a
+            href={adminSignInUrl}
+            className="text-xs font-semibold text-[var(--color-primary)] hover:underline"
+          >
+            Sign in as an admin
+          </a>
+        </div>
       )}
     </AuthShell>
   );

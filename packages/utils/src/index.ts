@@ -22,6 +22,23 @@ export const capitalizeFirstLetter = (str: string): string => {
 // Auth / localStorage helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Builds a cross-app sign-in URL from a configured origin.
+ *
+ * Uses the configured origin when present, otherwise falls back to the local
+ * dev origin only when running in development. Returns null when no origin is
+ * available, so production builds can hide the link instead of linking nowhere.
+ */
+export const resolveSignInUrl = (
+  configuredUrl: string | undefined,
+  devOrigin: string,
+  isDev: boolean,
+): string | null => {
+  const base = configuredUrl?.trim() || (isDev ? devOrigin : '');
+  if (!base) return null;
+  return `${base.replace(/\/+$/, '')}/signin`;
+};
+
 /** Retrieves the serialised user object from localStorage (or null). */
 export const getUser = (): unknown => {
   const user = localStorage.getItem('user');

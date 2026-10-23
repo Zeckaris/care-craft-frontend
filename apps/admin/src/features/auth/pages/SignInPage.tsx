@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { fillDemoAccount } from "@carecraft/auth-hooks";
+import { resolveSignInUrl } from "@carecraft/utils";
 import { useLogin } from "@/hooks/useLogin";
 import { useState } from "react";
 
@@ -21,6 +22,11 @@ export default function SignInPage() {
   const { login, loading, error, setError } = useLogin();
 
   const [showMfaInput, setShowMfaInput] = useState(false);
+  const teacherSignInUrl = resolveSignInUrl(
+    import.meta.env.VITE_TEACHER_APP_URL,
+    "http://localhost:5174",
+    import.meta.env.DEV,
+  );
 
   const handleTryDemo = () => {
     fillDemoAccount("admin", (credentials) => {
@@ -207,6 +213,17 @@ export default function SignInPage() {
             Sign up
           </a>
         </Text>
+
+        {teacherSignInUrl && (
+          <div style={{ textAlign: "center", marginTop: 8 }}>
+            <a
+              href={teacherSignInUrl}
+              style={{ color: "var(--accent)", fontSize: 13 }}
+            >
+              Sign in as a teacher
+            </a>
+          </div>
+        )}
       </Card>
     </div>
   );
