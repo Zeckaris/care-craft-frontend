@@ -8,6 +8,7 @@ import {
   GithubOutlined,
   SendOutlined,
 } from "@ant-design/icons";
+import TryDemoButton from "@/public/components/TryDemoButton";
 import "@/public/styles/public.css";
 
 const { Header, Content, Footer } = Layout;
@@ -131,22 +132,20 @@ export default function PublicLayout() {
               Sign In
             </Button>
           </Link>
-          <Link to="/signin">
-            <Button
-              className="cc-btn-gold"
-              style={{
-                height: "44px",
-                borderRadius: "22px",
-                padding: "0 24px",
-                fontSize: "15px",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              Try Demo
-            </Button>
-          </Link>
+          <TryDemoButton
+            className="cc-btn-gold"
+            style={{
+              height: "44px",
+              borderRadius: "22px",
+              padding: "0 24px",
+              fontSize: "15px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            Try Demo
+          </TryDemoButton>
         </div>
 
         {/* MOBILE MENU TOGGLE BUTTON */}
@@ -236,15 +235,13 @@ export default function PublicLayout() {
               Sign In
             </Button>
           </Link>
-          <Link to="/signin" style={{ width: "100%" }}>
-            <Button
-              block
-              className="cc-btn-gold"
-              style={{ height: "44px", borderRadius: "22px" }}
-            >
-              Try Demo
-            </Button>
-          </Link>
+          <TryDemoButton
+            block
+            className="cc-btn-gold"
+            style={{ height: "44px", borderRadius: "22px" }}
+          >
+            Try Demo
+          </TryDemoButton>
         </div>
       </Drawer>
 

@@ -20,7 +20,13 @@ export function AuthShell({ children, width = 'login' }: AuthShellProps) {
   const logoUrl = branding?.logo;
 
   return (
-    <div className="min-h-dvh bg-[var(--color-bg)] px-4 py-8 safe-pt safe-pb sm:py-[60px]">
+    <div
+      className="min-h-dvh bg-[var(--color-bg)] px-4"
+      style={{
+        paddingTop: 'calc(var(--safe-top) + clamp(2rem, 6vh, 60px))',
+        paddingBottom: 'calc(var(--safe-bottom) + clamp(2rem, 6vh, 60px))',
+      }}
+    >
       <div
         className={cn(
           'mx-auto w-full',

@@ -16,6 +16,7 @@ import {
   LineChartOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
+import TryDemoButton from "@/public/components/TryDemoButton";
 import "@/public/styles/public.css";
 
 const { Title, Paragraph } = Typography;
@@ -305,11 +306,9 @@ export default function FeaturesPage() {
           <Title level={2}>Ready to Transform Your School?</Title>
           
           <Space size="large" wrap style={{ marginTop: "24px" }}>
-            <Link to="/signin">
-              <Button size="large" className="cc-btn-gold">
-                Try Demo Account
-              </Button>
-            </Link>
+            <TryDemoButton size="large" className="cc-btn-gold">
+              Try Demo Account
+            </TryDemoButton>
             
             <Link to="/about">
               <Button size="large" className="cc-btn-blue">
