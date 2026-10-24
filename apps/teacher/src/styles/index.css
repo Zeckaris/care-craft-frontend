@@ -100,8 +100,8 @@
     background-color: var(--color-bg);
     color: var(--color-text);
     min-height: 100%;
-    /* Prevent content from going under iOS home indicator */
-    padding-bottom: var(--safe-bottom);
+    /* The bottom nav owns the bottom safe-area inset. Adding it here too
+       lifts fixed bottom elements away from the viewport edge. */
   }
 
   #root {
