@@ -1,6 +1,7 @@
 import { Helmet } from "@dr.pogodin/react-helmet";
 import { Typography, Row, Col, Space, Button } from "antd";
 import { Link } from "react-router-dom";
+import TryDemoButton from "@/public/components/TryDemoButton";
 import "@/public/styles/public.css";
 
 const { Title, Paragraph } = Typography;
@@ -152,11 +153,9 @@ export default function AboutPage() {
         <div className="container">
           <Title level={2}>Want to See It in Action?</Title>
           <Space size="large" wrap style={{ marginTop: "24px" }}>
-            <Link to="/signin">
-              <Button size="large" className="cc-btn-gold">
-                Try Demo Account
-              </Button>
-            </Link>
+            <TryDemoButton size="large" className="cc-btn-gold">
+              Try Demo Account
+            </TryDemoButton>
             
             <Link to="/features">
               <Button size="large" className="cc-btn-blue">

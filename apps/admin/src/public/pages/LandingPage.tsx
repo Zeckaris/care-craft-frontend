@@ -13,6 +13,7 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
+import TryDemoButton from "@/public/components/TryDemoButton";
 import "@/public/styles/public.css";
 
 const { Title, Paragraph } = Typography;
@@ -314,11 +315,9 @@ export default function LandingPage() {
                 </Paragraph>
 
                 <Space size="large" wrap style={{ marginTop: "16px" }}>
-                  <Link to="/signin">
-                    <Button size="large" className="cc-btn-gold">
-                      Try Demo Account
-                    </Button>
-                  </Link>
+                  <TryDemoButton size="large" className="cc-btn-gold">
+                    Try Demo Account
+                  </TryDemoButton>
 
                   <Link to="/features">
                     <Button size="large" className="cc-btn-blue">
@@ -679,11 +678,9 @@ export default function LandingPage() {
           <Title level={2}>Ready to run your school on CareCraft?</Title>
 
           <Space size="large" wrap style={{ marginTop: "24px" }}>
-            <Link to="/signin">
-              <Button size="large" className="cc-btn-gold">
-                Try Demo Account
-              </Button>
-            </Link>
+            <TryDemoButton size="large" className="cc-btn-gold">
+              Try Demo Account
+            </TryDemoButton>
 
             <Link to="/features">
               <Button size="large" className="cc-btn-blue">
