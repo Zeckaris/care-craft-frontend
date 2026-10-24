@@ -119,13 +119,13 @@ export function SectionCard({ item, className, pendingSync }: SectionCardProps) 
         </div>
 
         {/* Bottom row: Student count + Prominent Take Attendance Action */}
-        <div className="pt-4 mt-3 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-3">
+        <div className="pt-4 mt-3 border-t border-[var(--color-border)] flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap text-xs sm:text-sm text-[var(--color-text-secondary)]">
             <Users size={15} className="shrink-0 text-[var(--color-text-muted)]" />
             <span className="font-medium tabular-nums">{studentCount} student{studentCount !== 1 ? 's' : ''}</span>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex w-full items-center justify-end gap-2 shrink-0 sm:ml-auto sm:w-auto">
             <Button
               id={`section-detail-${section._id}`}
               variant="ghost"
